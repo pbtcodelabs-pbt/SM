@@ -120,6 +120,10 @@ for ln in lines:
     out.append(ln)
 s='\n'.join(out)
 s=s.replace('Fruit Mandi POS','Sabzi Mandi POS')
+# ---------- ⚡ تیز اپڈیٹ ----------
+rep("navigator.serviceWorker.register('./sw.js').then((reg) => {",
+    "navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {\n      document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') reg.update().catch(()=>{}); });\n      window.addEventListener('focus', () => reg.update().catch(()=>{}));\n      setTimeout(() => reg.update().catch(()=>{}), 3000);")
+rep("setInterval(() => { reg.update(); }, 60 * 1000);","setInterval(() => { reg.update().catch(()=>{}); }, 30 * 1000);")
 for a_,b_ in [("acc.name || 'صدام حسین'","acc.name || smOwner()"),("'شکریہ — صدام حسین'","'شکریہ — ' + smBiz()"),
               ('صرف صدام حسین (ایڈمن)','صرف ایڈمن'),('صرف ایڈمن (صدام)','صرف ایڈمن'),('صدام حسین جلد','ایڈمن جلد'),
               ('صدام کو','ایڈمن کو'),('Powered by Saddam Fruit Mandi','Powered by Sabzi Mandi'),("name:'Saddam Hussain'","name:'مالک'"),
@@ -137,6 +141,11 @@ s=s[:j]+'<img id="smTopLogo" '+s[j+5:]
 
 # ---------- 7) رجسٹریشن فارم + برانڈنگ ----------
 reg = r'''
+<style>
+  /* 🥬 ورژن نمبر — صرف مالک کی پہچان کے لیے، مدھم (دکاندار کی توجہ نہ کھینچے) */
+  #loginVersionBadge{ background:transparent !important; box-shadow:none !important; border:none !important; padding:0 !important;
+    color:rgba(255,255,255,.5) !important; font-family:Arial,sans-serif !important; font-size:11px !important; font-weight:400 !important; letter-spacing:.5px; }
+</style>
 <!-- 🥬 سبزی منڈی — پہلی بار: دکان کی رجسٹریشن -->
 <div id="smRegOverlay" dir="rtl" style="display:none; position:fixed; inset:0; z-index:2147483000; background:linear-gradient(160deg,#065f46,#022c22); overflow:auto; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;">
   <div style="max-width:420px; margin:28px auto; background:#fff; border-radius:20px; padding:18px 16px; box-shadow:0 10px 30px rgba(0,0,0,.35);">
@@ -167,6 +176,7 @@ reg = r'''
     </div>
     <button type="button" onclick="smRegSave()" style="width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ رجسٹر کریں</button>
     <div style="text-align:center; font-size:12.5px; color:#64748b; margin-top:10px; line-height:1.9;">ابتدائی پن: <b dir="ltr">1234</b> — لاگ ان کے بعد سیٹنگز سے بدل لیں</div>
+    <div id="smRegVersion" dir="ltr" style="text-align:center; margin-top:8px; font-family:Arial,sans-serif; font-size:10.5px; letter-spacing:.5px; color:#b6c2cf;"></div>
   </div>
 </div>
 <script>
@@ -202,6 +212,7 @@ function smApplyBranding(){
   const n = smBiz();
   document.title = n;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('smRegVersion', (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '');
   set('smTopTitle', n); set('smSideBrand', n); set('mobileBrandText', n); set('hbcBusinessName', n); set('smLoginShop', n);
   const st = AppState.settings;
   const im = document.getElementById('smTopLogo');
