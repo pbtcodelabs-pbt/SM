@@ -59,7 +59,11 @@ s=s[:ins]+'\n'+boot+s[ins:]
 rep('Object.keys(localStorage)','smLsKeys()',2)
 s=s.replace('indexedDB.open(', "indexedDB.open('SM_'+")
 
-# ---------- 2) آئیکن / فونٹ — الگ ریپو میں اپنے ساتھ ہیں، راستے ویسے ہی رہیں ----------
+# ---------- 2) آئیکن `icons/` اور فونٹ `fonts/` فولڈر میں (صاف ستھرا ریپو) ----------
+for f in ['favicon-32.png','icon-180.png','icon-192.png']:
+    rep(f'href="{f}"', f'href="icons/{f}"')
+rep("url('./JameelNooriNastaleeq-Regular.ttf')","url('./fonts/JameelNooriNastaleeq-Regular.ttf')")
+rep("url('./JameelNooriNastaleeq-Kasheeda.ttf')","url('./fonts/JameelNooriNastaleeq-Kasheeda.ttf')")
 
 # ---------- 3) زبردستی والا صدام کا نام/نمبر ہٹائیں ----------
 rep("AppState.settings.businessName = 'صدام حسین فروٹ منڈی';\nAppState.settings.businessPhone = '03425556364';",
@@ -221,11 +225,15 @@ w=open(f'{SRC}/sw.js',encoding='utf-8').read()
 w=re.sub(r"const CACHE_VERSION = '[^']*';", f"const CACHE_VERSION = '{VERSION}';", w, count=1)
 w=w.replace('saddam-fruit-mandi-','sabzi-mandi-general-')  # کیش کا نام اور صفائی — دونوں صرف سبزی منڈی کے اپنے
 w=w.replace("// ---------- 🏷️ صدام فروٹ منڈی — Service Worker ----------","// ---------- 🥬 سبزی منڈی (جنرل ایپ) — Service Worker ----------")
+for f in ['favicon-32.png','icon-180.png','icon-192.png','icon-512.png']:
+    w=w.replace(f"'./{f}'", f"'./icons/{f}'")
+for f in ['JameelNooriNastaleeq-Regular.ttf','JameelNooriNastaleeq-Kasheeda.ttf']:
+    w=w.replace(f"'./{f}'", f"'./fonts/{f}'")
 w=w.replace('صدام کی ہدایت','ہدایت').replace('صدام','مالک')
 open(f'{OUT}/sw.js','w',encoding='utf-8').write(w)
 
 # ---------- 9) manifest ----------
 man={"name":"سبزی منڈی","short_name":"سبزی منڈی","start_url":"./index.html","scope":"./","orientation":"portrait","description":"سبزی منڈی — بلنگ اور حساب کتاب","display":"standalone","background_color":"#065f46","theme_color":"#065f46","dir":"rtl","lang":"ur",
-     "icons":[{"src":"favicon-32.png","sizes":"32x32","type":"image/png"},{"src":"icon-180.png","sizes":"180x180","type":"image/png","purpose":"any"},{"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
+     "icons":[{"src":"icons/favicon-32.png","sizes":"32x32","type":"image/png"},{"src":"icons/icon-180.png","sizes":"180x180","type":"image/png","purpose":"any"},{"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},{"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}
 open(f'{OUT}/manifest.json','w',encoding='utf-8').write(json.dumps(man,ensure_ascii=False,indent=2))
 print('built', VERSION)
