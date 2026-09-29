@@ -8733,7 +8733,7 @@ function getDeveloperContact(){
 // 🆕 FM28SEPMO0835PM: بلال فروٹ فارم کی ایک بار والی صفائی کا کوڈ بھی مکمل ہٹا دیا — اب اس کا کوئی نشان باقی نہیں
 // 🆕 FM29SEPTU0310AM: گاہک کو نقد ادھار — بل جیسا حساب ٹیبل (دستی کیش، سابقہ، ٹوٹل، وصولی، اب تک ٹوٹل بقایا) + یادداشت وقت کے ساتھ
 // 🆕 FM29SEPTU0525AM: بیوپاری سے نقد ادھار لیا — گاہک والے فارم جیسا ٹیبل؛ دونوں فارموں میں محفوظ کے بعد پرنٹ (تھرمل) / سکرین شاٹ اور شیئر / پوسٹر شیئر
-const APP_BUILD_VERSION = 'SM299TU#006'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM299TU#007'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -44310,7 +44310,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---------- سروس ورکر رجسٹر کریں ----------
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then((reg) => {
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
+      document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') reg.update().catch(()=>{}); });
+      window.addEventListener('focus', () => reg.update().catch(()=>{}));
+      setTimeout(() => reg.update().catch(()=>{}), 3000);
 
       // ---------- اگر پہلے سے ایک نیا ورژن انتظار میں موجود ہو (پیج دوبارہ کھلنے پر) ----------
       if(reg.waiting){
@@ -44330,7 +44333,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // ---------- ہر تھوڑی دیر بعد خود بخود چیک کرتے رہیں کہ نیا ورژن تو نہیں آیا ----------
-      setInterval(() => { reg.update(); }, 60 * 1000);
+      setInterval(() => { reg.update().catch(()=>{}); }, 30 * 1000);
 
     }).catch((err) => console.warn('Service worker registration failed:', err));
   });
@@ -44422,6 +44425,11 @@ document.addEventListener('DOMContentLoaded', () => {
   <option value="روپے">
 </datalist>
 
+<style>
+  /* 🥬 ورژن نمبر — صرف مالک کی پہچان کے لیے، مدھم (دکاندار کی توجہ نہ کھینچے) */
+  #loginVersionBadge{ background:transparent !important; box-shadow:none !important; border:none !important; padding:0 !important;
+    color:rgba(255,255,255,.5) !important; font-family:Arial,sans-serif !important; font-size:11px !important; font-weight:400 !important; letter-spacing:.5px; }
+</style>
 <!-- 🥬 سبزی منڈی — پہلی بار: دکان کی رجسٹریشن -->
 <div id="smRegOverlay" dir="rtl" style="display:none; position:fixed; inset:0; z-index:2147483000; background:linear-gradient(160deg,#065f46,#022c22); overflow:auto; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;">
   <div style="max-width:420px; margin:28px auto; background:#fff; border-radius:20px; padding:18px 16px; box-shadow:0 10px 30px rgba(0,0,0,.35);">
@@ -44452,6 +44460,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <button type="button" onclick="smRegSave()" style="width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ رجسٹر کریں</button>
     <div style="text-align:center; font-size:12.5px; color:#64748b; margin-top:10px; line-height:1.9;">ابتدائی پن: <b dir="ltr">1234</b> — لاگ ان کے بعد سیٹنگز سے بدل لیں</div>
+    <div id="smRegVersion" dir="ltr" style="text-align:center; margin-top:8px; font-family:Arial,sans-serif; font-size:10.5px; letter-spacing:.5px; color:#b6c2cf;"></div>
   </div>
 </div>
 <script>
@@ -44487,6 +44496,7 @@ function smApplyBranding(){
   const n = smBiz();
   document.title = n;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('smRegVersion', (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '');
   set('smTopTitle', n); set('smSideBrand', n); set('mobileBrandText', n); set('hbcBusinessName', n); set('smLoginShop', n);
   const st = AppState.settings;
   const im = document.getElementById('smTopLogo');
