@@ -8733,7 +8733,7 @@ function getDeveloperContact(){
 // 🆕 FM28SEPMO0835PM: بلال فروٹ فارم کی ایک بار والی صفائی کا کوڈ بھی مکمل ہٹا دیا — اب اس کا کوئی نشان باقی نہیں
 // 🆕 FM29SEPTU0310AM: گاہک کو نقد ادھار — بل جیسا حساب ٹیبل (دستی کیش، سابقہ، ٹوٹل، وصولی، اب تک ٹوٹل بقایا) + یادداشت وقت کے ساتھ
 // 🆕 FM29SEPTU0525AM: بیوپاری سے نقد ادھار لیا — گاہک والے فارم جیسا ٹیبل؛ دونوں فارموں میں محفوظ کے بعد پرنٹ (تھرمل) / سکرین شاٹ اور شیئر / پوسٹر شیئر
-const APP_BUILD_VERSION = 'SM299TU#007'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM299TU#008'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -44427,41 +44427,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <style>
   /* 🥬 ورژن نمبر — صرف مالک کی پہچان کے لیے، مدھم (دکاندار کی توجہ نہ کھینچے) */
-  #loginVersionBadge{ background:transparent !important; box-shadow:none !important; border:none !important; padding:0 !important;
-    color:rgba(255,255,255,.5) !important; font-family:Arial,sans-serif !important; font-size:11px !important; font-weight:400 !important; letter-spacing:.5px; }
+  #loginVersionBadge{ background:#15803d !important; color:#fff !important; box-shadow:none !important; border:none !important;
+    padding:3px 12px !important; border-radius:999px !important; font-family:Arial,sans-serif !important; font-size:12px !important; font-weight:700 !important; letter-spacing:.4px; }
 </style>
 <!-- 🥬 سبزی منڈی — پہلی بار: دکان کی رجسٹریشن -->
 <div id="smRegOverlay" dir="rtl" style="display:none; position:fixed; inset:0; z-index:2147483000; background:linear-gradient(160deg,#065f46,#022c22); overflow:auto; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;">
-  <div style="max-width:420px; margin:28px auto; background:#fff; border-radius:20px; padding:18px 16px; box-shadow:0 10px 30px rgba(0,0,0,.35);">
-    <div style="text-align:center;"><img src="icons/icon-192.png" alt="" style="width:92px; height:92px; border-radius:22px; box-shadow:0 5px 14px rgba(0,0,0,.3); object-fit:cover;"></div>
-    <div style="text-align:center; font-size:26px; font-weight:800; color:#065f46;">سبزی منڈی</div>
-    <div style="text-align:center; font-size:15px; color:#475569; margin-bottom:12px;">اپنی دکان رجسٹر کریں</div>
-    <label style="font-weight:800; color:#0f172a; font-size:15px;">🏪 دکان کا نام *</label>
-    <input id="smRegShop" type="text" dir="rtl" placeholder="مثلاً رحمان سبزی منڈی" style="width:100%; box-sizing:border-box; padding:11px; margin:4px 0 10px; border:2px solid #86efac; border-radius:10px; font-family:inherit; font-size:17px;">
-    <label style="font-weight:800; color:#0f172a; font-size:15px;">👤 مالک کا نام *</label>
-    <input id="smRegOwner" type="text" dir="rtl" placeholder="مالک کا پورا نام" style="width:100%; box-sizing:border-box; padding:11px; margin:4px 0 10px; border:2px solid #86efac; border-radius:10px; font-family:inherit; font-size:17px;">
-    <label style="font-weight:800; color:#0f172a; font-size:15px;">📱 مالک کا موبائل نمبر *</label>
-    <input id="smRegPhone" type="tel" inputmode="numeric" dir="ltr" placeholder="03XXXXXXXXX" maxlength="13" style="width:100%; box-sizing:border-box; padding:11px; margin:4px 0 10px; border:2px solid #86efac; border-radius:10px; font-family:'Arial Black',Arial,sans-serif; font-size:18px; text-align:center;">
-    <label style="font-weight:800; color:#0f172a; font-size:15px;">🏪 دکان کا لوگو <span style="font-size:12px; color:#64748b;">(اختیاری)</span></label>
-    <div style="font-size:12px; color:#64748b; margin-top:2px;">بل، رسید، رپورٹ اور پوسٹر پر آئے گا</div>
-    <div style="display:flex; align-items:center; gap:10px; margin:6px 0 12px;">
-      <img id="smRegLogoPrev" style="width:64px; height:64px; border-radius:14px; object-fit:cover; background:#f1f5f9; border:2px dashed #cbd5e1; display:block;" alt="">
-      <label style="flex:1; text-align:center; padding:10px; background:#eef2ff; color:#1e3a8a; border-radius:10px; font-weight:800; cursor:pointer;">📷 تصویر لگائیں
-        <input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Logo')">
-      </label>
+  <style>
+    #smRegOverlay .smWrap{ min-height:100dvh; box-sizing:border-box; padding:14px; display:flex; align-items:center; justify-content:center; }
+    #smRegOverlay .smCard{ box-sizing:border-box; width:100%; max-width:420px; background:#fff; border-radius:18px; padding:14px 16px; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
+    #smRegOverlay label.smL{ display:block; font-weight:800; color:#0f172a; font-size:14px; margin:2px 0 2px; }
+    #smRegOverlay input.smI{ width:100%; box-sizing:border-box; padding:9px 10px; margin:0; border:2px solid #86efac; border-radius:10px; font-family:inherit; font-size:16px; }
+    #smRegOverlay .smPics{ display:flex; gap:8px; }
+    #smRegOverlay .smPic{ flex:1; display:flex; align-items:center; gap:8px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:12px; padding:6px 8px; cursor:pointer; }
+    #smRegOverlay .smPic img{ width:40px; height:40px; object-fit:cover; background:#e2e8f0; flex:0 0 auto; }
+    #smRegOverlay .smPic b{ display:block; font-size:13px; color:#1e3a8a; line-height:1.6; }
+    #smRegOverlay .smPic small{ display:block; font-size:10.5px; color:#64748b; line-height:1.5; }
+  </style>
+  <div class="smWrap"><div class="smCard">
+    <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
+      <img src="icons/icon-192.png" alt="" style="width:58px; height:58px; border-radius:14px; box-shadow:0 4px 10px rgba(0,0,0,.25); object-fit:cover;">
+      <div style="text-align:right;">
+        <div style="font-size:24px; font-weight:800; color:#065f46; line-height:1.5;">سبزی منڈی</div>
+        <div style="font-size:13px; color:#475569; line-height:1.6;">اپنی دکان رجسٹر کریں</div>
+      </div>
     </div>
-    <label style="font-weight:800; color:#0f172a; font-size:15px;">👤 مالک کی تصویر <span style="font-size:12px; color:#64748b;">(اختیاری)</span></label>
-    <div style="font-size:12px; color:#64748b; margin-top:2px;">ایپ کے اوپر ہیڈر میں نظر آئے گی</div>
-    <div style="display:flex; align-items:center; gap:10px; margin:6px 0 12px;">
-      <img id="smRegOwnerPrev" style="width:64px; height:64px; border-radius:50%; object-fit:cover; background:#f1f5f9; border:2px dashed #cbd5e1; display:block;" alt="">
-      <label style="flex:1; text-align:center; padding:10px; background:#eef2ff; color:#1e3a8a; border-radius:10px; font-weight:800; cursor:pointer;">📷 تصویر لگائیں
-        <input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Owner')">
-      </label>
+    <div>
+      <label class="smL">🏪 دکان کا نام *</label>
+      <input id="smRegShop" class="smI" type="text" dir="rtl" placeholder="مثلاً رحمان سبزی منڈی">
     </div>
-    <button type="button" onclick="smRegSave()" style="width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ رجسٹر کریں</button>
-    <div style="text-align:center; font-size:12.5px; color:#64748b; margin-top:10px; line-height:1.9;">ابتدائی پن: <b dir="ltr">1234</b> — لاگ ان کے بعد سیٹنگز سے بدل لیں</div>
-    <div id="smRegVersion" dir="ltr" style="text-align:center; margin-top:8px; font-family:Arial,sans-serif; font-size:10.5px; letter-spacing:.5px; color:#b6c2cf;"></div>
-  </div>
+    <div>
+      <label class="smL">👤 مالک کا نام *</label>
+      <input id="smRegOwner" class="smI" type="text" dir="rtl" placeholder="مالک کا پورا نام">
+    </div>
+    <div>
+      <label class="smL">📱 مالک کا موبائل نمبر *</label>
+      <input id="smRegPhone" class="smI" type="tel" inputmode="numeric" dir="ltr" placeholder="03XXXXXXXXX" maxlength="13" style="font-family:'Arial Black',Arial,sans-serif; font-size:17px; text-align:center;">
+    </div>
+    <div>
+      <label class="smL">🖼️ تصویریں <span style="font-size:11px; color:#64748b; font-weight:400;">(اختیاری)</span></label>
+      <div class="smPics">
+        <label class="smPic"><img id="smRegLogoPrev" alt="" style="border-radius:10px;"><span><b>🏪 دکان کا لوگو</b><small>بل، رسید، رپورٹ</small></span>
+          <input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Logo')"></label>
+        <label class="smPic"><img id="smRegOwnerPrev" alt="" style="border-radius:50%;"><span><b>👤 مالک کی تصویر</b><small>اوپر ہیڈر میں</small></span>
+          <input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Owner')"></label>
+      </div>
+    </div>
+    <div>
+      <button type="button" onclick="smRegSave()" style="width:100%; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ رجسٹر کریں</button>
+      <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; flex-wrap:wrap;">
+        <span style="font-size:12px; color:#64748b;">ابتدائی پن: <b dir="ltr">1234</b></span>
+        <span id="smRegVersion" dir="ltr" style="display:inline-block; background:#15803d; color:#fff; font-family:Arial,sans-serif; font-size:12px; font-weight:700; letter-spacing:.4px; padding:3px 12px; border-radius:999px;"></span>
+      </div>
+    </div>
+  </div></div>
 </div>
 <script>
 const smRegImgs = { Logo: '', Owner: '' };
