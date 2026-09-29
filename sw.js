@@ -2,7 +2,7 @@
 // یہ نمبر HTML فائل کے APP_BUILD_VERSION جیسا نہیں ہوتا (وہ اردو میں ہے، یہ ہمیشہ انگریزی/ASCII میں رہے گا) —
 // صرف کیش کا نام بدلنے کے لیے استعمال ہوتا ہے تاکہ پرانی فائلیں خودکار صاف ہو کر نئی لوڈ ہو جائیں۔
 // ہر نئی ڈیلیوری پر یہ نمبر لازمی بدلیں (فائل کے نام جیسا ہی رکھیں) ----------
-const CACHE_VERSION = 'SM299TU#003';
+const CACHE_VERSION = 'SM299TU#004';
 const CACHE_NAME = 'sabzi-mandi-general-' + CACHE_VERSION;
 
 // ---------- 🔒🆕 ہدایت (FM21SEPMO03): آف لائن نہ چلنے کی اصل جڑ یہاں ملی — پہلے تمام فائلیں
@@ -18,12 +18,12 @@ const CRITICAL_URLS = [
   './manifest.json'
 ];
 const OPTIONAL_URLS = [
-  './favicon-32.png',
-  './icon-180.png',
-  './icon-192.png',
-  './icon-512.png',
-  './JameelNooriNastaleeq-Regular.ttf',
-  './JameelNooriNastaleeq-Kasheeda.ttf',
+  './icons/favicon-32.png',
+  './icons/icon-180.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './fonts/JameelNooriNastaleeq-Regular.ttf',
+  './fonts/JameelNooriNastaleeq-Kasheeda.ttf',
   // ---------- 🆕 ہدایت (FM8SEPTU4): 3 نئے فونٹ — fonts/ فولڈر میں ---------- -->
   './fonts/PTSimpleBoldRuled.ttf',
   './fonts/ThuluthAlsmt.ttf',
