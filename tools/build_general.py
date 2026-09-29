@@ -140,7 +140,7 @@ reg = r'''
 <!-- 🥬 سبزی منڈی — پہلی بار: دکان کی رجسٹریشن -->
 <div id="smRegOverlay" dir="rtl" style="display:none; position:fixed; inset:0; z-index:2147483000; background:linear-gradient(160deg,#065f46,#022c22); overflow:auto; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;">
   <div style="max-width:420px; margin:28px auto; background:#fff; border-radius:20px; padding:18px 16px; box-shadow:0 10px 30px rgba(0,0,0,.35);">
-    <div style="text-align:center; font-size:44px;">🥬</div>
+    <div style="text-align:center;"><img src="icons/icon-192.png" alt="" style="width:92px; height:92px; border-radius:22px; box-shadow:0 5px 14px rgba(0,0,0,.3); object-fit:cover;"></div>
     <div style="text-align:center; font-size:26px; font-weight:800; color:#065f46;">سبزی منڈی</div>
     <div style="text-align:center; font-size:15px; color:#475569; margin-bottom:12px;">اپنی دکان رجسٹر کریں</div>
     <label style="font-weight:800; color:#0f172a; font-size:15px;">🏪 دکان کا نام *</label>
@@ -149,11 +149,20 @@ reg = r'''
     <input id="smRegOwner" type="text" dir="rtl" placeholder="مالک کا پورا نام" style="width:100%; box-sizing:border-box; padding:11px; margin:4px 0 10px; border:2px solid #86efac; border-radius:10px; font-family:inherit; font-size:17px;">
     <label style="font-weight:800; color:#0f172a; font-size:15px;">📱 مالک کا موبائل نمبر *</label>
     <input id="smRegPhone" type="tel" inputmode="numeric" dir="ltr" placeholder="03XXXXXXXXX" maxlength="13" style="width:100%; box-sizing:border-box; padding:11px; margin:4px 0 10px; border:2px solid #86efac; border-radius:10px; font-family:'Arial Black',Arial,sans-serif; font-size:18px; text-align:center;">
-    <label style="font-weight:800; color:#0f172a; font-size:15px;">🖼️ دکان کی تصویر / لوگو <span style="font-size:12px; color:#64748b;">(اختیاری)</span></label>
-    <div style="display:flex; align-items:center; gap:10px; margin:6px 0 14px;">
-      <img id="smRegPhotoPrev" style="width:64px; height:64px; border-radius:14px; object-fit:cover; background:#f1f5f9; border:2px dashed #cbd5e1; display:block;" alt="">
+    <label style="font-weight:800; color:#0f172a; font-size:15px;">🏪 دکان کا لوگو <span style="font-size:12px; color:#64748b;">(اختیاری)</span></label>
+    <div style="font-size:12px; color:#64748b; margin-top:2px;">بل، رسید، رپورٹ اور پوسٹر پر آئے گا</div>
+    <div style="display:flex; align-items:center; gap:10px; margin:6px 0 12px;">
+      <img id="smRegLogoPrev" style="width:64px; height:64px; border-radius:14px; object-fit:cover; background:#f1f5f9; border:2px dashed #cbd5e1; display:block;" alt="">
       <label style="flex:1; text-align:center; padding:10px; background:#eef2ff; color:#1e3a8a; border-radius:10px; font-weight:800; cursor:pointer;">📷 تصویر لگائیں
-        <input id="smRegPhoto" type="file" accept="image/*" style="display:none;" onchange="smRegPickPhoto(this)">
+        <input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Logo')">
+      </label>
+    </div>
+    <label style="font-weight:800; color:#0f172a; font-size:15px;">👤 مالک کی تصویر <span style="font-size:12px; color:#64748b;">(اختیاری)</span></label>
+    <div style="font-size:12px; color:#64748b; margin-top:2px;">ایپ کے اوپر ہیڈر میں نظر آئے گی</div>
+    <div style="display:flex; align-items:center; gap:10px; margin:6px 0 12px;">
+      <img id="smRegOwnerPrev" style="width:64px; height:64px; border-radius:50%; object-fit:cover; background:#f1f5f9; border:2px dashed #cbd5e1; display:block;" alt="">
+      <label style="flex:1; text-align:center; padding:10px; background:#eef2ff; color:#1e3a8a; border-radius:10px; font-weight:800; cursor:pointer;">📷 تصویر لگائیں
+        <input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Owner')">
       </label>
     </div>
     <button type="button" onclick="smRegSave()" style="width:100%; padding:13px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ رجسٹر کریں</button>
@@ -161,9 +170,9 @@ reg = r'''
   </div>
 </div>
 <script>
-let smRegPhotoData = '';
-function smRegPickPhoto(inp){
-  const f = inp.files && inp.files[0]; if(!f) return;
+const smRegImgs = { Logo: '', Owner: '' };
+// ---------- تصویر چھوٹی کر کے (256px) محفوظ — ایپ ہلکی رہے ----------
+function smShrinkImage(file, cb){
   const r = new FileReader();
   r.onload = () => {
     const img = new Image();
@@ -171,20 +180,32 @@ function smRegPickPhoto(inp){
       const M = 256, sc = Math.min(1, M / Math.max(img.width, img.height));
       const c = document.createElement('canvas'); c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      smRegPhotoData = c.toDataURL('image/jpeg', 0.85);
-      document.getElementById('smRegPhotoPrev').src = smRegPhotoData;
+      cb(c.toDataURL('image/jpeg', 0.85));
     };
     img.src = r.result;
   };
-  r.readAsDataURL(f);
+  r.readAsDataURL(file);
+}
+function smRegPick(inp, kind){
+  const f = inp.files && inp.files[0]; if(!f) return;
+  smShrinkImage(f, d => { smRegImgs[kind] = d; document.getElementById('smReg' + kind + 'Prev').src = d; });
+}
+// ---------- بعد میں بدلنا: ہیڈر کی تصویر پر ٹیپ (صرف ایڈمن) → مالک کی تصویر؛ لوگو "My Account" سے ----------
+function smChangeOwnerPhoto(){
+  if(!document.body.classList.contains('role-admin')) return;
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = () => { const f = inp.files && inp.files[0]; if(!f) return;
+    smShrinkImage(f, d => { AppState.settings.ownerPhoto = d; saveToStorage('settings', AppState.settings); smApplyBranding(); }); };
+  inp.click();
 }
 function smApplyBranding(){
   const n = smBiz();
   document.title = n;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
   set('smTopTitle', n); set('smSideBrand', n); set('mobileBrandText', n); set('hbcBusinessName', n); set('smLoginShop', n);
-  const logo = AppState.settings.shopLogoDataUrl;
-  if(logo){ const im = document.getElementById('smTopLogo'); if(im) im.src = logo; }
+  const st = AppState.settings;
+  const im = document.getElementById('smTopLogo');
+  if(im){ im.src = st.ownerPhoto || st.businessLogo || 'icons/icon-192.png'; im.style.objectFit = 'cover'; im.style.cursor = 'pointer'; im.onclick = smChangeOwnerPhoto; }
 }
 function smRegSave(){
   const shop = document.getElementById('smRegShop').value.trim();
@@ -196,7 +217,8 @@ function smRegSave(){
   AppState.settings.businessName = shop;
   AppState.settings.ownerName = owner;
   AppState.settings.businessPhone = phone;
-  if(smRegPhotoData) AppState.settings.shopLogoDataUrl = smRegPhotoData;
+  if(smRegImgs.Logo) AppState.settings.businessLogo = smRegImgs.Logo;
+  if(smRegImgs.Owner) AppState.settings.ownerPhoto = smRegImgs.Owner;
   AppState.settings.smRegistered = true;
   AppState.settings.smRegisteredAt = new Date().toISOString();
   saveToStorage('settings', AppState.settings);
@@ -217,6 +239,9 @@ window.addEventListener('DOMContentLoaded', () => {
 k=s.rindex('</body>')
 s=s[:k]+reg+s[k:]
 # لاگ ان سکرین پر دکان کا نام
+k=s.index('<div id="loginScreen">'); k2=s.index('>🥬</div>',k)
+k1=s.rfind('<div style="width:56px;',k,k2)
+s=s[:k1]+'<img src="icons/icon-192.png" alt="" style="display:block; width:64px; height:64px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,.35); object-fit:cover; margin:0 auto 6px;">'+s[k2+len('>🥬</div>'):]
 rep('    <div id="loginVersionBadge"','    <div id="smLoginShop" style="text-align:center; color:#fff; font-size:22px; font-weight:800; margin:4px 0 8px; font-family:\'JameelNooriNastaleeqKasheeda\',\'JameelNooriNastaleeq\',serif; text-shadow:0 2px 4px rgba(0,0,0,.4);">سبزی منڈی</div>\n    <div id="loginVersionBadge"')
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
