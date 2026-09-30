@@ -36,15 +36,24 @@ const APP_EDITION = 'general';
   SP.clear = function(){ mine(this).forEach(k => rm.call(this, P + k)); };
   Object.defineProperty(SP, 'length', { get(){ return mine(this).length; }, configurable: true });
   window.smLsKeys = function(){ return mine(window.localStorage); };
+  // ---------- ☁️ سبزی منڈی کا اپنا فائربیس (sabzi-mandi-143e6) — صدام والا کبھی نہیں ----------
+  // لائسنس/ٹرائل/ڈیوائس ہمیشہ کھلے؛ دکان کا ڈیٹا (shops/<موبائل>/…) صرف آن لائن پیکج (P2 سے اوپر) میں
   const of = window.fetch.bind(window);
   window.fetch = function(input, init){
     const u = (typeof input === 'string') ? input : (input && input.url) || '';
-    if(/firestore\.googleapis\.com|identitytoolkit\.googleapis\.com|securetoken\.googleapis\.com|firebaseio\.com/.test(u)){
+    if(/firestore\.googleapis\.com/.test(u) && /\/documents\/shops\//.test(u) && !smIsCloudPlan()){
       return Promise.resolve(new Response('{}', { status: 503, headers: { 'Content-Type': 'application/json' } }));
     }
     return of(input, init);
   };
 })();
+function _smSettings(){ try{ return JSON.parse(localStorage.getItem('fmPos_settings') || '{}') || {}; }catch(e){ return {}; } }
+// 📦 پیکج: P1 = اکیلا صارف (فون + گوگل ڈرائیو)، P2 = مالک + 1 ملازم … P6 = مالک + 5 ملازم (کلاؤڈ)
+const SM_PLAN_STAFF = { P1: 0, P2: 1, P3: 2, P4: 3, P5: 4, P6: 5 };
+function smPlan(){ try{ return (typeof AppState !== 'undefined' && AppState.settings && AppState.settings.smPlan) || _smSettings().smPlan || 'P1'; }catch(e){ return 'P1'; } }
+function smIsCloudPlan(){ return (SM_PLAN_STAFF[smPlan()] || 0) > 0; }
+function smShopMobile(){ try{ return ((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.businessPhone) || _smSettings().businessPhone || 'unregistered').replace(/[^0-9]/g, '') || 'unregistered'; }catch(e){ return 'unregistered'; } }
+function smShopBase(){ return 'shops/' + smShopMobile() + '/data/'; }
 function smBiz(){ try{ return (AppState.settings.businessName || '').trim() || 'سبزی منڈی'; }catch(e){ return 'سبزی منڈی'; } }
 function smPhone(){ try{ return AppState.settings.businessPhone || ''; }catch(e){ return ''; } }
 function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catch(e){ return 'مالک'; } }
@@ -59,6 +68,11 @@ s=s[:ins]+'\n'+boot+s[ins:]
 rep('Object.keys(localStorage)','smLsKeys()',2)
 s=s.replace('indexedDB.open(', "indexedDB.open('SM_'+")
 
+# ---------- 1b) سبزی منڈی کا اپنا فائربیس ----------
+s=re.sub(r"const FIREBASE_PROJECT_ID = '[^']*';", "const FIREBASE_PROJECT_ID = 'sabzi-mandi-143e6';", s, count=1)
+s=re.sub(r"const FIREBASE_API_KEY = '[^']*';", "const FIREBASE_API_KEY = 'AIzaSyAfvu0JOHGgNzp9HEcRpCnE40jSN2X2n7w';", s, count=1)
+# ---------- 1c) ہر دکان کا ڈیٹا الگ: shopData/ → shops/<موبائل>/data/ ----------
+s=s.replace("'shopData/", "smShopBase() + '").replace("`shopData/", "`${smShopBase()}")
 # ---------- 2) آئیکن `icons/` اور فونٹ `fonts/` فولڈر میں (صاف ستھرا ریپو) ----------
 for f in ['favicon-32.png','icon-180.png','icon-192.png']:
     rep(f'href="{f}"', f'href="icons/{f}"')
@@ -131,6 +145,27 @@ for a_,b_ in [("acc.name || 'صدام حسین'","acc.name || smOwner()"),("'ش�
     s=s.replace(a_,b_)
 s=s.replace('<title>سبزی منڈی</title>','<title>سبزی منڈی</title>')
 
+# ---------- 5b) 📦 پیکج (P1–P6) — لائسنس کوڈ میں پیکج، ملازموں کی حد، ملازم کا فون دکان سے جڑے ----------
+# (الف) ڈویلپر پینل: کوڈ بناتے وقت پیکج چنیں
+i=s.index('<select id="giftCodeDaysInput"'); j=s.index('</select>', i)+len('</select>')
+s=s[:j]+'\n<select id="giftCodePlanInput" style="width:100%; padding:9px; margin-bottom:8px; border:2px solid #16a34a; border-radius:8px; font-weight:800;"><option value="P1">📦 P1 — اکیلا صارف (صرف مالک، گوگل ڈرائیو)</option><option value="P2">📦 P2 — مالک + 1 ملازم (آن لائن)</option><option value="P3">📦 P3 — مالک + 2 ملازم</option><option value="P4">📦 P4 — مالک + 3 ملازم</option><option value="P5">📦 P5 — مالک + 4 ملازم</option><option value="P6">📦 P6 — مالک + 5 ملازم</option></select>'+s[j:]
+rep("  if(nameVal) fields.customerName = { stringValue: nameVal };", "  if(nameVal) fields.customerName = { stringValue: nameVal };\n  fields.plan = { stringValue: (document.getElementById('giftCodePlanInput') || {}).value || 'P1' }; // 📦 پیکج")
+# (ب) کوڈ لگانے/واپس آنے پر پیکج محفوظ
+k=s.index('async function activateSubscription(code){')
+k2=s.index("  const data = _parseFirestoreFields(doc.fields || {});", k)+len("  const data = _parseFirestoreFields(doc.fields || {});")
+s=s[:k2]+"\n  if(data.plan && SM_PLAN_STAFF[data.plan] !== undefined){ AppState.settings.smPlan = data.plan; try{ persistAllData(); }catch(e){} setTimeout(() => { try{ smPushLicenseMirror(); }catch(e){} }, 3000); } // 📦 پیکج"+s[k2:]
+# (ج) ملازموں کی حد
+rep("""  if(role === 'salesman' && screens.length === 0){""","""  { // 📦 پیکج کی حد
+    const _lim = SM_PLAN_STAFF[smPlan()] || 0;
+    const _cnt = usersData.filter(u => u.role !== 'admin' && u.role !== 'customer' && u.is_active !== false).length;
+    if(role !== 'customer' && _cnt >= _lim){
+      alert(_lim === 0 ? `📦 آپ کا پیکج ${smPlan()} (اکیلا صارف) ہے — ملازم شامل نہیں ہو سکتے۔\\n\\nملازم کے لیے پیکج P2 یا اس سے اوپر لیں (ڈویلپر: 03206793793)۔`
+        : `📦 آپ کے پیکج ${smPlan()} میں زیادہ سے زیادہ ${_lim} ملازم ہیں — حد پوری ہو گئی۔\\n\\nمزید ملازم کے لیے پیکج بڑھائیں (ڈویلپر: 03206793793)۔`);
+      return;
+    }
+  }
+  if(role === 'salesman' && screens.length === 0){""")
+
 # ---------- 6) ہیڈر عنوان / لوگو کو پہچان (id) ----------
 rep('white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">سبزی منڈی</span>\n      <span id="connStatusBadge"',
     'white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="smTopTitle">سبزی منڈی</span>\n      <span id="connStatusBadge"')
@@ -192,6 +227,7 @@ reg = r'''
       <button type="button" onclick="smRegSave()" style="width:100%; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ رجسٹر کریں</button>
       <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; flex-wrap:wrap;">
         <span style="font-size:12px; color:#64748b;">ابتدائی پن: <b dir="ltr">1234</b></span>
+        <a href="javascript:void(0)" onclick="smJoinAsStaff()" style="font-size:12.5px; color:#1d4ed8; font-weight:800;">📲 ملازم ہیں؟ دکان سے جڑیں</a>
         <span id="smRegVersion" dir="ltr" style="display:inline-block; background:#15803d; color:#fff; font-family:Arial,sans-serif; font-size:12px; font-weight:700; letter-spacing:.4px; padding:3px 12px; border-radius:999px;"></span>
       </div>
     </div>
@@ -231,6 +267,7 @@ function smApplyBranding(){
   document.title = n;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
   set('smRegVersion', (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '');
+  set('smPlanBadge', `📦 ${smPlan()} • ${smIsCloudPlan() ? 'آن لائن — مالک + ' + SM_PLAN_STAFF[smPlan()] + ' ملازم' : 'اکیلا صارف (گوگل ڈرائیو)'}`);
   set('smTopTitle', n); set('smSideBrand', n); set('mobileBrandText', n); set('hbcBusinessName', n); set('smLoginShop', n);
   const st = AppState.settings;
   const im = document.getElementById('smTopLogo');
@@ -257,8 +294,45 @@ function smRegSave(){
   }catch(e){}
   document.getElementById('smRegOverlay').style.display = 'none';
   smApplyBranding();
-  try{ setupLoginScreen(); }catch(e){}
+  setTimeout(() => location.reload(), 300); // دکان کا کلاؤڈ راستہ (موبائل نمبر) نئے سرے سے بنے
 }
+// ---------- 📲 ملازم کا فون: پہلے سے رجسٹر دکان سے جڑیں (مالک کا موبائل نمبر) ----------
+async function smJoinAsStaff(){
+  const m = (prompt('📲 جس دکان سے جڑنا ہے، اس کے مالک کا موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, '');
+  if(!/^03\d{9}$/.test(m)){ if(m) alert('درست موبائل نمبر لکھیں'); return; }
+  AppState.settings.businessPhone = m; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = true;
+  AppState.settings.smPlan = 'P2';
+  saveToStorage('settings', AppState.settings);
+  const ok = await smPullLicenseMirror();
+  if(!ok){ alert('❌ اس نمبر کی کوئی آن لائن دکان نہیں ملی، یا اس کا پیکج آن لائن (P2+) نہیں۔\n\nنمبر چیک کریں یا مالک سے پوچھیں۔'); AppState.settings.smRegistered = false; saveToStorage('settings', AppState.settings); return; }
+  location.reload();
+}
+// ---------- 🔁 لائسنس آئینہ: مالک کا فون پیکج/مدت دکان کے کلاؤڈ میں رکھتا ہے، ملازم کا فون وہیں سے لیتا ہے ----------
+async function smPushLicenseMirror(){
+  if(!smIsCloudPlan() || AppState.currentRole === 'salesman' || AppState.settings.smJoinedAsStaff) return;
+  try{
+    await authFirestoreFetch(`${smShopBase()}license?key=${FIREBASE_API_KEY}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: { plan: { stringValue: smPlan() }, expiry: { stringValue: AppState.settings.subscriptionExpiry || '' }, shop: { stringValue: smBiz() }, owner: { stringValue: smOwner() }, updatedAt: { integerValue: String(Date.now()) } } }) });
+  }catch(e){}
+}
+async function smPullLicenseMirror(){
+  try{
+    const res = await authFirestoreFetch(`${smShopBase()}license?key=${FIREBASE_API_KEY}`, { cache: 'no-store' });
+    if(!res || !res.ok) return false;
+    const d = await res.json(); const f = d.fields || {};
+    const plan = f.plan?.stringValue, exp = f.expiry?.stringValue;
+    if(!plan || !SM_PLAN_STAFF[plan]) return false;
+    AppState.settings.smPlan = plan;
+    if(exp){ AppState.settings.subscriptionExpiry = exp; AppState.settings.isOnFreeTrial = false; }
+    if(f.shop?.stringValue) AppState.settings.businessName = f.shop.stringValue;
+    if(f.owner?.stringValue) AppState.settings.ownerName = f.owner.stringValue;
+    saveToStorage('settings', AppState.settings);
+    return true;
+  }catch(e){ return false; }
+}
+window.addEventListener('load', () => {
+  setTimeout(() => { try{ if(AppState.settings.smJoinedAsStaff) smPullLicenseMirror().then(ok => { if(ok) smApplyBranding(); }); else smPushLicenseMirror(); }catch(e){} }, 6000);
+});
 window.addEventListener('DOMContentLoaded', () => {
   smApplyBranding();
   if(!AppState.settings.smRegistered) document.getElementById('smRegOverlay').style.display = 'block';
@@ -271,7 +345,7 @@ s=s[:k]+reg+s[k:]
 k=s.index('<div id="loginScreen">'); k2=s.index('>🥬</div>',k)
 k1=s.rfind('<div style="width:56px;',k,k2)
 s=s[:k1]+'<img src="icons/icon-192.png" alt="" style="display:block; width:64px; height:64px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,.35); object-fit:cover; margin:0 auto 6px;">'+s[k2+len('>🥬</div>'):]
-rep('    <div id="loginVersionBadge"','    <div id="smLoginShop" style="text-align:center; color:#fff; font-size:22px; font-weight:800; margin:4px 0 8px; font-family:\'JameelNooriNastaleeqKasheeda\',\'JameelNooriNastaleeq\',serif; text-shadow:0 2px 4px rgba(0,0,0,.4);">سبزی منڈی</div>\n    <div id="loginVersionBadge"')
+rep('    <div id="loginVersionBadge"','    <div id="smPlanBadge" style="text-align:center; color:#fde68a; font-size:12.5px; font-weight:800; margin:0 0 6px; font-family:Arial,sans-serif;"></div>\n    <div id="smLoginShop" style="text-align:center; color:#fff; font-size:22px; font-weight:800; margin:4px 0 8px; font-family:\'JameelNooriNastaleeqKasheeda\',\'JameelNooriNastaleeq\',serif; text-shadow:0 2px 4px rgba(0,0,0,.4);">سبزی منڈی</div>\n    <div id="loginVersionBadge"')
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
