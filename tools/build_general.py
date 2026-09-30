@@ -192,6 +192,7 @@ reg = r'''
     #smRegOverlay .smPic{ flex:1; display:flex; align-items:center; gap:8px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:12px; padding:6px 8px; cursor:pointer; }
     #smRegOverlay .smPic img{ width:40px; height:40px; object-fit:cover; background:#e2e8f0; flex:0 0 auto; }
     #smRegOverlay .smPic b{ display:block; font-size:13px; color:#1e3a8a; line-height:1.6; }
+    #smRegOverlay .smPicBtn{ flex:1; text-align:center; padding:6px 2px; background:#eef2ff; color:#1e3a8a; border-radius:9px; font-size:12.5px; font-weight:800; cursor:pointer; border:1px solid #c7d2fe; }
     #smRegOverlay .smPic small{ display:block; font-size:10.5px; color:#64748b; line-height:1.5; }
   </style>
   <div class="smWrap"><div class="smCard">
@@ -217,10 +218,20 @@ reg = r'''
     <div>
       <label class="smL">🖼️ تصویریں <span style="font-size:11px; color:#64748b; font-weight:400;">(اختیاری)</span></label>
       <div class="smPics">
-        <label class="smPic"><img id="smRegLogoPrev" alt="" style="border-radius:10px;"><span><b>🏪 دکان کا لوگو</b><small>بل، رسید، رپورٹ</small></span>
-          <input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Logo')"></label>
-        <label class="smPic"><img id="smRegOwnerPrev" alt="" style="border-radius:50%;"><span><b>👤 مالک کی تصویر</b><small>اوپر ہیڈر میں</small></span>
-          <input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Owner')"></label>
+        <div class="smPic" style="cursor:default; flex-direction:column; align-items:stretch; gap:5px;">
+          <div style="display:flex; align-items:center; gap:8px;"><img id="smRegLogoPrev" alt="" style="border-radius:10px;"><span><b>🏪 دکان کا لوگو</b><small>بل، رسید، رپورٹ</small></span></div>
+          <div style="display:flex; gap:5px;">
+            <label class="smPicBtn">📷 کیمرہ<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="smRegPick(this,'Logo')"></label>
+            <label class="smPicBtn">🖼️ گیلری<input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Logo')"></label>
+          </div>
+        </div>
+        <div class="smPic" style="cursor:default; flex-direction:column; align-items:stretch; gap:5px;">
+          <div style="display:flex; align-items:center; gap:8px;"><img id="smRegOwnerPrev" alt="" style="border-radius:50%;"><span><b>👤 مالک کی تصویر</b><small>اوپر ہیڈر میں</small></span></div>
+          <div style="display:flex; gap:5px;">
+            <label class="smPicBtn">📷 کیمرہ<input type="file" accept="image/*" capture="user" style="display:none;" onchange="smRegPick(this,'Owner')"></label>
+            <label class="smPicBtn">🖼️ گیلری<input type="file" accept="image/*" style="display:none;" onchange="smRegPick(this,'Owner')"></label>
+          </div>
+        </div>
       </div>
     </div>
     <div>
@@ -257,7 +268,9 @@ function smRegPick(inp, kind){
 // ---------- بعد میں بدلنا: ہیڈر کی تصویر پر ٹیپ (صرف ایڈمن) → مالک کی تصویر؛ لوگو "My Account" سے ----------
 function smChangeOwnerPhoto(){
   if(!document.body.classList.contains('role-admin')) return;
+  const useCam = confirm('📷 کیمرے سے نئی تصویر لینی ہے؟\n\nOK = کیمرہ   •   Cancel = گیلری سے چنیں');
   const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*';
+  if(useCam) inp.setAttribute('capture', 'user');
   inp.onchange = () => { const f = inp.files && inp.files[0]; if(!f) return;
     smShrinkImage(f, d => { AppState.settings.ownerPhoto = d; saveToStorage('settings', AppState.settings); smApplyBranding(); }); };
   inp.click();
