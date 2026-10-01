@@ -2,7 +2,7 @@
 // یہ نمبر HTML فائل کے APP_BUILD_VERSION جیسا نہیں ہوتا (وہ اردو میں ہے، یہ ہمیشہ انگریزی/ASCII میں رہے گا) —
 // صرف کیش کا نام بدلنے کے لیے استعمال ہوتا ہے تاکہ پرانی فائلیں خودکار صاف ہو کر نئی لوڈ ہو جائیں۔
 // ہر نئی ڈیلیوری پر یہ نمبر لازمی بدلیں (فائل کے نام جیسا ہی رکھیں) ----------
-const CACHE_VERSION = 'SM110TH024';
+const CACHE_VERSION = 'SM110TH025';
 const CACHE_NAME = 'sabzi-mandi-general-' + CACHE_VERSION;
 
 // ---------- 🔒🆕 ہدایت (FM21SEPMO03): آف لائن نہ چلنے کی اصل جڑ یہاں ملی — پہلے تمام فائلیں
@@ -90,6 +90,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;
+  // SM110TH025: privacy/terms pages (Google consent screen) are plain pages, never served from the app cache
+  if (/\/(privacy|terms)\.html$/.test(new URL(req.url).pathname)) return;
 
   const url = new URL(req.url);
 
