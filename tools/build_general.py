@@ -55,7 +55,25 @@ function smNormPlan(p){ p = String(p || '').trim(); if(SM_PLAN_LEGACY[p]) p = SM
 function smPlan(){ try{ return smNormPlan((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.smPlan) || _smSettings().smPlan) || 'P1'; }catch(e){ return 'P1'; } }
 function smIsCloudPlan(){ return (SM_PLAN_STAFF[smPlan()] || 0) > 0; }
 function smShopMobile(){ try{ return ((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.businessPhone) || _smSettings().businessPhone || 'unregistered').replace(/[^0-9]/g, '') || 'unregistered'; }catch(e){ return 'unregistered'; } }
-function smShopBase(){ return 'shops/' + smShopMobile() + '/data/'; }
+function smMakeShopCode(){
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let out = '';
+  try{ const r = new Uint32Array(8); crypto.getRandomValues(r); for(let i = 0; i < 8; i++) out += A[r[i] % A.length]; }
+  catch(e){ for(let i = 0; i < 8; i++) out += A[Math.floor(Math.random() * A.length)]; }
+  return out;
+}
+function smShopCode(){
+  try{
+    const st = (typeof AppState !== 'undefined' && AppState.settings) ? AppState.settings : _smSettings();
+    if(st.smShopCode) return st.smShopCode;
+    if(st.smRegistered && !st.smJoinedAsStaff){ // پہلے سے رجسٹر دکان جس کے پاس ابھی کوڈ نہیں — ایک بار بنا کر محفوظ
+      const c = smMakeShopCode(); st.smShopCode = c;
+      try{ const raw = _smSettings(); raw.smShopCode = c; localStorage.setItem('fmPos_settings', JSON.stringify(raw)); }catch(e){}
+      return c;
+    }
+  }catch(e){}
+  return '';
+}
+function smShopBase(){ const c = smShopCode(); return 'shops/' + smShopMobile() + (c ? '-' + c : '') + '/data/'; }
 function smBiz(){ try{ return (AppState.settings.businessName || '').trim() || 'سبزی منڈی'; }catch(e){ return 'سبزی منڈی'; } }
 function smPhone(){ try{ return AppState.settings.businessPhone || ''; }catch(e){ return ''; } }
 function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catch(e){ return 'مالک'; } }
@@ -349,6 +367,31 @@ async function setupLoginScreen(){ const r = await _origSetupLoginScreen.apply(t
 function smBiz(){''')
 
 
+# ---------- 5e) 🔐 ملازم کوڈ — دکان کا خفیہ راستہ (موبائل + کوڈ)؛ بغیر کوڈ کوئی دکان سے نہیں جڑ سکتا ----------
+rep('<div class="subBoxRow admin-only" id="subBoxRow"', '<div id="smShopCodeRow" class="admin-only" style="display:none;"></div>\n    <div class="subBoxRow admin-only" id="subBoxRow"')
+rep("function renderSubscriptionBanner(){ _origRenderSubscriptionBanner(); smApplySubWarning(); }", "function renderSubscriptionBanner(){ _origRenderSubscriptionBanner(); smApplySubWarning(); try{ smRenderShopCodeRow(); }catch(e){} }")
+rep("function smBiz(){", r'''function smFmtCode(c){ c = String(c || ''); return c.length > 4 ? c.slice(0, 4) + '-' + c.slice(4) : c; }
+function smRenderShopCodeRow(){
+  const el = document.getElementById('smShopCodeRow'); if(!el) return;
+  const act = document.querySelector('.screen.active');
+  if(!(act && act.id === 'screen-home') || !smIsCloudPlan() || AppState.settings.smJoinedAsStaff){ el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = `<div dir="rtl" style="margin:6px 0 8px; background:#ecfdf5; border:1.5px solid #86efac; border-radius:12px; padding:8px 10px;">
+    <div style="font-size:13px; font-weight:800; color:#065f46;">🔐 ملازم کا کوڈ <span style="font-weight:600; color:#475569; font-size:11.5px;">— ملازم کے فون پر "دکان سے جڑیں" میں آپ کا موبائل نمبر + یہ کوڈ ڈالیں</span></div>
+    <div style="display:flex; align-items:center; gap:8px; margin-top:6px;">
+      <span style="flex:1; font-family:Arial,sans-serif; font-weight:900; font-size:20px; letter-spacing:2px; direction:ltr; text-align:center; background:#fff; border:1.5px dashed #34d399; border-radius:10px; padding:6px;">${smFmtCode(smShopCode())}</span>
+      <button type="button" onclick="smCopyShopCode()" style="width:auto !important; margin:0 !important; padding:8px 12px !important; border-radius:10px !important; background:#e0f2fe !important; color:#075985 !important; border:none !important; font-weight:800; cursor:pointer;">📋</button>
+      <button type="button" onclick="smShareShopCode()" style="width:auto !important; margin:0 !important; padding:8px 12px !important; border-radius:10px !important; background:#dcfce7 !important; color:#166534 !important; border:none !important; font-weight:800; cursor:pointer;">📤</button>
+    </div></div>`;
+}
+function smShopCodeMessage(){ return 'سبزی منڈی ایپ میں دکان سے جڑنے کے لیے:\nدکان: ' + smBiz() + '\nمالک کا موبائل نمبر: ' + smShopMobile() + '\nملازم کا کوڈ: ' + smFmtCode(smShopCode()); }
+async function smCopyShopCode(){
+  try{ await navigator.clipboard.writeText(smFmtCode(smShopCode())); alert('✅ ملازم کا کوڈ کاپی ہو گیا'); }
+  catch(e){ prompt('کوڈ کاپی کر لیں:', smFmtCode(smShopCode())); }
+}
+function smShareShopCode(){ window.open('https://wa.me/?text=' + encodeURIComponent(smShopCodeMessage()), '_blank'); }
+function smBiz(){''')
+
 # ---------- 6) ہیڈر عنوان / لوگو کو پہچان (id) ----------
 rep('white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">سبزی منڈی</span>\n      <span id="connStatusBadge"',
     'white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="smTopTitle">سبزی منڈی</span>\n      <span id="connStatusBadge"')
@@ -483,6 +526,7 @@ function smRegSave(){
   if(smRegImgs.Owner) AppState.settings.ownerPhoto = smRegImgs.Owner;
   AppState.settings.smRegistered = true;
   AppState.settings.smRegisteredAt = new Date().toISOString();
+  if(!AppState.settings.smShopCode && !AppState.settings.smJoinedAsStaff) AppState.settings.smShopCode = smMakeShopCode(); // 🔐 دکان کا خفیہ کوڈ
   saveToStorage('settings', AppState.settings);
   try{
     const adm = usersData.find(u => u.role === 'admin');
@@ -494,13 +538,20 @@ function smRegSave(){
 }
 // ---------- 📲 ملازم کا فون: پہلے سے رجسٹر دکان سے جڑیں (مالک کا موبائل نمبر) ----------
 async function smJoinAsStaff(){
-  const m = (prompt('📲 جس دکان سے جڑنا ہے، اس کے مالک کا موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, '');
+  const m = (prompt('📲 مالک کا موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, '');
   if(!/^03\d{9}$/.test(m)){ if(m) alert('درست موبائل نمبر لکھیں'); return; }
-  AppState.settings.businessPhone = m; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = true;
+  const c = (prompt('🔐 مالک سے "ملازم کا کوڈ" لے کر لکھیں (مثلاً K7M2-9QXP):') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if(c.length !== 8){ if(c) alert('کوڈ درست نہیں — 8 حروف/ہندسے ہونے چاہییں'); return; }
+  const prev = { p: AppState.settings.businessPhone, c: AppState.settings.smShopCode, r: AppState.settings.smRegistered, j: AppState.settings.smJoinedAsStaff, pl: AppState.settings.smPlan };
+  AppState.settings.businessPhone = m; AppState.settings.smShopCode = c; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = true;
   AppState.settings.smPlan = 'P1+1';
   saveToStorage('settings', AppState.settings);
   const ok = await smPullLicenseMirror();
-  if(!ok){ alert('❌ اس نمبر کی کوئی آن لائن دکان نہیں ملی، یا اس کا پیکج آن لائن (P1+1 یا اس سے اوپر) نہیں۔\n\nنمبر چیک کریں یا مالک سے پوچھیں۔'); AppState.settings.smRegistered = false; saveToStorage('settings', AppState.settings); return; }
+  if(!ok){
+    alert('❌ نمبر یا کوڈ غلط ہے، یا مالک کا پیکج آن لائن (P1+1 یا اس سے اوپر) نہیں۔\n\nمالک سے دوبارہ پوچھ کر ٹھیک لکھیں۔');
+    AppState.settings.businessPhone = prev.p; AppState.settings.smShopCode = prev.c; AppState.settings.smRegistered = prev.r; AppState.settings.smJoinedAsStaff = prev.j; AppState.settings.smPlan = prev.pl;
+    saveToStorage('settings', AppState.settings); return;
+  }
   location.reload();
 }
 // ---------- 🔁 لائسنس آئینہ: مالک کا فون پیکج/مدت دکان کے کلاؤڈ میں رکھتا ہے، ملازم کا فون وہیں سے لیتا ہے ----------
