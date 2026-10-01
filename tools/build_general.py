@@ -396,7 +396,8 @@ function smBiz(){''')
 rep('<div class="pageTitle">🔑 ملازمین</div>', '<div class="pageTitle">🔑 ملازمین</div>\n      <div id="smShopCodeRow" class="admin-only" style="display:none;"></div>')
 rep("function renderSubscriptionBanner(){ _origRenderSubscriptionBanner(); smApplySubWarning(); }", "function renderSubscriptionBanner(){ _origRenderSubscriptionBanner(); smApplySubWarning(); }")
 # 👔 ملازم کو سبسکرپشن پٹی نظر نہ آئے (صرف مالک)؛ "ہوم" اجازت کی فہرست سے ہٹ گئی (ہوم ہر ملازم کو ہمیشہ ملتا ہے، اس میں اس کی اجازت والی سکرینیں ہی نظر آتی ہیں)
-rep("if(!isHomePage || !isSubscriptionActive()){ row.style.display = 'none'; return; }", "if(!isHomePage || !isSubscriptionActive() || AppState.currentRole !== 'admin'){ row.style.display = 'none'; return; }")
+if "AppState.currentRole !== 'admin'){ row.style.display = 'none'; return; }" not in s:  # FM110TH274 سے FM میں یہ جانچ پہلے ہی ہے
+    rep("if(!isHomePage || !isSubscriptionActive()){ row.style.display = 'none'; return; }", "if(!isHomePage || !isSubscriptionActive() || AppState.currentRole !== 'admin'){ row.style.display = 'none'; return; }")
 rep("const ASSIGNABLE_SCREENS = [\n  {key:'home', label:'🏠 ہوم'},\n", "const ASSIGNABLE_SCREENS = [\n")
 rep("function smBiz(){", r'''function smFmtCode(c){ c = String(c || ''); return c.length > 4 ? c.slice(0, 4) + '-' + c.slice(4) : c; }
 let _smCodeOpen = false;
@@ -444,6 +445,45 @@ function smParseJoinText(raw){
   return { mobile, code };
 }
 function smBiz(){''')
+
+# ---------- 5f) 👔 ملازم کے فون پر سبسکرپشن/دن/ایکسپائری بالکل نظر نہ آئے (صرف مالک کو)؛ ختم ہو تو صرف سادہ پیغام ----------
+rep("function smBiz(){", r'''function smStaffCleanLogin(){
+  try{
+    if(!AppState.settings.smJoinedAsStaff) return;
+    const active = isSubscriptionActive();
+    const pill = document.getElementById('loginSubStatus');
+    if(pill){
+      pill.classList.remove('smSubWarn');
+      if(active) pill.style.display = 'none';
+      else { pill.style.display = ''; pill.textContent = '⚠️ دکان کی سبسکرپشن ختم ہے — مالک سے کہیں کہ تجدید کروائیں'; }
+    }
+    const chk = document.getElementById('smSubCheckBtn'); if(chk && chk.parentElement) chk.parentElement.style.display = 'none';
+    ['smSubCheckMsg','smPlanBadge','loginLicenseInfoBox'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  }catch(e){}
+}
+function smStaffCleanGate(){
+  try{
+    if(!AppState.settings.smJoinedAsStaff) return;
+    const g = document.getElementById('subscriptionGateScreen'); if(!g) return;
+    const st = document.getElementById('subGateStatus');
+    if(st) st.textContent = 'دکان کی سبسکرپشن ختم ہو چکی ہے۔ مالک سے کہیں کہ سبسکرپشن کی تجدید کروائیں، پھر نیچے "دوبارہ چیک کریں" دبائیں۔';
+    g.querySelectorAll('input, label, .loginHint').forEach(el => { el.style.display = 'none'; });
+    g.querySelectorAll('button').forEach(b => { const t = b.textContent || ''; if(/Activate/i.test(t)) b.style.display = 'none'; });
+    const uid = document.getElementById('subGateUid'); if(uid && uid.parentElement) uid.parentElement.style.display = 'none';
+    let rb = document.getElementById('smStaffRecheckBtn');
+    if(!rb){
+      rb = document.createElement('button'); rb.id = 'smStaffRecheckBtn'; rb.type = 'button'; rb.textContent = '🔄 دوبارہ چیک کریں';
+      rb.style.cssText = 'margin-top:12px; width:100%; padding:11px; border:none; border-radius:10px; background:#16a34a; color:#fff; font-weight:800; font-size:15px; cursor:pointer;';
+      rb.onclick = async () => { rb.textContent = '⏳ …'; const ok = await smPullLicenseMirror(); if(ok && isSubscriptionActive()) location.reload(); else { rb.textContent = '🔄 دوبارہ چیک کریں'; const m = document.getElementById('subGateMsg'); if(m){ m.style.color = '#b91c1c'; m.textContent = 'ابھی تک تجدید نہیں ہوئی۔'; } } };
+      const box = g.querySelector('.loginBox'); if(box) box.appendChild(rb);
+    }
+  }catch(e){}
+}
+function smBiz(){''')
+rep("async function setupLoginScreen(){ const r = await _origSetupLoginScreen.apply(this, arguments); try{ smApplySubWarning(); }catch(e){} return r; }",
+    "async function setupLoginScreen(){ const r = await _origSetupLoginScreen.apply(this, arguments); try{ smApplySubWarning(); }catch(e){} try{ smStaffCleanLogin(); }catch(e){} return r; }")
+rep("function showSubscriptionGate(){", "function _origShowSubscriptionGate(){")
+rep("function smBiz(){", "function showSubscriptionGate(){ _origShowSubscriptionGate(); setTimeout(smStaffCleanGate, 50); setTimeout(smStaffCleanGate, 700); }\nfunction smBiz(){")
 
 # ---------- 6) ہیڈر عنوان / لوگو کو پہچان (id) ----------
 rep('white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">سبزی منڈی</span>\n      <span id="connStatusBadge"',
