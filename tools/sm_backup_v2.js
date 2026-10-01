@@ -1,5 +1,5 @@
 /* =====================================================================
-   ☁️ سبزی منڈی — نیا گوگل ڈرائیو بیک اپ / ریسٹور نظام (SM110TH023)
+   ☁️ سبزی منڈی — نیا گوگل ڈرائیو بیک اپ / ریسٹور نظام (SM110TH024)
    یہ سکرپٹ index.html کے آخر میں لگتی ہے (build_general.py خود لگاتا ہے) اور پرانے ڈرائیو فنکشن بدل دیتی ہے۔
    ---------------------------------------------------------------------
    ✔ فائل کا نام: BKSM + تاریخ(2) + مہینہ(3 حروف) + دن(2) + وقت  → مثلاً BKSM01OCTTH0112PM.JSON
@@ -17,7 +17,7 @@
   if(window.__smBkV2) return; window.__smBkV2 = true;
 
   // 👉 سبزی منڈی کے اپنے گوگل OAuth کلائنٹ کی ID یہاں (یا build_general میں) لگائیں؛ خالی ہو تو پرانی (FM والی) ID چلتی رہے گی
-  const OWN_CLIENT_ID = '';
+  const OWN_CLIENT_ID = '17117109520-cmjeqcj0eq2q1qu9gvcfq2iiovrm8et9.apps.googleusercontent.com';
   const KEEP = 10;
   const TOKEN_KEY = 'smDriveTok';
   const EMAIL_KEY = 'smGdriveEmail';
