@@ -112,6 +112,29 @@ a=s.index('const USERS_SEED_DATA = [')
 b=s.index('\n];',a)+3
 s=s[:b]+"\nUSERS_SEED_DATA.splice(1); USERS_SEED_DATA[0].name = 'مالک'; USERS_SEED_DATA[0].phone = ''; // 🥬 صرف مالک (ایڈمن)\n"+s[b:]
 
+
+# ---------- 4b) 🧹 نمونے (ڈیمو) کا سارا مواد ختم — نئی دکان بالکل خالی؛ مثالوں میں صرف ABC / XYZ اور کوئی رقم نہیں ----------
+# منظوری کے منتظر نمونے کے بل (Aslam Bhai / Muhammad Usman / Walk-in / Lipton Tea) ہر لانچ پر نظر آتے تھے
+a=s.index('let pendingBillsData = [')
+b=s.index('\n];', a)+3
+s=s[:a]+'let pendingBillsData = []; // 🥬 جنرل ایپ: کوئی نمونہ بل نہیں'+s[b:]
+rep('let nextPendingId = 3;', 'let nextPendingId = 1;')
+rep("loadFromStorage('nextCustomerId', 4)", "loadFromStorage('nextCustomerId', 1)")
+rep("loadFromStorage('nextSupplierId', 3)", "loadFromStorage('nextSupplierId', 1)")
+# امپورٹ ٹیمپلیٹ (CSV) کی مثالی قطاریں — اصلی لگنے والے نام نہیں
+_CUST_ROWS = "'Aslam Bhai,03001234567,Main Bazaar,Lahore', 'Fatima Traders,03211234567,Shop 12 Anarkali,Lahore'"
+_SUP_ROWS = "'Khalid Suppliers,03331234567,Warehouse Road,Karachi', 'Al-Madina Traders,03451234567,Wholesale Market,Faisalabad'"
+assert _CUST_ROWS in s and _SUP_ROWS in s
+s = s.replace(_CUST_ROWS, "'ABC,03000000001,Address,City', 'XYZ,03000000002,Address,City'")
+s = s.replace(_SUP_ROWS, "'ABC,03000000001,Address,City', 'XYZ,03000000002,Address,City'")
+_PROD_ROWS = "    'Lipton Tea,Beverages,1kg,8964000111,700,850,780,24,5,,Aisle 4',\n    'Lipton Tea,Beverages,500g,8964000112,360,450,410,40,10,,Aisle 4',\n    'Sugar,Grocery,Default,8964000200,140,160,150,100,20,,Warehouse-1',\n"
+assert _PROD_ROWS in s
+s = s.replace(_PROD_ROWS, "    'ABC,Category,Default,,0,0,0,0,0,,',\n    'XYZ,Category,Default,,0,0,0,0,0,,',\n")
+for _o, _n in [('FM_Product_Import_Template','SM_Product_Import_Template'),('FM_Customer_Import_Template','SM_Customer_Import_Template'),('FM_Supplier_Import_Template','SM_Supplier_Import_Template')]:
+    assert _o in s; s = s.replace(_o, _n)
+# پرانے تبصروں میں صدام کے پروجیکٹ کا نام — بھی نہ رہے
+s = s.replace('fm-saddam-mandi.web.app', 'other-project.web.app').replace('fm-saddam-mandi', 'other-project')
+
 # ---------- 5) نام اور نمبر — ہر جگہ دکان کا اپنا ----------
 NAMES=['صدام حسین فروٹ منڈی','صدام فروٹ منڈی']
 lines=s.split('\n')
@@ -640,12 +663,21 @@ if _a!=-1:
 s=s.replace('میں فروٹ منڈی ایپ','میں سبزی منڈی ایپ')
 s=s.replace('Fruit_Mandi_POS_ad_poster.png','Sabzi_Mandi_POS_ad_poster.png')
 s=s.replace('https://username.github.io/FruitMandiPOS/','https://username.github.io/SM/')
-# ---------- ☁️ SM110TH025: نیا گوگل ڈرائیو بیک اپ نظام (tools/sm_backup_v2.js) ----------
+# ---------- ☁️ SM110TH026: نیا گوگل ڈرائیو بیک اپ نظام (tools/sm_backup_v2.js) ----------
 _old="setTimeout(checkScheduledAutoBackup, 8000);\nsetInterval(checkScheduledAutoBackup, 10 * 60 * 1000);"
 if s.count(_old)==1: s=s.replace(_old,"/* پرانا شیڈولر بند — نیا نظام آخر میں */")
 _js=open(_p.join(ROOT,'tools','sm_backup_v2.js'),encoding='utf-8').read()
 _k=s.rindex('</body>')
 s=s[:_k]+'<script>\n/* SM_BACKUP_V2_BEGIN */\n'+_js+'\n/* SM_BACKUP_V2_END */\n</script>\n'+s[_k:]
+# ---------- SM110TH026: LEGACY_DEMO_CUSTOMERS کی تعریف (صفائی میں ہٹ جاتی تھی، کسٹمر سنک ایرر دیتا تھا) ----------
+if 'const LEGACY_DEMO_CUSTOMERS' not in s:
+    rep("function isLegacyDemoCustomer(c){\n  return !!c && LEGACY_DEMO_CUSTOMERS.some(", "const LEGACY_DEMO_CUSTOMERS = [];\nfunction isLegacyDemoCustomer(c){\n  return !!c && LEGACY_DEMO_CUSTOMERS.some(")
+# ---------- SM110TH026: کسٹمر پروفائل میں Delete بٹن (tools/sm_customer_delete.js) ----------
+rep("<span class=\"sideIcon\">📜</span><span class=\"sideLabel\">Transactions</span></button>\n  `;\n\n  renderCustomerMainContent(c.customer_id);",
+    "<span class=\"sideIcon\">📜</span><span class=\"sideLabel\">Transactions</span></button>\n    ${AppState.currentRole === 'admin' ? `<button style=\"background:linear-gradient(155deg,#dc2626,#7f1d1d);\" onclick=\"deleteCustomerFromProfile(${c.customer_id})\"><span class=\"sideIcon\">🗑️</span><span class=\"sideLabel\">Delete</span></button>` : ''}\n  `;\n\n  renderCustomerMainContent(c.customer_id);")
+_js2=open(_p.join(ROOT,'tools','sm_customer_delete.js'),encoding='utf-8').read()
+_k2=s.rindex('</body>')
+s=s[:_k2]+'<script>\n/* SM_CUSTOMER_DELETE_BEGIN */\n'+_js2+'\n/* SM_CUSTOMER_DELETE_END */\n</script>\n'+s[_k2:]
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
@@ -658,7 +690,7 @@ for f in ['favicon-32.png','icon-180.png','icon-192.png','icon-512.png']:
 for f in ['JameelNooriNastaleeq-Regular.ttf','JameelNooriNastaleeq-Kasheeda.ttf']:
     w=w.replace(f"'./{f}'", f"'./fonts/{f}'")
 w=w.replace('صدام کی ہدایت','ہدایت').replace('صدام','مالک')
-w=w.replace("if (req.method !== 'GET') return;", "if (req.method !== 'GET') return;\n  // SM110TH025: privacy/terms pages are plain pages, never served from the app cache\n  if (/\\/(privacy|terms)\\.html$/.test(new URL(req.url).pathname)) return;", 1)
+w=w.replace("if (req.method !== 'GET') return;", "if (req.method !== 'GET') return;\n  // SM110TH026: privacy/terms pages are plain pages, never served from the app cache\n  if (/\\/(privacy|terms)\\.html$/.test(new URL(req.url).pathname)) return;", 1)
 open(f'{OUT}/sw.js','w',encoding='utf-8').write(w)
 
 # ---------- 9) manifest ----------
