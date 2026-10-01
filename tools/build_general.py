@@ -485,6 +485,44 @@ rep("async function setupLoginScreen(){ const r = await _origSetupLoginScreen.ap
 rep("function showSubscriptionGate(){", "function _origShowSubscriptionGate(){")
 rep("function smBiz(){", "function showSubscriptionGate(){ _origShowSubscriptionGate(); setTimeout(smStaffCleanGate, 50); setTimeout(smStaffCleanGate, 700); }\nfunction smBiz(){")
 
+# ---------- 5g) 🏪 دکانوں کی رجسٹری (صرف ڈویلپر کے لیے) — ہر مالک کا فون کلاؤڈ میں اپنی دکان کی مختصر تفصیل رکھتا ہے ----------
+# registry/<مالک کا موبائل>: دکان، مالک، پیکج، میعاد، ملازموں کے نام/یوزر نیم (PIN کبھی نہیں)، ورژن، آخری بار کب کھلی
+# فائربیس Rules میں اس کا پڑھنا بند (read: false) — صرف فائربیس کنسول میں ڈویلپر کو نظر آتا ہے؛ لکھنا صرف ایپ سے
+rep("function smBiz(){", r'''const SM_REGISTRY_CONSOLE = 'https://console.firebase.google.com/project/sabzi-mandi-143e6/firestore/databases/-default-/data/~2Fregistry';
+async function smPushRegistry(){
+  try{
+    const st = AppState.settings;
+    if(!st.smRegistered || st.smJoinedAsStaff || !navigator.onLine) return; // صرف مالک کا فون
+    const mobile = smShopMobile(); if(!mobile || mobile === 'unregistered') return;
+    const staff = usersData.filter(u => u.role !== 'admin' && u.role !== 'customer').map(u => ({ n: u.name, u: u.username || '', a: u.is_active !== false }));
+    const f = {
+      shop: { stringValue: smBiz() }, owner: { stringValue: smOwner() }, mobile: { stringValue: mobile },
+      plan: { stringValue: smPlan() }, staffLimit: { integerValue: String(SM_PLAN_STAFF[smPlan()] || 0) },
+      staffCount: { integerValue: String(staff.length) }, staff: { stringValue: JSON.stringify(staff) },
+      expiry: { stringValue: st.subscriptionExpiry || '' }, trial: { booleanValue: !!st.isOnFreeTrial },
+      activatedOn: { stringValue: st.subscriptionActivatedOn || '' }, code: { stringValue: st.lastActivationCode || '' },
+      version: { stringValue: (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '' },
+      deviceUID: { stringValue: st.deviceUID || '' }, lastSeen: { integerValue: String(Date.now()) },
+      registeredAt: { stringValue: st.smRegisteredAt || '' }
+    };
+    await authFirestoreFetch(`registry/${mobile}?key=${FIREBASE_API_KEY}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: f }) });
+  }catch(e){}
+}
+setTimeout(() => { try{ smPushRegistry(); }catch(e){} }, 12000);
+setInterval(() => { try{ smPushRegistry(); }catch(e){} }, 20 * 60 * 1000);
+function smBiz(){''')
+# smSetPlan کے بعد بھی (پیکج بدلنے پر فوراً)
+rep("  if(!quiet) setTimeout(() => { try{ smPushLicenseMirror(); }catch(e){} }, 3000);\n  return true;", "  if(!quiet) setTimeout(() => { try{ smPushLicenseMirror(); smPushRegistry(); }catch(e){} }, 3000);\n  return true;")
+# ڈویلپر پینل: ایک بٹن جو فائربیس کنسول میں رجسٹری کھولے
+rep("      <!-- ---------- 🚧 ہدایت (25 ستمبر، دوپہر): مینٹیننس موڈ بٹن", """      <!-- ---------- 🏪 دکانوں کی رجسٹری ---------- -->
+      <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:12px; margin-bottom:14px;" dir="rtl">
+        <div style="font-size:12.5px; font-weight:800; color:#166534; margin-bottom:4px;">🏪 دکانوں کی فہرست</div>
+        <div style="font-size:11px; color:#64748b; margin-bottom:8px; line-height:1.6;">ہر دکان: مالک، موبائل، پیکج، میعاد، ملازموں کے نام، ورژن، آخری بار کب کھلی۔ فائربیس میں کھلتی ہے (صرف آپ کے گوگل اکاؤنٹ سے)۔</div>
+        <button type="button" onclick="window.open(SM_REGISTRY_CONSOLE, '_blank')" style="width:100%; padding:11px; border:none; border-radius:10px; background:#16a34a; color:#fff; font-weight:900; font-size:14px; cursor:pointer;">🏪 دکانوں کی فہرست کھولیں</button>
+      </div>
+
+      <!-- ---------- 🚧 ہدایت (25 ستمبر، دوپہر): مینٹیننس موڈ بٹن""")
+
 # ---------- 6) ہیڈر عنوان / لوگو کو پہچان (id) ----------
 rep('white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">سبزی منڈی</span>\n      <span id="connStatusBadge"',
     'white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="smTopTitle">سبزی منڈی</span>\n      <span id="connStatusBadge"')
