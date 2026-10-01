@@ -626,6 +626,20 @@ k=s.index('<div id="loginScreen">'); k2=s.index('>🥬</div>',k)
 k1=s.rfind('<div style="width:56px;',k,k2)
 s=s[:k1]+'<img src="icons/icon-192.png" alt="" style="display:block; width:64px; height:64px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,.35); object-fit:cover; margin:0 auto 6px;">'+s[k2+len('>🥬</div>'):]
 rep('    <div id="loginVersionBadge"','    <div id="smPlanBadge" style="text-align:center; color:#fde68a; font-size:12.5px; font-weight:800; margin:0 0 6px; font-family:Arial,sans-serif;"></div>\n    <div id="smLoginShop" style="text-align:center; color:#fff; font-size:22px; font-weight:800; margin:4px 0 8px; font-family:\'JameelNooriNastaleeqKasheeda\',\'JameelNooriNastaleeq\',serif; text-shadow:0 2px 4px rgba(0,0,0,.4);">سبزی منڈی</div>\n    <div id="loginVersionBadge"')
+
+# ---------- 🔐🧹 SM110TH022 حفاظتی صفائی (ہر بلڈ پر خود لگتی ہے) ----------
+# 1) ڈویلپر پینل کا ڈیفالٹ پاسورڈ بدلا (پرانا 6 ہندسوں والا ہر گاہک کی ایپ میں کھلا تھا)؛ پاسورڈ ریپو میں نہیں، صرف ہیش یہاں
+s=s.replace('8b5a43764420e5af43f7c4623ad3a6699a628be06269051d38f494f9f4b22a9a','1bc34201e0c395cc1ed2021784233cbfbe636288640a177959dab6f721682b8b')
+s=s.replace('// ڈیفالٹ پاسورڈ: 857766 — ہدایت FM3SEPTH12','// ڈیفالٹ پاسورڈ: (مالک کے پاس، ریپو میں نہیں)')
+# 2) URL سے ڈویلپر پاسورڈ ری سیٹ کا خفیہ لنک ختم (سورس میں سب کو نظر آتا تھا)
+_a=s.find("if(p.get('devpwreset') === 'saddamFM19reset'){")
+if _a!=-1:
+    _b=s.find('}\n', s.find("400);", _a))
+    s=s[:_a]+"/* devpwreset ہٹا دیا گیا */"+s[_b+1:]
+# 3) گاہک کو جانے والے پیغامات/نام میں فروٹ منڈی نہیں
+s=s.replace('میں فروٹ منڈی ایپ','میں سبزی منڈی ایپ')
+s=s.replace('Fruit_Mandi_POS_ad_poster.png','Sabzi_Mandi_POS_ad_poster.png')
+s=s.replace('https://username.github.io/FruitMandiPOS/','https://username.github.io/SM/')
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
