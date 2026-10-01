@@ -37,7 +37,7 @@ const APP_EDITION = 'general';
   Object.defineProperty(SP, 'length', { get(){ return mine(this).length; }, configurable: true });
   window.smLsKeys = function(){ return mine(window.localStorage); };
   // ---------- ☁️ سبزی منڈی کا اپنا فائربیس (sabzi-mandi-143e6) — صدام والا کبھی نہیں ----------
-  // لائسنس/ٹرائل/ڈیوائس ہمیشہ کھلے؛ دکان کا ڈیٹا (shops/<موبائل>/…) صرف آن لائن پیکج (P2 سے اوپر) میں
+  // لائسنس/ٹرائل/ڈیوائس ہمیشہ کھلے؛ دکان کا ڈیٹا (shops/<موبائل>/…) صرف آن لائن پیکج (P1+1 سے اوپر) میں
   const of = window.fetch.bind(window);
   window.fetch = function(input, init){
     const u = (typeof input === 'string') ? input : (input && input.url) || '';
@@ -48,9 +48,11 @@ const APP_EDITION = 'general';
   };
 })();
 function _smSettings(){ try{ return JSON.parse(localStorage.getItem('fmPos_settings') || '{}') || {}; }catch(e){ return {}; } }
-// 📦 پیکج: P1 = اکیلا صارف (فون + گوگل ڈرائیو)، P2 = مالک + 1 ملازم … P6 = مالک + 5 ملازم (کلاؤڈ)
-const SM_PLAN_STAFF = { P1: 0, P2: 1, P3: 2, P4: 3, P5: 4, P6: 5 };
-function smPlan(){ try{ return (typeof AppState !== 'undefined' && AppState.settings && AppState.settings.smPlan) || _smSettings().smPlan || 'P1'; }catch(e){ return 'P1'; } }
+// 📦 پیکج: P1 = صرف مالک (اکیلا صارف: فون + گوگل ڈرائیو)؛ P1+1 = مالک + 1 ملازم … P1+5 = مالک + 5 ملازم (آن لائن کلاؤڈ)
+const SM_PLAN_STAFF = { 'P1': 0, 'P1+1': 1, 'P1+2': 2, 'P1+3': 3, 'P1+4': 4, 'P1+5': 5 };
+const SM_PLAN_LEGACY = { P2: 'P1+1', P3: 'P1+2', P4: 'P1+3', P5: 'P1+4', P6: 'P1+5' }; // پرانے بنے کوڈ اب بھی چلیں
+function smNormPlan(p){ p = String(p || '').trim(); if(SM_PLAN_LEGACY[p]) p = SM_PLAN_LEGACY[p]; return SM_PLAN_STAFF[p] !== undefined ? p : null; }
+function smPlan(){ try{ return smNormPlan((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.smPlan) || _smSettings().smPlan) || 'P1'; }catch(e){ return 'P1'; } }
 function smIsCloudPlan(){ return (SM_PLAN_STAFF[smPlan()] || 0) > 0; }
 function smShopMobile(){ try{ return ((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.businessPhone) || _smSettings().businessPhone || 'unregistered').replace(/[^0-9]/g, '') || 'unregistered'; }catch(e){ return 'unregistered'; } }
 function smShopBase(){ return 'shops/' + smShopMobile() + '/data/'; }
@@ -145,26 +147,207 @@ for a_,b_ in [("acc.name || 'صدام حسین'","acc.name || smOwner()"),("'ش�
     s=s.replace(a_,b_)
 s=s.replace('<title>سبزی منڈی</title>','<title>سبزی منڈی</title>')
 
-# ---------- 5b) 📦 پیکج (P1–P6) — لائسنس کوڈ میں پیکج، ملازموں کی حد، ملازم کا فون دکان سے جڑے ----------
-# (الف) ڈویلپر پینل: کوڈ بناتے وقت پیکج چنیں
+# ---------- 5a) ⏳ کوڈ بنتے وقت باریک پراگریس لائن (بٹن اور نتیجے کے ڈبے کے بیچ) ----------
+_GEN_OLD = '<button class="testPrintBtn" style="background:#dcfce7; color:#15803d;" onclick="generateGiftCode()">🎁 Generate Code</button>'
+_GEN_NEW = ('<button class="testPrintBtn" id="giftGenBtn" style="background:#dcfce7; color:#15803d;" onclick="generateGiftCode()">🎁 Generate Code</button>\n'
+            '<div id="giftGenProgress" style="display:none; height:5px; margin:8px 2px 10px; border-radius:999px; background:#d1fae5; overflow:hidden;">'
+            '<div id="giftGenProgressBar" style="height:100%; width:0%; background:linear-gradient(90deg,#16a34a,#22c55e); border-radius:999px; transition:width .25s ease;"></div></div>')
+rep(_GEN_OLD, _GEN_NEW)
+_A_OLD = "  const code = generateRandomGiftCode();\n\n  const fields = {"
+_A_NEW = ("  const _gp = document.getElementById('giftGenProgress'), _gb = document.getElementById('giftGenProgressBar'), _gbtn = document.getElementById('giftGenBtn');\n"
+          "  let _gt = null, _gw = 8;\n"
+          "  if(_gp){ _gp.style.display = 'block'; _gb.style.width = '8%'; _gt = setInterval(() => { _gw = Math.min(90, _gw + (90 - _gw) * 0.18); _gb.style.width = _gw + '%'; }, 200); }\n"
+          "  if(_gbtn){ _gbtn.disabled = true; _gbtn.style.opacity = '.65'; }\n"
+          "  const code = generateRandomGiftCode();\n\n  const fields = {")
+rep(_A_OLD, _A_NEW)
+_B_OLD = ("    loadIssuedCodesList(); // ---------- نیا کوڈ فہرست میں فوراً نظر آ جائے ----------\n  }catch(e){\n"
+          "    alert('⚠️ کوڈ نہیں بن سکا — انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں۔ (' + e.message + ')');\n  }")
+_B_NEW = ("    loadIssuedCodesList(); // ---------- نیا کوڈ فہرست میں فوراً نظر آ جائے ----------\n    if(_gb) _gb.style.width = '100%';\n  }catch(e){\n"
+          "    if(_gb){ _gb.style.background = '#ef4444'; _gb.style.width = '100%'; }\n"
+          "    alert('⚠️ کوڈ نہیں بن سکا — انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں۔ (' + e.message + ')');\n  }\n"
+          "  finally{\n    if(_gt) clearInterval(_gt);\n    if(_gbtn){ _gbtn.disabled = false; _gbtn.style.opacity = '1'; }\n"
+          "    setTimeout(() => { if(_gp) _gp.style.display = 'none'; if(_gb){ _gb.style.width = '0%'; _gb.style.background = 'linear-gradient(90deg,#16a34a,#22c55e)'; } }, 900);\n  }")
+rep(_B_OLD, _B_NEW)
+
+# ---------- 5b) 📦 پیکج: P1 (صرف مالک)، P1+1 … P1+5 (مالک + 1…5 ملازم) ----------
 i=s.index('<select id="giftCodeDaysInput"'); j=s.index('</select>', i)+len('</select>')
-s=s[:j]+'\n<select id="giftCodePlanInput" style="width:100%; padding:9px; margin-bottom:8px; border:2px solid #16a34a; border-radius:8px; font-weight:800;"><option value="P1">📦 P1 — اکیلا صارف (صرف مالک، گوگل ڈرائیو)</option><option value="P2">📦 P2 — مالک + 1 ملازم (آن لائن)</option><option value="P3">📦 P3 — مالک + 2 ملازم</option><option value="P4">📦 P4 — مالک + 3 ملازم</option><option value="P5">📦 P5 — مالک + 4 ملازم</option><option value="P6">📦 P6 — مالک + 5 ملازم</option></select>'+s[j:]
+_PLAN_SEL = '\n<select id="giftCodePlanInput" style="width:100%; padding:9px; margin-bottom:8px; border:2px solid #16a34a; border-radius:8px; font-weight:800;"><option value="P1">📦 P1 — صرف مالک (اکیلا، گوگل ڈرائیو)</option><option value="P1+1">📦 P1+1 — مالک + 1 ملازم (آن لائن)</option><option value="P1+2">📦 P1+2 — مالک + 2 ملازم</option><option value="P1+3">📦 P1+3 — مالک + 3 ملازم</option><option value="P1+4">📦 P1+4 — مالک + 4 ملازم</option><option value="P1+5">📦 P1+5 — مالک + 5 ملازم</option></select>'
+s=s[:j]+_PLAN_SEL+s[j:]
 rep("  if(nameVal) fields.customerName = { stringValue: nameVal };", "  if(nameVal) fields.customerName = { stringValue: nameVal };\n  fields.plan = { stringValue: (document.getElementById('giftCodePlanInput') || {}).value || 'P1' }; // 📦 پیکج")
-# (ب) کوڈ لگانے/واپس آنے پر پیکج محفوظ
+# کوڈ لگنے پر پیکج
 k=s.index('async function activateSubscription(code){')
-k2=s.index("  const data = _parseFirestoreFields(doc.fields || {});", k)+len("  const data = _parseFirestoreFields(doc.fields || {});")
-s=s[:k2]+"\n  if(data.plan && SM_PLAN_STAFF[data.plan] !== undefined){ AppState.settings.smPlan = data.plan; try{ persistAllData(); }catch(e){} setTimeout(() => { try{ smPushLicenseMirror(); }catch(e){} }, 3000); } // 📦 پیکج"+s[k2:]
-# (ج) ملازموں کی حد
-rep("""  if(role === 'salesman' && screens.length === 0){""","""  { // 📦 پیکج کی حد
+_k = "  const data = _parseFirestoreFields(doc.fields || {});"
+k2=s.index(_k, k)+len(_k)
+s=s[:k2]+"\n  if(data.plan){ try{ smSetPlan(data.plan); }catch(e){} } // 📦 پیکج"+s[k2:]
+# ملازموں کی حد
+rep("""  if(role === 'salesman' && screens.length === 0){""", r'''  { // 📦 پیکج کی حد
     const _lim = SM_PLAN_STAFF[smPlan()] || 0;
     const _cnt = usersData.filter(u => u.role !== 'admin' && u.role !== 'customer' && u.is_active !== false).length;
     if(role !== 'customer' && _cnt >= _lim){
-      alert(_lim === 0 ? `📦 آپ کا پیکج ${smPlan()} (اکیلا صارف) ہے — ملازم شامل نہیں ہو سکتے۔\\n\\nملازم کے لیے پیکج P2 یا اس سے اوپر لیں (ڈویلپر: 03206793793)۔`
-        : `📦 آپ کے پیکج ${smPlan()} میں زیادہ سے زیادہ ${_lim} ملازم ہیں — حد پوری ہو گئی۔\\n\\nمزید ملازم کے لیے پیکج بڑھائیں (ڈویلپر: 03206793793)۔`);
+      alert(_lim === 0 ? `📦 آپ کا پیکج P1 (صرف مالک) ہے — ملازم شامل نہیں ہو سکتے۔\n\nملازم کے لیے پیکج P1+1 یا اس سے اوپر لیں (ڈویلپر: 03206793793)۔`
+        : `📦 آپ کے پیکج ${smPlan()} (مالک + ${_lim} ملازم) میں حد پوری ہو گئی۔\n\nمزید ملازم کے لیے پیکج بڑھائیں (ڈویلپر: 03206793793)۔`);
       return;
     }
   }
-  if(role === 'salesman' && screens.length === 0){""")
+  if(role === 'salesman' && screens.length === 0){''')
+
+# ---------- 5c) 🔁 بحالی: پیکج واپس + خوبصورت پیغام + "سبسکرپشن چیک" بٹن ----------
+rep("async function _licFindByUid(uid){\n  let best = null;", "async function _licFindByUid(uid){\n  let best = null; let _maxPlan = null; const _licTodayStr = _smYMD(new Date());")
+rep("if(d.subscriptionExpiry) best = { expiry: d.subscriptionExpiry, on: d.subscriptionActivatedOn || '', code: d.lastActivationCode || '' };",
+    "if(d.subscriptionExpiry) best = { expiry: d.subscriptionExpiry, on: d.subscriptionActivatedOn || '', code: d.lastActivationCode || '', plan: d.smPlan || '' };")
+rep("if(!best || exp > best.expiry) best = { expiry: exp, on, code };",
+    "const _np = smNormPlan(d.plan) || 'P1'; if(exp >= _licTodayStr && (!_maxPlan || SM_PLAN_STAFF[_np] > SM_PLAN_STAFF[_maxPlan])) _maxPlan = _np;\n        if(!best || exp > best.expiry) best = { expiry: exp, on, code };")
+rep("  return best;\n}\nlet _licRestoreBusy = null;", "  if(best && _maxPlan) best.plan = _maxPlan;\n  return best;\n}\nlet _licRestoreBusy = null;")
+rep("_licApplyRestore(best.expiry, best.on, best.code);", "_licApplyRestore(best.expiry, best.on, best.code, best.plan);")
+rep("function _licApplyRestore(expiryStr, activatedOn, code){\n", "function _licApplyRestore(expiryStr, activatedOn, code, plan){\n  try{ smAfterRestore(expiryStr, code, plan); }catch(e){} // 📦 پیکج بحال + خوبصورت پیغام\n")
+i=s.index('function _licApplyRestore('); j=s.index('\n}\n', i)
+s=s[:i]+s[i:j].replace('}, 1200);','}, 5200);')+s[j:]
+rep("lastActivationCode: { stringValue: String(AppState.settings.lastActivationCode || '') },", "lastActivationCode: { stringValue: String(AppState.settings.lastActivationCode || '') }, smPlan: { stringValue: smPlan() },")
+_pill = '<div id="loginSubStatus" style="display:inline-block; background:#eef2ff; border-radius:16px; padding:4px 14px; margin-bottom:6px; font-size:11px; font-weight:800; color:var(--primary-dark);"></div>'
+rep(_pill, _pill + '\n    <div style="margin:0 0 8px;"><button type="button" id="smSubCheckBtn" onclick="smRefreshSubscription(this)" style="width:auto !important; margin:0 !important; padding:5px 14px !important; font-size:12px !important; border-radius:999px !important; background:#ecfdf5 !important; color:#065f46 !important; border:1.5px solid #6ee7b7 !important; font-weight:800; cursor:pointer; box-shadow:none !important;">🔄 سبسکرپشن چیک / تازہ کریں</button></div>\n    <div id="smSubCheckMsg" style="display:none;"></div>')
+rep("${row('📅 ختم ہونے کی تاریخ', val(_bkEsc(expTxt)))}", "${row('📅 ختم ہونے کی تاریخ', val(_bkEsc(expTxt)))}\n    ${row('📦 پیکج', val(_bkEsc(smPlan())))}")
+rep("function smBiz(){", r'''function smPlanText(p){ p = smNormPlan(p) || 'P1'; const n = SM_PLAN_STAFF[p]; return n === 0 ? 'صرف مالک' : ('مالک + ' + n + ' ملازم'); }
+function smSetPlan(plan, quiet){
+  const np = smNormPlan(plan); if(!np) return false;
+  AppState.settings.smPlan = np;
+  try{ saveToStorage('settings', AppState.settings); }catch(e){}
+  try{ smApplyBranding(); }catch(e){}
+  if(!quiet) setTimeout(() => { try{ smPushLicenseMirror(); }catch(e){} }, 3000);
+  return true;
+}
+async function smFetchPlanForCode(code){
+  try{
+    const res = await fetch(`${FIRESTORE_BASE}/licenses/${encodeURIComponent(code)}?key=${FIREBASE_API_KEY}`);
+    if(!res.ok) return null;
+    const d = await res.json(); const np = smNormPlan(d.fields && d.fields.plan && d.fields.plan.stringValue);
+    if(np) smSetPlan(np);
+    return np;
+  }catch(e){ return null; }
+}
+async function smAfterRestore(expiryStr, code, plan){
+  let p = smNormPlan(plan);
+  if(!p && code) p = await smFetchPlanForCode(code);
+  if(p) smSetPlan(p);
+  smShowRestoreCard(expiryStr, p || smPlan());
+}
+function smShowRestoreCard(expiryStr, plan){
+  try{
+    const days = Math.max(0, Math.round((new Date(expiryStr) - new Date()) / 86400000));
+    const p = smNormPlan(plan) || 'P1';
+    const old = document.getElementById('smRestoreCard'); if(old) old.remove();
+    const el = document.createElement('div'); el.id = 'smRestoreCard';
+    el.style.cssText = 'position:fixed; inset:0; z-index:2147483600; background:rgba(2,44,34,.8); display:flex; align-items:center; justify-content:center; padding:18px;';
+    el.innerHTML = `<div dir="rtl" style="background:#fff; border-radius:22px; max-width:380px; width:100%; padding:22px 18px 18px; text-align:center; box-shadow:0 14px 44px rgba(0,0,0,.5); font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq',serif;">
+      <div style="font-size:48px; line-height:1.2;">✅</div>
+      <div style="font-size:22px; font-weight:900; color:#065f46; margin:4px 0 10px;">آپ کی سبسکرپشن بحال ہو گئی</div>
+      <div style="font-size:16px; color:#334155; line-height:2;">آپ کی پرانی سبسکرپشن کے <b style="color:#15803d; font-family:Arial,sans-serif;">${days}</b> دن باقی ہیں۔<br>پیکج: <b style="font-family:Arial,sans-serif; color:#0f766e;">📦 ${p}</b> — ${smPlanText(p)}<br><span style="color:#0f766e; font-weight:900;">نیا کوڈ لگانے کی ضرورت نہیں</span><br>آپ کی ایپ کھل رہی ہے…</div>
+      <button type="button" onclick="document.getElementById('smRestoreCard').remove()" style="margin-top:14px; width:auto !important; padding:8px 28px !important; border:none !important; border-radius:999px !important; background:#16a34a !important; color:#fff !important; font-size:15px !important; font-weight:800; cursor:pointer;">ٹھیک ہے</button>
+    </div>`;
+    document.body.appendChild(el);
+    setTimeout(() => { try{ el.remove(); }catch(e){} }, 7000);
+  }catch(e){}
+}
+async function smRefreshSubscription(btn){
+  const label = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ چیک ہو رہا ہے…'; }
+  let note = '';
+  try{
+    const uid = getOrCreateDeviceUID();
+    const best = await _licFindByUid(uid);
+    const today = _smYMD(new Date());
+    if(best && best.expiry && best.expiry >= today){
+      if(AppState.settings.isOnFreeTrial || !AppState.settings.subscriptionExpiry || best.expiry > AppState.settings.subscriptionExpiry){
+        AppState.settings.subscriptionExpiry = best.expiry; AppState.settings.isOnFreeTrial = false;
+        if(best.on) AppState.settings.subscriptionActivatedOn = best.on;
+        if(best.code) AppState.settings.lastActivationCode = best.code;
+        persistAllData();
+      }
+      if(best.plan) smSetPlan(best.plan, true); else if(best.code) await smFetchPlanForCode(best.code);
+    }
+    try{ setupLoginScreen(); }catch(e){}
+    try{ renderLoginLicenseInfo(); }catch(e){}
+    smApplyBranding();
+    const days = daysLeftInSubscription();
+    if(isSubscriptionActive()){
+      note = AppState.settings.isOnFreeTrial
+        ? '🎁 مفت آزمائش چل رہی ہے — ' + days + ' دن باقی'
+        : '✅ آپ کی سبسکرپشن فعال ہے\n📦 پیکج ' + smPlan() + ' (' + smPlanText(smPlan()) + ')\n📅 ' + days + ' دن باقی';
+    } else note = '⚠️ کوئی فعال سبسکرپشن نہیں ملی — کوڈ لگائیں یا ڈویلپر سے رابطہ کریں (03206793793)';
+  }catch(e){ note = '⚠️ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں'; }
+  const box = document.getElementById('smSubCheckMsg');
+  if(box){
+    box.style.cssText = 'display:block; margin:0 0 8px; background:#ecfdf5; border:1.5px solid #86efac; color:#065f46; border-radius:12px; padding:8px 12px; font-size:13px; font-weight:800; line-height:1.8; white-space:pre-line;';
+    box.textContent = note;
+    setTimeout(() => { try{ box.style.display = 'none'; }catch(e){} }, 9000);
+  }
+  if(btn){ btn.disabled = false; btn.textContent = label; }
+}
+function smBiz(){''')
+
+
+# ---------- 5d) 📅 پورے دن (آج کا دن شامل نہیں) + باقی دن جمع + ≤6 دن پر سرخ چمکتی وارننگ ----------
+# (الف) مقامی تاریخ — پہلے toISOString (UTC) تھا، رات/صبح سویرے ایک دن کم ہو جاتا تھا (30 کی جگہ 29)
+for _old, _new in [
+  ("new Date(Number(data.expiresAt)).toISOString().slice(0,10)", "_smYMD(new Date(Number(data.expiresAt)))"),
+  ("new Date(Number(data.activatedAt)).toISOString().slice(0,10)", "_smYMD(new Date(Number(data.activatedAt)))"),
+  ("new Date(ms).toISOString().slice(0, 10)", "_smYMD(new Date(ms))"),
+  ("new Date(Number(d.activatedAt)).toISOString().slice(0, 10)", "_smYMD(new Date(Number(d.activatedAt)))"),
+  ("AppState.settings.subscriptionActivatedOn = new Date().toISOString().slice(0,10);", "AppState.settings.subscriptionActivatedOn = _smYMD(new Date());"),
+  ("AppState.settings.subscriptionExpiry = trialEnd.toISOString().slice(0,10);", "AppState.settings.subscriptionExpiry = _smYMD(trialEnd);"),
+]:
+    assert _old in s, _old
+    s = s.replace(_old, _new)
+# (ب) نیا کوڈ: باقی دن + نئے دن (6 + 30 = 36)، شروع آج کے بعد سے
+rep("""  const hasActivePaidSub = isSubscriptionActive() && !AppState.settings.isOnFreeTrial;
+  const base = hasActivePaidSub ? new Date(AppState.settings.subscriptionExpiry) : new Date();
+  base.setDate(base.getDate() + daysNum);
+  const newExpiryStr = base.toISOString().slice(0,10);""",
+"""  // 📅 پورے دن: آج کا دن گنتی میں شامل نہیں (30 دن کا کوڈ = آج سے پورے 30 دن)؛ پرانے باقی دن بھی جمع (6 + 30 = 36)
+  const hasActivePaidSub = isSubscriptionActive() && !AppState.settings.isOnFreeTrial;
+  const carriedDays = hasActivePaidSub ? daysLeftInSubscription() : 0;
+  const base = hasActivePaidSub ? _smParseYMD(AppState.settings.subscriptionExpiry) : (() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; })();
+  base.setDate(base.getDate() + daysNum);
+  const newExpiryStr = _smYMD(base);""")
+rep("return {success:true, expiry: newExpiryStr, daysGranted: daysNum};", "return {success:true, expiry: newExpiryStr, daysGranted: daysNum, carried: carriedDays, totalDays: daysNum + carriedDays};")
+# (ج) پیغامات (اردو، جمع شدہ دنوں کے ساتھ)
+rep("msgEl.textContent = `✅ Activated! ${result.daysGranted} day(s) added — valid until ${result.expiry}. Opening app...`;", "msgEl.textContent = smActMsg(result) + ' ایپ کھل رہی ہے…';")
+rep("msgEl.textContent = `✅ Activated! ${result.daysGranted} day(s) added — valid until ${result.expiry}.`;", "msgEl.textContent = smActMsg(result);")
+# (د) سرخ چمکتی وارننگ: ہوم کی سبسکرپشن پٹی + لاگ ان کی پٹی
+rep("function renderSubscriptionBanner(){", "function _origRenderSubscriptionBanner(){")
+rep("function setupLoginScreen(){", "function _origSetupLoginScreen(){")
+_css = '''<style id="smSubWarnCss">
+@keyframes smSubGlow { 0%,100%{ box-shadow:0 0 6px 1px rgba(239,68,68,.55); } 50%{ box-shadow:0 0 20px 6px rgba(239,68,68,.95); } }
+#subBoxRow.smSubWarn{ background:linear-gradient(135deg,#dc2626,#7f1d1d) !important; border:2px solid #fecaca !important; border-radius:14px !important; animation:smSubGlow 1.6s ease-in-out infinite; }
+#subBoxRow.smSubWarn *:not(button){ background:transparent !important; color:#fff !important; font-weight:900 !important; border-color:transparent !important; text-shadow:0 1px 2px rgba(0,0,0,.4); }
+#subBoxRow.smSubWarn #subBoxDaysVal{ font-size:1.12em !important; white-space:nowrap; }
+#subBoxRow.smSubWarn{ flex-wrap:nowrap; overflow:hidden; }
+#loginSubStatus.smSubWarn{ background:linear-gradient(135deg,#dc2626,#991b1b) !important; color:#fff !important; border:2px solid #fecaca !important; animation:smSubGlow 1.6s ease-in-out infinite; font-size:13.5px !important; font-weight:900 !important; padding:6px 16px !important; }
+</style>
+'''
+s = s.replace("</head>", _css + "</head>", 1)  # صرف پہلا (اصل) head
+rep("function smBiz(){", r'''function _smYMD(d){ const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0'); return y + '-' + m + '-' + dd; }
+function _smParseYMD(str){ const p = String(str).split('-').map(Number); return new Date(p[0], (p[1] || 1) - 1, p[2] || 1); }
+function smActMsg(r){
+  if(r.restored) return '✅ سبسکرپشن بحال ہو گئی — ' + formatDateDMY(r.expiry) + ' تک۔';
+  const tot = r.totalDays || r.daysGranted;
+  return (r.carried > 0)
+    ? '✅ ' + r.daysGranted + ' دن + پرانے ' + r.carried + ' دن = کل ' + tot + ' دن کی سبسکرپشن — ' + formatDateDMY(r.expiry) + ' تک۔'
+    : '✅ ' + r.daysGranted + ' دن کی سبسکرپشن فعال — ' + formatDateDMY(r.expiry) + ' تک۔';
+}
+function smApplySubWarning(){
+  try{
+    const active = isSubscriptionActive();
+    const days = active ? daysLeftInSubscription() : 99;
+    const warn = active && days <= (AppState.settings.isOnFreeTrial ? 2 : 6);
+    const row = document.getElementById('subBoxRow'), pill = document.getElementById('loginSubStatus');
+    [row, pill].forEach(el => { if(el) el.classList.toggle('smSubWarn', warn); });
+    if(pill && warn) pill.textContent = (days === 0) ? '⚠️ آج سبسکرپشن کا آخری دن ہے' : ('⚠️ ' + days + ' دن باقی — تجدید کروائیں');
+  }catch(e){}
+}
+function renderSubscriptionBanner(){ _origRenderSubscriptionBanner(); smApplySubWarning(); }
+async function setupLoginScreen(){ const r = await _origSetupLoginScreen.apply(this, arguments); try{ smApplySubWarning(); }catch(e){} return r; }
+function smBiz(){''')
+
 
 # ---------- 6) ہیڈر عنوان / لوگو کو پہچان (id) ----------
 rep('white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">سبزی منڈی</span>\n      <span id="connStatusBadge"',
@@ -280,7 +463,7 @@ function smApplyBranding(){
   document.title = n;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
   set('smRegVersion', (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '');
-  set('smPlanBadge', `📦 ${smPlan()} • ${smIsCloudPlan() ? 'آن لائن — مالک + ' + SM_PLAN_STAFF[smPlan()] + ' ملازم' : 'اکیلا صارف (گوگل ڈرائیو)'}`);
+  set('smPlanBadge', '📦 ' + smPlan() + ' • ' + (smIsCloudPlan() ? 'مالک + ' + SM_PLAN_STAFF[smPlan()] + ' ملازم (آن لائن)' : 'صرف مالک — اکیلا صارف (گوگل ڈرائیو)'));
   set('smTopTitle', n); set('smSideBrand', n); set('mobileBrandText', n); set('hbcBusinessName', n); set('smLoginShop', n);
   const st = AppState.settings;
   const im = document.getElementById('smTopLogo');
@@ -314,10 +497,10 @@ async function smJoinAsStaff(){
   const m = (prompt('📲 جس دکان سے جڑنا ہے، اس کے مالک کا موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, '');
   if(!/^03\d{9}$/.test(m)){ if(m) alert('درست موبائل نمبر لکھیں'); return; }
   AppState.settings.businessPhone = m; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = true;
-  AppState.settings.smPlan = 'P2';
+  AppState.settings.smPlan = 'P1+1';
   saveToStorage('settings', AppState.settings);
   const ok = await smPullLicenseMirror();
-  if(!ok){ alert('❌ اس نمبر کی کوئی آن لائن دکان نہیں ملی، یا اس کا پیکج آن لائن (P2+) نہیں۔\n\nنمبر چیک کریں یا مالک سے پوچھیں۔'); AppState.settings.smRegistered = false; saveToStorage('settings', AppState.settings); return; }
+  if(!ok){ alert('❌ اس نمبر کی کوئی آن لائن دکان نہیں ملی، یا اس کا پیکج آن لائن (P1+1 یا اس سے اوپر) نہیں۔\n\nنمبر چیک کریں یا مالک سے پوچھیں۔'); AppState.settings.smRegistered = false; saveToStorage('settings', AppState.settings); return; }
   location.reload();
 }
 // ---------- 🔁 لائسنس آئینہ: مالک کا فون پیکج/مدت دکان کے کلاؤڈ میں رکھتا ہے، ملازم کا فون وہیں سے لیتا ہے ----------
@@ -334,8 +517,8 @@ async function smPullLicenseMirror(){
     if(!res || !res.ok) return false;
     const d = await res.json(); const f = d.fields || {};
     const plan = f.plan?.stringValue, exp = f.expiry?.stringValue;
-    if(!plan || !SM_PLAN_STAFF[plan]) return false;
-    AppState.settings.smPlan = plan;
+    const np = smNormPlan(plan); if(!np || !SM_PLAN_STAFF[np]) return false;
+    AppState.settings.smPlan = np;
     if(exp){ AppState.settings.subscriptionExpiry = exp; AppState.settings.isOnFreeTrial = false; }
     if(f.shop?.stringValue) AppState.settings.businessName = f.shop.stringValue;
     if(f.owner?.stringValue) AppState.settings.ownerName = f.owner.stringValue;
