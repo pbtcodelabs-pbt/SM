@@ -8166,9 +8166,9 @@ function exportBackupData(){
 // ---------- ☁️ Google Drive Backup — Google Identity Services (GIS) کے ذریعے، صرف
 // drive.file اجازت (ایپ صرف اپنی بنائی فائلیں دیکھ سکے، پوری Drive تک رسائی نہیں)
 // ---------- 🐞 ہدایت (FM8SEPTU0510PM): اصل خرابی ملی — یہ Client ID دراصل AIO POS ایپ کا تھا
-// (کسی دوسرے Google Cloud پروجیکٹ کا، جس میں fm-saddam-mandi.web.app کبھی authorized origin نہیں تھا)،
+// (کسی دوسرے Google Cloud پروجیکٹ کا، جس میں other-project.web.app کبھی authorized origin نہیں تھا)،
 // اسی لیے "Access blocked: Authorization Error (400: origin_mismatch)" آ رہا تھا۔ اب Fruit Mandi کا اپنا،
-// الگ، مخصوص Client ID بنایا (fm-saddam-mandi پروجیکٹ کے اندر ہی) — دونوں ایپس اب مکمل آزاد، ایک بند ہو تو
+// الگ، مخصوص Client ID بنایا (other-project پروجیکٹ کے اندر ہی) — دونوں ایپس اب مکمل آزاد، ایک بند ہو تو
 // دوسری متاثر نہ ہو ---------- -->
 const GOOGLE_DRIVE_CLIENT_ID = '954131537356-kh49ke097he59m4vlgu6cmoli51t0lq6.apps.googleusercontent.com';
 const GOOGLE_DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
@@ -8342,7 +8342,7 @@ function checkScheduledAutoBackup(){
   setTimeout(() => { autoBackupCheckLock = false; }, 5000);
 }
 // ---------- ایپ کھلتے ہی ایک بار، پھر ہر 10 منٹ بعد دوبارہ چیک (تاکہ لمبی سیشن میں اگلا سلاٹ بھی وقت پر پکڑا جائے) ---------- -->
-/* SM110TH025: پرانا شیڈولر بند — نیا نظام tools/sm_backup_v2.js (آخر میں) */
+/* پرانا شیڈولر بند — نیا نظام آخر میں */
 
 async function backupToGoogleDrive(silent){
   const btn = document.getElementById('gdriveBackupBtn');
@@ -8957,7 +8957,7 @@ function getDeveloperContact(){
 // 🆕 FM29SEPTU0310AM: گاہک کو نقد ادھار — بل جیسا حساب ٹیبل (دستی کیش، سابقہ، ٹوٹل، وصولی، اب تک ٹوٹل بقایا) + یادداشت وقت کے ساتھ
 // 🆕 FM309WE#265: سیریل ماسٹر کاپی — صرف ہاتھ سے محفوظ/بحال (کوئی خودکار نظام نہیں)؛ نئی محفوظ کرنے سے پہلے تصدیق، بحالی میں فون/کلاؤڈ کی نئی کاپی، ٹکراؤ والے نئے نمبر درست، ڈرائیو کا جھوٹا ✅ ختم
 // 🆕 FM29SEPTU0525AM: بیوپاری سے نقد ادھار لیا — گاہک والے فارم جیسا ٹیبل؛ دونوں فارموں میں محفوظ کے بعد پرنٹ (تھرمل) / سکرین شاٹ اور شیئر / پوسٹر شیئر
-const APP_BUILD_VERSION = 'SM110TH025'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM110TH027'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -13285,15 +13285,8 @@ function deleteBillingCartDraft(){
 }
 
 // ---------- Bills Awaiting Approval (سیلزمین کے بھیجے ہوئے بل جو ایڈمن کی منظوری کے منتظر ہیں) ----------
-let pendingBillsData = [
-  {pending_id:1, salesman_name:'Aslam Bhai', customer_id:1, customer_name:'Muhammad Usman', sale_mode:'retail', payment_method:'cash',
-   items:[{variant_id:1, name:'Lipton Tea 1kg', qty:2, unitPrice:850}, {variant_id:3, name:'Lipton Tea 250g', qty:5, unitPrice:240}],
-   status:'pending', admin_note:'', submitted_at: new Date(Date.now()-25*60000).toISOString(), acknowledged:false},
-  {pending_id:2, salesman_name:'Aslam Bhai', customer_id:null, customer_name:'Walk-in Customer', sale_mode:'retail', payment_method:'cash',
-   items:[{variant_id:2, name:'Lipton Tea 500g', qty:3, unitPrice:450}],
-   status:'pending', admin_note:'', submitted_at: new Date(Date.now()-8*60000).toISOString(), acknowledged:false},
-];
-let nextPendingId = 3;
+let pendingBillsData = []; // 🥬 جنرل ایپ: کوئی نمونہ بل نہیں
+let nextPendingId = 1;
 
 /* =====================================================================
    BARCODE SCANNER (کیمرہ سے لائیو بارکوڈ اسکین — BarcodeDetector API)
@@ -16351,11 +16344,10 @@ const PRODUCT_CSV_HEADERS = ['Product Name','Category','Variant Label','Barcode'
 function downloadProductCsvTemplate(){
   const rows = [
     PRODUCT_CSV_HEADERS.join(','),
-    'Lipton Tea,Beverages,1kg,8964000111,700,850,780,24,5,,Aisle 4',
-    'Lipton Tea,Beverages,500g,8964000112,360,450,410,40,10,,Aisle 4',
-    'Sugar,Grocery,Default,8964000200,140,160,150,100,20,,Warehouse-1',
+    'ABC,Category,Default,,0,0,0,0,0,,',
+    'XYZ,Category,Default,,0,0,0,0,0,,',
   ];
-  downloadCsvFile(rows.join('\n'), 'FM_Product_Import_Template.csv');
+  downloadCsvFile(rows.join('\n'), 'SM_Product_Import_Template.csv');
 }
 
 let pendingProductImportRows = [];
@@ -16467,9 +16459,9 @@ function confirmProductCsvImport(){
 function downloadPartyCsvTemplate(){
   const isCustomer = currentPartyTab === 'customers';
   const rows = isCustomer
-    ? ['Name,Phone,Address,Area', 'Aslam Bhai,03001234567,Main Bazaar,Lahore', 'Fatima Traders,03211234567,Shop 12 Anarkali,Lahore']
-    : ['Name,Phone,Address,Area', 'Khalid Suppliers,03331234567,Warehouse Road,Karachi', 'Al-Madina Traders,03451234567,Wholesale Market,Faisalabad'];
-  downloadCsvFile(rows.join('\n'), (isCustomer ? 'FM_Customer_Import_Template.csv' : 'FM_Supplier_Import_Template.csv'));
+    ? ['Name,Phone,Address,Area', 'ABC,03000000001,Address,City', 'XYZ,03000000002,Address,City']
+    : ['Name,Phone,Address,Area', 'ABC,03000000001,Address,City', 'XYZ,03000000002,Address,City'];
+  downloadCsvFile(rows.join('\n'), (isCustomer ? 'SM_Customer_Import_Template.csv' : 'SM_Supplier_Import_Template.csv'));
 }
 
 // ---------- کسٹمر/سپلائر امپورٹ فائل میں مختلف ناموں کے کالم بھی خودکار پہچانے جائیں (Name/Client Name، Phone/Mobile وغیرہ) ----------
@@ -21378,11 +21370,12 @@ function jumpToProduct(productId){
 // ---------- 🧹 FM309WE#267 (ہدایت): نمونے کے (ڈیمو) کسٹمر مکمل ختم — نئے فون پر کبھی نظر نہیں آئیں گے ----------
 const CUSTOMERS_SEED_DATA = [ /* 🥬 جنرل ایپ: کوئی پرانا ریکارڈ نہیں */
 ];
+const LEGACY_DEMO_CUSTOMERS = [];
 function isLegacyDemoCustomer(c){
   return !!c && LEGACY_DEMO_CUSTOMERS.some(d => d.customer_id === c.customer_id && d.name === c.name && (d.phone || '') === (c.phone || ''));
 }
 let customersData = loadFromStorage('customers', CUSTOMERS_SEED_DATA);
-let nextCustomerId = loadFromStorage('nextCustomerId', 4);
+let nextCustomerId = loadFromStorage('nextCustomerId', 1);
 
 // ---------- 🔢 ہدایت (FM6SEPSU13): کسٹمر اور سپلائر کی فہرست میں بھی وہی مرضی کا سیریل نمبر —
 // بالکل سبزیوں کی طرح۔ کسٹمر اور سپلائر کی نمبرنگ الگ الگ (آزاد) حوض ہیں — ایک کسٹمر کا #5 اور
@@ -21451,7 +21444,7 @@ let nextMunshiLogId = loadFromStorage('nextMunshiLogId', 1);
 const SUPPLIERS_SEED_DATA = [ /* 🥬 جنرل ایپ: کوئی پرانا ریکارڈ نہیں */
 ];
 let suppliersData = loadFromStorage('suppliers', SUPPLIERS_SEED_DATA);
-let nextSupplierId = loadFromStorage('nextSupplierId', 3);
+let nextSupplierId = loadFromStorage('nextSupplierId', 1);
 
 /* =====================================================================
    💳 PAYMENTS HUB — تمام پیمنٹس کا مرکزی، متحدہ ریکارڈ (کسٹمر سے وصولی + سپلائر کو ادائیگی)
@@ -24719,6 +24712,7 @@ function openCustomerProfile(customerId){
     ${c.total_receivable > 0 ? `<button style="background:linear-gradient(155deg,#fb923c,#c2410c);" onclick="openCustomerReminderModal(${c.customer_id})"><span class="sideIcon">📢</span><span class="sideLabel">Remind</span></button>` : ''}
     <button style="background:linear-gradient(155deg,#8b5cf6,#5b21b6);" onclick="shareCustomerProfile(${c.customer_id})"><span class="sideIcon">🪪</span><span class="sideLabel">Profile</span></button>
     <button id="profileModeBtn" style="background:linear-gradient(155deg,#475569,#1e293b);" onclick="toggleProfileMainMode()"><span class="sideIcon">📜</span><span class="sideLabel">Transactions</span></button>
+    ${AppState.currentRole === 'admin' ? `<button style="background:linear-gradient(155deg,#dc2626,#7f1d1d);" onclick="deleteCustomerFromProfile(${c.customer_id})"><span class="sideIcon">🗑️</span><span class="sideLabel">Delete</span></button>` : ''}
   `;
 
   renderCustomerMainContent(c.customer_id);
@@ -45290,7 +45284,7 @@ window.addEventListener('DOMContentLoaded', () => {
 <script>
 /* SM_BACKUP_V2_BEGIN */
 /* =====================================================================
-   ☁️ سبزی منڈی — نیا گوگل ڈرائیو بیک اپ / ریسٹور نظام (SM110TH025)
+   ☁️ سبزی منڈی — نیا گوگل ڈرائیو بیک اپ / ریسٹور نظام (SM110TH026)
    یہ سکرپٹ index.html کے آخر میں لگتی ہے (build_general.py خود لگاتا ہے) اور پرانے ڈرائیو فنکشن بدل دیتی ہے۔
    ---------------------------------------------------------------------
    ✔ فائل کا نام: BKSM + تاریخ(2) + مہینہ(3 حروف) + دن(2) + وقت  → مثلاً BKSM01OCTTH0112PM.JSON
@@ -45901,6 +45895,45 @@ window.addEventListener('DOMContentLoaded', () => {
 })();
 
 /* SM_BACKUP_V2_END */
+</script>
+<script>
+/* SM_CUSTOMER_DELETE_BEGIN */
+/* SM110TH026 — کسٹمر پروفائل سے ڈیلیٹ (صرف ایڈمن): تصدیق 1 → تصدیق 2 → ایڈمن PIN → حذف
+   build_general.py اسے index.html کے آخر میں خود لگاتا ہے؛ بٹن openCustomerProfile کے سائیڈ کالم میں سب سے نیچے */
+async function deleteCustomerFromProfile(customerId){
+  if(AppState.currentRole !== 'admin'){ alert('صرف ایڈمن کسٹمر ڈیلیٹ کر سکتا ہے'); return; }
+  const c = customersData.find(x => x.customer_id === customerId);
+  if(!c) return;
+  const due = c.total_receivable || 0;
+  const wal = c.wallet_balance || 0;
+  const bills = (typeof invoicesData !== 'undefined' ? invoicesData : []).filter(i => i.customer_id === customerId).length;
+  let info = `کسٹمر: ${c.name}`;
+  if(due > 0) info += `\nاس سے آپ نے Rs. ${due.toLocaleString()} لینے ہیں`;
+  if(wal > 0) info += `\nاس کا والٹ (ایڈوانس) Rs. ${wal.toLocaleString()} ہے`;
+  if(bills > 0) info += `\nاس کے ${bills} بل ہیں`;
+  // ---------- تصدیق 1 ----------
+  if(!confirm(`⚠️ تصدیق 1/3\n\n${info}\n\nکیا آپ واقعی اس کسٹمر کو ڈیلیٹ کرنا چاہتے ہیں؟`)) return;
+  // ---------- تصدیق 2 ----------
+  if(!confirm(`❗ تصدیق 2/3\n\n"${c.name}" مکمل ڈیلیٹ ہو جائے گا اور دوبارہ واپس نہیں آئے گا۔${due > 0 ? '\n\n⚠️ اس کا بقایہ بھی ساتھ ختم ہو جائے گا۔' : ''}\n\nپکا ڈیلیٹ کرنا ہے؟`)) return;
+  // ---------- تصدیق 3: ایڈمن پن ----------
+  if(!(await confirmAdminPinForDelete(c.name))) return;
+  // حفاظتی نقل: آخری 20 ڈیلیٹ شدہ کسٹمر فون میں رہتے ہیں (صرف ڈویلپر کی ریکوری کے لیے)
+  try{
+    const log = loadFromStorage('smDeletedCustomersLog', []) || [];
+    log.push({ at: new Date().toISOString(), customer: JSON.parse(JSON.stringify(c, (k, v) => k === 'photo' ? undefined : v)) });
+    saveToStorage('smDeletedCustomersLog', log.slice(-20));
+  }catch(e){}
+  try{ idbDeleteImage('customer_' + customerId); }catch(e){}
+  customersData = customersData.filter(x => x.customer_id !== customerId);
+  persistAllData();
+  try{ pushCustomersToCloud(); }catch(e){}
+  try{ pauseCloudPolling(20000); }catch(e){}
+  closeProfileModal();
+  try{ renderPartyList(document.getElementById('partySearchInput')?.value || ''); }catch(e){}
+  alert(`🗑️ "${c.name}" ڈیلیٹ ہو گیا۔`);
+}
+
+/* SM_CUSTOMER_DELETE_END */
 </script>
 </body>
 </html>
