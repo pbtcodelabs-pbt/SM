@@ -23,7 +23,7 @@ const APP_EDITION = 'general';
   Object.defineProperty(SP, 'length', { get(){ return mine(this).length; }, configurable: true });
   window.smLsKeys = function(){ return mine(window.localStorage); };
   // ---------- ☁️ سبزی منڈی کا اپنا فائربیس (sabzi-mandi-143e6) — مالک والا کبھی نہیں ----------
-  // لائسنس/ٹرائل/ڈیوائس ہمیشہ کھلے؛ دکان کا ڈیٹا (shops/<موبائل>/…) صرف آن لائن پیکج (P2 سے اوپر) میں
+  // لائسنس/ٹرائل/ڈیوائس ہمیشہ کھلے؛ دکان کا ڈیٹا (shops/<موبائل>/…) صرف آن لائن پیکج (P1+1 سے اوپر) میں
   const of = window.fetch.bind(window);
   window.fetch = function(input, init){
     const u = (typeof input === 'string') ? input : (input && input.url) || '';
@@ -34,12 +34,111 @@ const APP_EDITION = 'general';
   };
 })();
 function _smSettings(){ try{ return JSON.parse(localStorage.getItem('fmPos_settings') || '{}') || {}; }catch(e){ return {}; } }
-// 📦 پیکج: P1 = اکیلا صارف (فون + گوگل ڈرائیو)، P2 = مالک + 1 ملازم … P6 = مالک + 5 ملازم (کلاؤڈ)
-const SM_PLAN_STAFF = { P1: 0, P2: 1, P3: 2, P4: 3, P5: 4, P6: 5 };
-function smPlan(){ try{ return (typeof AppState !== 'undefined' && AppState.settings && AppState.settings.smPlan) || _smSettings().smPlan || 'P1'; }catch(e){ return 'P1'; } }
+// 📦 پیکج: P1 = صرف مالک (اکیلا صارف: فون + گوگل ڈرائیو)؛ P1+1 = مالک + 1 ملازم … P1+5 = مالک + 5 ملازم (آن لائن کلاؤڈ)
+const SM_PLAN_STAFF = { 'P1': 0, 'P1+1': 1, 'P1+2': 2, 'P1+3': 3, 'P1+4': 4, 'P1+5': 5 };
+const SM_PLAN_LEGACY = { P2: 'P1+1', P3: 'P1+2', P4: 'P1+3', P5: 'P1+4', P6: 'P1+5' }; // پرانے بنے کوڈ اب بھی چلیں
+function smNormPlan(p){ p = String(p || '').trim(); if(SM_PLAN_LEGACY[p]) p = SM_PLAN_LEGACY[p]; return SM_PLAN_STAFF[p] !== undefined ? p : null; }
+function smPlan(){ try{ return smNormPlan((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.smPlan) || _smSettings().smPlan) || 'P1'; }catch(e){ return 'P1'; } }
 function smIsCloudPlan(){ return (SM_PLAN_STAFF[smPlan()] || 0) > 0; }
 function smShopMobile(){ try{ return ((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.businessPhone) || _smSettings().businessPhone || 'unregistered').replace(/[^0-9]/g, '') || 'unregistered'; }catch(e){ return 'unregistered'; } }
 function smShopBase(){ return 'shops/' + smShopMobile() + '/data/'; }
+function smPlanText(p){ p = smNormPlan(p) || 'P1'; const n = SM_PLAN_STAFF[p]; return n === 0 ? 'صرف مالک' : ('مالک + ' + n + ' ملازم'); }
+function smSetPlan(plan, quiet){
+  const np = smNormPlan(plan); if(!np) return false;
+  AppState.settings.smPlan = np;
+  try{ saveToStorage('settings', AppState.settings); }catch(e){}
+  try{ smApplyBranding(); }catch(e){}
+  if(!quiet) setTimeout(() => { try{ smPushLicenseMirror(); }catch(e){} }, 3000);
+  return true;
+}
+async function smFetchPlanForCode(code){
+  try{
+    const res = await fetch(`${FIRESTORE_BASE}/licenses/${encodeURIComponent(code)}?key=${FIREBASE_API_KEY}`);
+    if(!res.ok) return null;
+    const d = await res.json(); const np = smNormPlan(d.fields && d.fields.plan && d.fields.plan.stringValue);
+    if(np) smSetPlan(np);
+    return np;
+  }catch(e){ return null; }
+}
+async function smAfterRestore(expiryStr, code, plan){
+  let p = smNormPlan(plan);
+  if(!p && code) p = await smFetchPlanForCode(code);
+  if(p) smSetPlan(p);
+  smShowRestoreCard(expiryStr, p || smPlan());
+}
+function smShowRestoreCard(expiryStr, plan){
+  try{
+    const days = Math.max(0, Math.round((new Date(expiryStr) - new Date()) / 86400000));
+    const p = smNormPlan(plan) || 'P1';
+    const old = document.getElementById('smRestoreCard'); if(old) old.remove();
+    const el = document.createElement('div'); el.id = 'smRestoreCard';
+    el.style.cssText = 'position:fixed; inset:0; z-index:2147483600; background:rgba(2,44,34,.8); display:flex; align-items:center; justify-content:center; padding:18px;';
+    el.innerHTML = `<div dir="rtl" style="background:#fff; border-radius:22px; max-width:380px; width:100%; padding:22px 18px 18px; text-align:center; box-shadow:0 14px 44px rgba(0,0,0,.5); font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq',serif;">
+      <div style="font-size:48px; line-height:1.2;">✅</div>
+      <div style="font-size:22px; font-weight:900; color:#065f46; margin:4px 0 10px;">آپ کی سبسکرپشن بحال ہو گئی</div>
+      <div style="font-size:16px; color:#334155; line-height:2;">آپ کی پرانی سبسکرپشن کے <b style="color:#15803d; font-family:Arial,sans-serif;">${days}</b> دن باقی ہیں۔<br>پیکج: <b style="font-family:Arial,sans-serif; color:#0f766e;">📦 ${p}</b> — ${smPlanText(p)}<br><span style="color:#0f766e; font-weight:900;">نیا کوڈ لگانے کی ضرورت نہیں</span><br>آپ کی ایپ کھل رہی ہے…</div>
+      <button type="button" onclick="document.getElementById('smRestoreCard').remove()" style="margin-top:14px; width:auto !important; padding:8px 28px !important; border:none !important; border-radius:999px !important; background:#16a34a !important; color:#fff !important; font-size:15px !important; font-weight:800; cursor:pointer;">ٹھیک ہے</button>
+    </div>`;
+    document.body.appendChild(el);
+    setTimeout(() => { try{ el.remove(); }catch(e){} }, 7000);
+  }catch(e){}
+}
+async function smRefreshSubscription(btn){
+  const label = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ چیک ہو رہا ہے…'; }
+  let note = '';
+  try{
+    const uid = getOrCreateDeviceUID();
+    const best = await _licFindByUid(uid);
+    const today = _smYMD(new Date());
+    if(best && best.expiry && best.expiry >= today){
+      if(AppState.settings.isOnFreeTrial || !AppState.settings.subscriptionExpiry || best.expiry > AppState.settings.subscriptionExpiry){
+        AppState.settings.subscriptionExpiry = best.expiry; AppState.settings.isOnFreeTrial = false;
+        if(best.on) AppState.settings.subscriptionActivatedOn = best.on;
+        if(best.code) AppState.settings.lastActivationCode = best.code;
+        persistAllData();
+      }
+      if(best.plan) smSetPlan(best.plan, true); else if(best.code) await smFetchPlanForCode(best.code);
+    }
+    try{ setupLoginScreen(); }catch(e){}
+    try{ renderLoginLicenseInfo(); }catch(e){}
+    smApplyBranding();
+    const days = daysLeftInSubscription();
+    if(isSubscriptionActive()){
+      note = AppState.settings.isOnFreeTrial
+        ? '🎁 مفت آزمائش چل رہی ہے — ' + days + ' دن باقی'
+        : '✅ آپ کی سبسکرپشن فعال ہے\n📦 پیکج ' + smPlan() + ' (' + smPlanText(smPlan()) + ')\n📅 ' + days + ' دن باقی';
+    } else note = '⚠️ کوئی فعال سبسکرپشن نہیں ملی — کوڈ لگائیں یا ڈویلپر سے رابطہ کریں (03206793793)';
+  }catch(e){ note = '⚠️ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں'; }
+  const box = document.getElementById('smSubCheckMsg');
+  if(box){
+    box.style.cssText = 'display:block; margin:0 0 8px; background:#ecfdf5; border:1.5px solid #86efac; color:#065f46; border-radius:12px; padding:8px 12px; font-size:13px; font-weight:800; line-height:1.8; white-space:pre-line;';
+    box.textContent = note;
+    setTimeout(() => { try{ box.style.display = 'none'; }catch(e){} }, 9000);
+  }
+  if(btn){ btn.disabled = false; btn.textContent = label; }
+}
+function _smYMD(d){ const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), dd = String(d.getDate()).padStart(2, '0'); return y + '-' + m + '-' + dd; }
+function _smParseYMD(str){ const p = String(str).split('-').map(Number); return new Date(p[0], (p[1] || 1) - 1, p[2] || 1); }
+function smActMsg(r){
+  if(r.restored) return '✅ سبسکرپشن بحال ہو گئی — ' + formatDateDMY(r.expiry) + ' تک۔';
+  const tot = r.totalDays || r.daysGranted;
+  return (r.carried > 0)
+    ? '✅ ' + r.daysGranted + ' دن + پرانے ' + r.carried + ' دن = کل ' + tot + ' دن کی سبسکرپشن — ' + formatDateDMY(r.expiry) + ' تک۔'
+    : '✅ ' + r.daysGranted + ' دن کی سبسکرپشن فعال — ' + formatDateDMY(r.expiry) + ' تک۔';
+}
+function smApplySubWarning(){
+  try{
+    const active = isSubscriptionActive();
+    const days = active ? daysLeftInSubscription() : 99;
+    const warn = active && days <= (AppState.settings.isOnFreeTrial ? 2 : 6);
+    const row = document.getElementById('subBoxRow'), pill = document.getElementById('loginSubStatus');
+    [row, pill].forEach(el => { if(el) el.classList.toggle('smSubWarn', warn); });
+    if(pill && warn) pill.textContent = (days === 0) ? '⚠️ آج سبسکرپشن کا آخری دن ہے' : ('⚠️ ' + days + ' دن باقی — تجدید کروائیں');
+  }catch(e){}
+}
+function renderSubscriptionBanner(){ _origRenderSubscriptionBanner(); smApplySubWarning(); }
+async function setupLoginScreen(){ const r = await _origSetupLoginScreen.apply(this, arguments); try{ smApplySubWarning(); }catch(e){} return r; }
 function smBiz(){ try{ return (AppState.settings.businessName || '').trim() || 'سبزی منڈی'; }catch(e){ return 'سبزی منڈی'; } }
 function smPhone(){ try{ return AppState.settings.businessPhone || ''; }catch(e){ return ''; } }
 function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catch(e){ return 'مالک'; } }
@@ -2690,6 +2789,14 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+<style id="smSubWarnCss">
+@keyframes smSubGlow { 0%,100%{ box-shadow:0 0 6px 1px rgba(239,68,68,.55); } 50%{ box-shadow:0 0 20px 6px rgba(239,68,68,.95); } }
+#subBoxRow.smSubWarn{ background:linear-gradient(135deg,#dc2626,#7f1d1d) !important; border:2px solid #fecaca !important; border-radius:14px !important; animation:smSubGlow 1.6s ease-in-out infinite; }
+#subBoxRow.smSubWarn *:not(button){ background:transparent !important; color:#fff !important; font-weight:900 !important; border-color:transparent !important; text-shadow:0 1px 2px rgba(0,0,0,.4); }
+#subBoxRow.smSubWarn #subBoxDaysVal{ font-size:1.12em !important; white-space:nowrap; }
+#subBoxRow.smSubWarn{ flex-wrap:nowrap; overflow:hidden; }
+#loginSubStatus.smSubWarn{ background:linear-gradient(135deg,#dc2626,#991b1b) !important; color:#fff !important; border:2px solid #fecaca !important; animation:smSubGlow 1.6s ease-in-out infinite; font-size:13.5px !important; font-weight:900 !important; padding:6px 16px !important; }
+</style>
 </head>
 <body>
 <!-- ---------- 🗑️ ہدایت (FM13SEPSU): نیچے والا کالا "New update available" ٹوسٹ باکس مکمل ہٹا دیا —
@@ -2732,6 +2839,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
 
     <!-- ---------- ہمیشہ نظر آنے والی سبسکرپشن/ٹرائل کی حیثیت — لاگ ان سے پہلے ہی صاف پتا چل جائے ---------- -->
     <div id="loginSubStatus" style="display:inline-block; background:#eef2ff; border-radius:16px; padding:4px 14px; margin-bottom:6px; font-size:11px; font-weight:800; color:var(--primary-dark);"></div>
+    <div style="margin:0 0 8px;"><button type="button" id="smSubCheckBtn" onclick="smRefreshSubscription(this)" style="width:auto !important; margin:0 !important; padding:5px 14px !important; font-size:12px !important; border-radius:999px !important; background:#ecfdf5 !important; color:#065f46 !important; border:1.5px solid #6ee7b7 !important; font-weight:800; cursor:pointer; box-shadow:none !important;">🔄 سبسکرپشن چیک / تازہ کریں</button></div>
+    <div id="smSubCheckMsg" style="display:none;"></div>
 
     <!-- ---------- 🩺 تشخیصی بینر — اگر یہ ڈومین (مثلاً Firebase والا) Cloud (Firestore) سے یوزر/PIN ڈیٹا حاصل نہ کر سکے
     // تو یہاں صاف وجہ دکھائیں — تاکہ ڈویلپر بغیر براؤزر Console کھولے فوراً سمجھ سکے کہ کیا مسئلہ ہے ---------- -->
@@ -6967,7 +7076,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <option value="lifetime">🌟 Lifetime (ہمیشہ کے لیے)</option>
         <option value="custom">✍️ Custom Days (اپنی مرضی کے دن لکھیں)</option>
       </select>
-<select id="giftCodePlanInput" style="width:100%; padding:9px; margin-bottom:8px; border:2px solid #16a34a; border-radius:8px; font-weight:800;"><option value="P1">📦 P1 — اکیلا صارف (صرف مالک، گوگل ڈرائیو)</option><option value="P2">📦 P2 — مالک + 1 ملازم (آن لائن)</option><option value="P3">📦 P3 — مالک + 2 ملازم</option><option value="P4">📦 P4 — مالک + 3 ملازم</option><option value="P5">📦 P5 — مالک + 4 ملازم</option><option value="P6">📦 P6 — مالک + 5 ملازم</option></select>
+<select id="giftCodePlanInput" style="width:100%; padding:9px; margin-bottom:8px; border:2px solid #16a34a; border-radius:8px; font-weight:800;"><option value="P1">📦 P1 — صرف مالک (اکیلا، گوگل ڈرائیو)</option><option value="P1+1">📦 P1+1 — مالک + 1 ملازم (آن لائن)</option><option value="P1+2">📦 P1+2 — مالک + 2 ملازم</option><option value="P1+3">📦 P1+3 — مالک + 3 ملازم</option><option value="P1+4">📦 P1+4 — مالک + 4 ملازم</option><option value="P1+5">📦 P1+5 — مالک + 5 ملازم</option></select>
       <!-- ---------- ✍️ ہدایت (نئی تجویز): کسی بھی عدد کے دن دینے کے لیے — مثلاً 3، 10، 15، 42 دن،
       جب پرانے کسٹمر کی سبسکرپشن جزوی طور پر باقی ہو اور اسے صرف اتنے ہی دن کا نیا کوڈ دینا ہو ---------- -->
       <input type="number" id="giftCodeCustomDaysInput" min="1" placeholder="دنوں کی تعداد لکھیں (مثلاً 15)" style="display:none; width:100%; padding:9px; margin-bottom:8px; border:1.5px solid var(--primary); border-radius:8px; font-size:13px;">
@@ -8788,7 +8897,7 @@ function getDeveloperContact(){
 // 🆕 FM29SEPTU0310AM: گاہک کو نقد ادھار — بل جیسا حساب ٹیبل (دستی کیش، سابقہ، ٹوٹل، وصولی، اب تک ٹوٹل بقایا) + یادداشت وقت کے ساتھ
 // 🆕 FM309WE#265: سیریل ماسٹر کاپی — صرف ہاتھ سے محفوظ/بحال (کوئی خودکار نظام نہیں)؛ نئی محفوظ کرنے سے پہلے تصدیق، بحالی میں فون/کلاؤڈ کی نئی کاپی، ٹکراؤ والے نئے نمبر درست، ڈرائیو کا جھوٹا ✅ ختم
 // 🆕 FM29SEPTU0525AM: بیوپاری سے نقد ادھار لیا — گاہک والے فارم جیسا ٹیبل؛ دونوں فارموں میں محفوظ کے بعد پرنٹ (تھرمل) / سکرین شاٹ اور شیئر / پوسٹر شیئر
-const APP_BUILD_VERSION = 'SM110TH013'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM110TH016'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -8922,8 +9031,8 @@ function getOrCreateDeviceUID(){
   if(!AppState.settings.subscriptionExpiry && !AppState.settings.freeTrialGranted){
     const trialEnd = new Date();
     trialEnd.setDate(trialEnd.getDate() + 7);
-    AppState.settings.subscriptionExpiry = trialEnd.toISOString().slice(0,10);
-    AppState.settings.subscriptionActivatedOn = new Date().toISOString().slice(0,10);
+    AppState.settings.subscriptionExpiry = _smYMD(trialEnd);
+    AppState.settings.subscriptionActivatedOn = _smYMD(new Date());
     AppState.settings.freeTrialGranted = true;
     AppState.settings.isOnFreeTrial = true;
   }
@@ -8988,7 +9097,7 @@ async function syncSubscriptionToCloud(){
         fields: {
           subscriptionExpiry: { stringValue: String(AppState.settings.subscriptionExpiry || '') },
           subscriptionActivatedOn: { stringValue: String(AppState.settings.subscriptionActivatedOn || '') },
-          lastActivationCode: { stringValue: String(AppState.settings.lastActivationCode || '') },
+          lastActivationCode: { stringValue: String(AppState.settings.lastActivationCode || '') }, smPlan: { stringValue: smPlan() },
           updatedAt: { integerValue: String(Date.now()) }
         }
       })
@@ -9085,15 +9194,15 @@ async function activateSubscription(code){
 
   const doc = await docRes.json();
   const data = _parseFirestoreFields(doc.fields || {});
-  if(data.plan && SM_PLAN_STAFF[data.plan] !== undefined){ AppState.settings.smPlan = data.plan; try{ persistAllData(); }catch(e){} setTimeout(() => { try{ smPushLicenseMirror(); }catch(e){} }, 3000); } // 📦 پیکج
+  if(data.plan){ try{ smSetPlan(data.plan); }catch(e){} } // 📦 پیکج
 
   if(data.active === false) return {success:false, message:'This code has been revoked. Please contact the developer.'};
   // ---------- 🎁 ہدایت (FM3SEPTH10): اگر کوڈ کسی خاص ڈیوائس سے bound نہیں (boundUid خالی) تو کوئی بھی ڈیوائس ایک بار استعمال کر سکتی ہے ----------
   if(data.boundUid && data.boundUid !== uid) return {success:false, message:'This code was issued for a different device.'};
   if(data.activatedAt){
     if(String(data.activatedByUid || '') === String(uid) && Number(data.expiresAt) > Date.now()){
-      const expStr = new Date(Number(data.expiresAt)).toISOString().slice(0,10);
-      _licApplyRestore(expStr, new Date(Number(data.activatedAt)).toISOString().slice(0,10), trimmedCode);
+      const expStr = _smYMD(new Date(Number(data.expiresAt)));
+      _licApplyRestore(expStr, _smYMD(new Date(Number(data.activatedAt))), trimmedCode);
       return {success:true, expiry: expStr, daysGranted: Math.max(0, Math.round((Number(data.expiresAt) - Date.now()) / 86400000)), restored: true};
     }
     return {success:false, message:'یہ کوڈ کسی اور فون پر لگ چکا ہے۔'};
@@ -9104,10 +9213,12 @@ async function activateSubscription(code){
 
   // ---------- اگر پہلے سے فعال ادائیگی شدہ سبسکرپشن ہو تو نئے دن اس میں جوڑ دیں (توسیع/renewal)۔
   // لیکن اگر ابھی صرف مفت ٹرائل چل رہا ہو تو نیا کوڈ اسی پر جمع نہیں ہونا چاہیے ----------
+  // 📅 پورے دن: آج کا دن گنتی میں شامل نہیں (30 دن کا کوڈ = آج سے پورے 30 دن)؛ پرانے باقی دن بھی جمع (6 + 30 = 36)
   const hasActivePaidSub = isSubscriptionActive() && !AppState.settings.isOnFreeTrial;
-  const base = hasActivePaidSub ? new Date(AppState.settings.subscriptionExpiry) : new Date();
+  const carriedDays = hasActivePaidSub ? daysLeftInSubscription() : 0;
+  const base = hasActivePaidSub ? _smParseYMD(AppState.settings.subscriptionExpiry) : (() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; })();
   base.setDate(base.getDate() + daysNum);
-  const newExpiryStr = base.toISOString().slice(0,10);
+  const newExpiryStr = _smYMD(base);
 
   // ---------- Firestore میں کوڈ کو "استعمال شدہ" مارک کریں — دوبارہ استعمال ناممکن ----------
   // ---------- 🐞 ہدایت (FM10SEPTH0844AM): اصل "Access Blocked" خرابی یہیں ملی — یہ لکھائی بغیر
@@ -9138,16 +9249,16 @@ async function activateSubscription(code){
   }
 
   AppState.settings.subscriptionExpiry = newExpiryStr;
-  AppState.settings.subscriptionActivatedOn = new Date().toISOString().slice(0,10);
+  AppState.settings.subscriptionActivatedOn = _smYMD(new Date());
   AppState.settings.isOnFreeTrial = false;
   AppState.settings.lastActivationCode = trimmedCode; // ---------- Remote Revoke کے لیے یاد رکھیں ----------
   persistAllData();
   try{ await syncSubscriptionToCloud(); }catch(e){ /* آف لائن ہو تو اگلی بار sync ہو جائے گا */ }
-  return {success:true, expiry: newExpiryStr, daysGranted: daysNum};
+  return {success:true, expiry: newExpiryStr, daysGranted: daysNum, carried: carriedDays, totalDays: daysNum + carriedDays};
 }
 
 // ---------- ہوم پیج (اور ہر صفحے) کے اوپر باریک پٹی — کب سبسکرائب کیا، کب ختم ہوگی، کتنے دن باقی — روزانہ خودکار تازہ ----------
-function renderSubscriptionBanner(){
+function _origRenderSubscriptionBanner(){
   const row = document.getElementById('subBoxRow');
   if(!row) return;
 
@@ -9633,7 +9744,7 @@ function sendDevChat(channel){
 // جب تک فری ٹرائل فعال ہے (چاہے Admin نے PIN بدل بھی لیا ہو) تو نئے/عام صارف کو PIN کی کنفیوژن میں بالکل نہیں ڈالنا —
 // سیدھا "Enter App" بٹن دکھائیں، "Login" کا لفظ اور PIN باکس دونوں چھپے رہیں۔
 // ٹرائل ختم ہونے کے بعد (یا پیڈ سبسکرپشن پر) ہی اصل PIN لاگ ان واپس آئے گا ----------
-async function setupLoginScreen(){
+async function _origSetupLoginScreen(){
   // ---------- کوئی بھی غیر متوقع خرابی ہو (پرانا براؤزر، ڈیٹا کرپشن وغیرہ) تو صارف کبھی بھی خالی/غیر فعال اسکرین پر نہ رہے —
   // ناکامی کی صورت میں محفوظ ترین حالت (Free Trial کا سیدھا بٹن) خودکار دکھائیں ----------
   try{
@@ -10796,7 +10907,7 @@ async function submitActivationCode(){
   const result = await activateSubscription(code);
   if(result.success){
     msgEl.style.color = 'var(--success)';
-    msgEl.textContent = `✅ Activated! ${result.daysGranted} day(s) added — valid until ${result.expiry}. Opening app...`;
+    msgEl.textContent = smActMsg(result) + ' ایپ کھل رہی ہے…';
     setTimeout(() => {
       document.getElementById('subscriptionGateScreen').style.display = 'none';
       document.getElementById('app').style.display = 'grid';
@@ -11669,7 +11780,7 @@ async function activateFromLoginScreen(){
   const result = await activateSubscription(code);
   if(result.success){
     msgEl.style.color = 'var(--success)';
-    msgEl.textContent = `✅ Activated! ${result.daysGranted} day(s) added — valid until ${result.expiry}.`;
+    msgEl.textContent = smActMsg(result);
     setTimeout(() => { setupLoginScreen(); }, 1000); // ---------- لاگ ان سکرین کی حیثیت (Trial/Subscribed) فوراً تازہ ہو جائے ----------
   } else {
     msgEl.style.color = 'var(--danger)';
@@ -18706,7 +18817,8 @@ function offerCloseOrdersForDirectBill(invoice){
    (4) ٹرائل-لاک صفر کرنے سے پہلے ایک بار بحالی کی کوشش
    ===================================================================== */
 function _licToday0(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
-function _licApplyRestore(expiryStr, activatedOn, code){
+function _licApplyRestore(expiryStr, activatedOn, code, plan){
+  try{ smAfterRestore(expiryStr, code, plan); }catch(e){} // 📦 پیکج بحال + خوبصورت پیغام
   AppState.settings.subscriptionExpiry = expiryStr;
   AppState.settings.subscriptionActivatedOn = activatedOn || AppState.settings.subscriptionActivatedOn || '';
   if(code) AppState.settings.lastActivationCode = code;
@@ -18721,7 +18833,7 @@ function _licApplyRestore(expiryStr, activatedOn, code){
     if(g && g.style.display !== 'none' && g.style.display !== ''){
       const m = document.getElementById('subGateMsg');
       if(m){ m.style.color = 'var(--success)'; m.textContent = '✅ آپ کی پرانی سبسکرپشن مل گئی — ایپ کھل رہی ہے...'; }
-      setTimeout(() => { try{ location.reload(); }catch(e){} }, 1200);
+      setTimeout(() => { try{ location.reload(); }catch(e){} }, 5200);
     }
   }catch(e){}
   try{ syncSubscriptionToCloud(); }catch(e){}
@@ -18729,13 +18841,13 @@ function _licApplyRestore(expiryStr, activatedOn, code){
 }
 // ---------- اسی فون (UID) پر لگے تمام کوڈز میں سے سب سے لمبی میعاد والا ---------- -->
 async function _licFindByUid(uid){
-  let best = null;
+  let best = null; let _maxPlan = null; const _licTodayStr = _smYMD(new Date());
   // 1) devices/{uid}
   try{
     const res = await authFirestoreFetch(`devices/${encodeURIComponent(uid)}?key=${FIREBASE_API_KEY}`);
     if(res && res.status === 200){
       const d = _parseFirestoreFields((await res.json()).fields || {});
-      if(d.subscriptionExpiry) best = { expiry: d.subscriptionExpiry, on: d.subscriptionActivatedOn || '', code: d.lastActivationCode || '' };
+      if(d.subscriptionExpiry) best = { expiry: d.subscriptionExpiry, on: d.subscriptionActivatedOn || '', code: d.lastActivationCode || '', plan: d.smPlan || '' };
     }
   }catch(e){}
   // 2) licenses جہاں activatedByUid = یہ فون
@@ -18757,13 +18869,15 @@ async function _licFindByUid(uid){
         if(d.active === false) return;
         const ms = Number(d.expiresAt) || 0;
         if(!ms) return;
-        const exp = new Date(ms).toISOString().slice(0, 10);
+        const exp = _smYMD(new Date(ms));
         const code = decodeURIComponent(String(r.document.name || '').split('/').pop() || '');
-        const on = d.activatedAt ? new Date(Number(d.activatedAt)).toISOString().slice(0, 10) : '';
+        const on = d.activatedAt ? _smYMD(new Date(Number(d.activatedAt))) : '';
+        const _np = smNormPlan(d.plan) || 'P1'; if(exp >= _licTodayStr && (!_maxPlan || SM_PLAN_STAFF[_np] > SM_PLAN_STAFF[_maxPlan])) _maxPlan = _np;
         if(!best || exp > best.expiry) best = { expiry: exp, on, code };
       });
     }
   }catch(e){}
+  if(best && _maxPlan) best.plan = _maxPlan;
   return best;
 }
 let _licRestoreBusy = null;
@@ -18780,7 +18894,7 @@ async function restoreSubscriptionFromCloud(){
     if(expD < _licToday0()) return false; // پرانی، ختم شدہ سبسکرپشن — کوڈ ہی چاہیے
     const cur = AppState.settings.subscriptionExpiry;
     if(!AppState.settings.isOnFreeTrial && cur && cur >= best.expiry) return false;
-    _licApplyRestore(best.expiry, best.on, best.code);
+    _licApplyRestore(best.expiry, best.on, best.code, best.plan);
     return true;
   })();
   try{ return await _licRestoreBusy; } finally { _licRestoreBusy = null; }
@@ -18863,6 +18977,7 @@ function renderLoginLicenseInfo(){
       ${code ? `<div style="display:flex; gap:6px; margin-top:6px; justify-content:flex-start;">${btn('📋 کاپی', `_licCopy(${JSON.stringify(code).replace(/"/g, '&quot;')}, this)`, '#e0f2fe', '#075985')}${btn('⬇️ خانے میں لگائیں', 'licPasteCodeIntoBox()', '#dcfce7', '#166534')}</div>` : ''}
     </div>
     ${row('📅 ختم ہونے کی تاریخ', val(_bkEsc(expTxt)))}
+    ${row('📦 پیکج', val(_bkEsc(smPlan())))}
     <div style="font-size:12px; color:#475569; margin-top:6px; line-height:1.7;">یہ کوڈ سنبھال کر رکھیں — اسی موبائل پر ایپ دوبارہ لگانی پڑے تو یہی کوڈ دوبارہ ڈال دیں۔</div>
   </div>`;
 }
@@ -35837,8 +35952,8 @@ async function saveNewUser(){
     const _lim = SM_PLAN_STAFF[smPlan()] || 0;
     const _cnt = usersData.filter(u => u.role !== 'admin' && u.role !== 'customer' && u.is_active !== false).length;
     if(role !== 'customer' && _cnt >= _lim){
-      alert(_lim === 0 ? `📦 آپ کا پیکج ${smPlan()} (اکیلا صارف) ہے — ملازم شامل نہیں ہو سکتے۔\n\nملازم کے لیے پیکج P2 یا اس سے اوپر لیں (ڈویلپر: 03206793793)۔`
-        : `📦 آپ کے پیکج ${smPlan()} میں زیادہ سے زیادہ ${_lim} ملازم ہیں — حد پوری ہو گئی۔\n\nمزید ملازم کے لیے پیکج بڑھائیں (ڈویلپر: 03206793793)۔`);
+      alert(_lim === 0 ? `📦 آپ کا پیکج P1 (صرف مالک) ہے — ملازم شامل نہیں ہو سکتے۔\n\nملازم کے لیے پیکج P1+1 یا اس سے اوپر لیں (ڈویلپر: 03206793793)۔`
+        : `📦 آپ کے پیکج ${smPlan()} (مالک + ${_lim} ملازم) میں حد پوری ہو گئی۔\n\nمزید ملازم کے لیے پیکج بڑھائیں (ڈویلپر: 03206793793)۔`);
       return;
     }
   }
@@ -40032,7 +40147,7 @@ async function purchaseViaPlayBilling(sku, days){
     const base = hasActivePaidSub ? new Date(AppState.settings.subscriptionExpiry) : new Date();
     base.setDate(base.getDate() + days);
     AppState.settings.subscriptionExpiry = base.toISOString().slice(0,10);
-    AppState.settings.subscriptionActivatedOn = new Date().toISOString().slice(0,10);
+    AppState.settings.subscriptionActivatedOn = _smYMD(new Date());
     AppState.settings.isOnFreeTrial = false;
     AppState.settings.subscriptionViaPlayBilling = true;
     persistAllData();
@@ -45031,7 +45146,7 @@ function smApplyBranding(){
   document.title = n;
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
   set('smRegVersion', (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '');
-  set('smPlanBadge', `📦 ${smPlan()} • ${smIsCloudPlan() ? 'آن لائن — مالک + ' + SM_PLAN_STAFF[smPlan()] + ' ملازم' : 'اکیلا صارف (گوگل ڈرائیو)'}`);
+  set('smPlanBadge', '📦 ' + smPlan() + ' • ' + (smIsCloudPlan() ? 'مالک + ' + SM_PLAN_STAFF[smPlan()] + ' ملازم (آن لائن)' : 'صرف مالک — اکیلا صارف (گوگل ڈرائیو)'));
   set('smTopTitle', n); set('smSideBrand', n); set('mobileBrandText', n); set('hbcBusinessName', n); set('smLoginShop', n);
   const st = AppState.settings;
   const im = document.getElementById('smTopLogo');
@@ -45065,10 +45180,10 @@ async function smJoinAsStaff(){
   const m = (prompt('📲 جس دکان سے جڑنا ہے، اس کے مالک کا موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, '');
   if(!/^03\d{9}$/.test(m)){ if(m) alert('درست موبائل نمبر لکھیں'); return; }
   AppState.settings.businessPhone = m; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = true;
-  AppState.settings.smPlan = 'P2';
+  AppState.settings.smPlan = 'P1+1';
   saveToStorage('settings', AppState.settings);
   const ok = await smPullLicenseMirror();
-  if(!ok){ alert('❌ اس نمبر کی کوئی آن لائن دکان نہیں ملی، یا اس کا پیکج آن لائن (P2+) نہیں۔\n\nنمبر چیک کریں یا مالک سے پوچھیں۔'); AppState.settings.smRegistered = false; saveToStorage('settings', AppState.settings); return; }
+  if(!ok){ alert('❌ اس نمبر کی کوئی آن لائن دکان نہیں ملی، یا اس کا پیکج آن لائن (P1+1 یا اس سے اوپر) نہیں۔\n\nنمبر چیک کریں یا مالک سے پوچھیں۔'); AppState.settings.smRegistered = false; saveToStorage('settings', AppState.settings); return; }
   location.reload();
 }
 // ---------- 🔁 لائسنس آئینہ: مالک کا فون پیکج/مدت دکان کے کلاؤڈ میں رکھتا ہے، ملازم کا فون وہیں سے لیتا ہے ----------
@@ -45085,8 +45200,8 @@ async function smPullLicenseMirror(){
     if(!res || !res.ok) return false;
     const d = await res.json(); const f = d.fields || {};
     const plan = f.plan?.stringValue, exp = f.expiry?.stringValue;
-    if(!plan || !SM_PLAN_STAFF[plan]) return false;
-    AppState.settings.smPlan = plan;
+    const np = smNormPlan(plan); if(!np || !SM_PLAN_STAFF[np]) return false;
+    AppState.settings.smPlan = np;
     if(exp){ AppState.settings.subscriptionExpiry = exp; AppState.settings.isOnFreeTrial = false; }
     if(f.shop?.stringValue) AppState.settings.businessName = f.shop.stringValue;
     if(f.owner?.stringValue) AppState.settings.ownerName = f.owner.stringValue;
