@@ -640,7 +640,7 @@ if _a!=-1:
 s=s.replace('میں فروٹ منڈی ایپ','میں سبزی منڈی ایپ')
 s=s.replace('Fruit_Mandi_POS_ad_poster.png','Sabzi_Mandi_POS_ad_poster.png')
 s=s.replace('https://username.github.io/FruitMandiPOS/','https://username.github.io/SM/')
-# ---------- ☁️ SM110TH024: نیا گوگل ڈرائیو بیک اپ نظام (tools/sm_backup_v2.js) ----------
+# ---------- ☁️ SM110TH025: نیا گوگل ڈرائیو بیک اپ نظام (tools/sm_backup_v2.js) ----------
 _old="setTimeout(checkScheduledAutoBackup, 8000);\nsetInterval(checkScheduledAutoBackup, 10 * 60 * 1000);"
 if s.count(_old)==1: s=s.replace(_old,"/* پرانا شیڈولر بند — نیا نظام آخر میں */")
 _js=open(_p.join(ROOT,'tools','sm_backup_v2.js'),encoding='utf-8').read()
@@ -658,6 +658,7 @@ for f in ['favicon-32.png','icon-180.png','icon-192.png','icon-512.png']:
 for f in ['JameelNooriNastaleeq-Regular.ttf','JameelNooriNastaleeq-Kasheeda.ttf']:
     w=w.replace(f"'./{f}'", f"'./fonts/{f}'")
 w=w.replace('صدام کی ہدایت','ہدایت').replace('صدام','مالک')
+w=w.replace("if (req.method !== 'GET') return;", "if (req.method !== 'GET') return;\n  // SM110TH025: privacy/terms pages are plain pages, never served from the app cache\n  if (/\\/(privacy|terms)\\.html$/.test(new URL(req.url).pathname)) return;", 1)
 open(f'{OUT}/sw.js','w',encoding='utf-8').write(w)
 
 # ---------- 9) manifest ----------
