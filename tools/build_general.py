@@ -368,7 +368,7 @@ function smBiz(){''')
 
 
 # ---------- 5e) 🔐 ملازم کوڈ — دکان کا خفیہ راستہ (موبائل + کوڈ)؛ بغیر کوڈ کوئی دکان سے نہیں جڑ سکتا ----------
-rep('<div class="subBoxRow admin-only" id="subBoxRow"', '<div id="smShopCodeRow" class="admin-only" style="display:none;"></div>\n    <div class="subBoxRow admin-only" id="subBoxRow"')
+rep('<div id="homeTopControlsRow">', '<div id="smShopCodeRow" class="admin-only" style="display:none;"></div>\n      <div id="homeTopControlsRow">')
 rep("function renderSubscriptionBanner(){ _origRenderSubscriptionBanner(); smApplySubWarning(); }", "function renderSubscriptionBanner(){ _origRenderSubscriptionBanner(); smApplySubWarning(); try{ smRenderShopCodeRow(); }catch(e){} }")
 rep("function smBiz(){", r'''function smFmtCode(c){ c = String(c || ''); return c.length > 4 ? c.slice(0, 4) + '-' + c.slice(4) : c; }
 function smRenderShopCodeRow(){
