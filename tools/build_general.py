@@ -640,6 +640,12 @@ if _a!=-1:
 s=s.replace('میں فروٹ منڈی ایپ','میں سبزی منڈی ایپ')
 s=s.replace('Fruit_Mandi_POS_ad_poster.png','Sabzi_Mandi_POS_ad_poster.png')
 s=s.replace('https://username.github.io/FruitMandiPOS/','https://username.github.io/SM/')
+# ---------- ☁️ SM110TH023: نیا گوگل ڈرائیو بیک اپ نظام (tools/sm_backup_v2.js) ----------
+_old="setTimeout(checkScheduledAutoBackup, 8000);\nsetInterval(checkScheduledAutoBackup, 10 * 60 * 1000);"
+if s.count(_old)==1: s=s.replace(_old,"/* پرانا شیڈولر بند — نیا نظام آخر میں */")
+_js=open(_p.join(ROOT,'tools','sm_backup_v2.js'),encoding='utf-8').read()
+_k=s.rindex('</body>')
+s=s[:_k]+'<script>\n/* SM_BACKUP_V2_BEGIN */\n'+_js+'\n/* SM_BACKUP_V2_END */\n</script>\n'+s[_k:]
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
