@@ -9055,7 +9055,7 @@ function getDeveloperContact(){
 // 🆕 FM29SEPTU0310AM: گاہک کو نقد ادھار — بل جیسا حساب ٹیبل (دستی کیش، سابقہ، ٹوٹل، وصولی، اب تک ٹوٹل بقایا) + یادداشت وقت کے ساتھ
 // 🆕 FM309WE#265: سیریل ماسٹر کاپی — صرف ہاتھ سے محفوظ/بحال (کوئی خودکار نظام نہیں)؛ نئی محفوظ کرنے سے پہلے تصدیق، بحالی میں فون/کلاؤڈ کی نئی کاپی، ٹکراؤ والے نئے نمبر درست، ڈرائیو کا جھوٹا ✅ ختم
 // 🆕 FM29SEPTU0525AM: بیوپاری سے نقد ادھار لیا — گاہک والے فارم جیسا ٹیبل؛ دونوں فارموں میں محفوظ کے بعد پرنٹ (تھرمل) / سکرین شاٹ اور شیئر / پوسٹر شیئر
-const APP_BUILD_VERSION = 'SM210FR035'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM210FR036'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -12122,7 +12122,7 @@ function tryAutoLogin(){
   if(typeof isMaintenanceBlocked === 'function' && isMaintenanceBlocked()){ try{ applyMaintenanceOverlayState(); }catch(e){} return false; } // 🚧 خودکار لاگ ان بھی بند
   // ---------- PIN Lock بند ہو تو سیدھا واحد Admin یوزر کے طور پر داخل کریں — کوئی PIN نہیں مانگا جائے گا۔
   // یہ صرف سنگل یوزر (بغیر Salesman/staff) کے لیے محفوظ ہے — Settings میں واضح انتباہ کے بعد ہی بند ہوتا ہے ----------
-  if(AppState.settings.pinLockEnabled === false){
+  if(AppState.settings.pinLockEnabled === false && !AppState.settings.smJoinedAsStaff){ // 🧑‍💼 SM210FR036
     const adminUser = usersData.find(u => u.role === 'admin' && u.is_active);
     if(adminUser){
       applyRole(adminUser.role, adminUser.name);
@@ -12143,6 +12143,7 @@ function tryAutoLogin(){
 
   let user = usersData.find(u => u.user_id === remembered.user_id && (!remembered.role || u.role === remembered.role) && (!remembered.name || u.name === remembered.name));
   if(!user && remembered.role && remembered.name) user = usersData.find(u => u.role === remembered.role && u.name === remembered.name); // id بدل گئی ہو تو نام/عہدہ سے
+  if(user && user.role === 'admin' && AppState.settings.smJoinedAsStaff){ saveToStorage('rememberedSession', null); return false; } // 🧑‍💼 SM210FR036
   try{ _migratePhoneOwner(); if(user && !isPhoneOwnerUser(user)){ saveToStorage('rememberedSession', null); return false; } }catch(e){}
   try{ if(user && user.role === 'admin' && getBioCred() && _bioAdminUser()){ setTimeout(() => { try{ renderBioLoginButton(); }catch(e){} }, 300); return false; } }catch(e){}
   if(!user || !user.is_active){
@@ -19648,6 +19649,19 @@ function rememberDeviceLoginUser(user){
   }catch(e){ return true; }
 }
 function applyLoginDeviceLock(){
+  _origApplyLoginDeviceLock();
+  // 🧑‍💼 SM210FR036: جو فون "دکان سے جڑیں" سے ملازم بنا، اس پر ایڈمن کا خانہ نہیں — صرف ملازم کا (7 ٹیپ سے سب خانے پھر بھی کھل سکتے ہیں)
+  try{
+    if(!(AppState.settings && AppState.settings.smJoinedAsStaff) || _loginShowAll) return;
+    const rows = document.querySelectorAll('#loginPinWrap > .loginRoleRow');
+    const adminRow = rows[0], staffRow = rows[1];
+    if(!adminRow || !staffRow) return;
+    const o = _phoneOwnerUser();
+    if(o && o.role === 'salesman') return; // پہلے سے اپنے نام پر لاک
+    adminRow.style.display = 'none'; staffRow.style.display = '';
+  }catch(e){}
+}
+function _origApplyLoginDeviceLock(){
   try{
     _migratePhoneOwner();
     const wrap = document.getElementById('loginPinWrap');
@@ -45851,6 +45865,10 @@ async function smJoinAsStaff(){
     AppState.settings.businessPhone = prev.p; AppState.settings.smShopCode = prev.c; AppState.settings.smRegistered = prev.r; AppState.settings.smJoinedAsStaff = prev.j; AppState.settings.smPlan = prev.pl;
     saveToStorage('settings', AppState.settings); return;
   }
+  // 🧑‍💼 SM210FR036: یہ فون اب ملازم کا — پرانی دکان کا "فون کا مالک"/یاد رکھا ایڈمن سیشن/فنگر پرنٹ صاف، تاکہ ایڈمن کا خانہ نہ کھلے
+  try{ localStorage.removeItem('fm_phoneOwner'); }catch(e){}
+  try{ localStorage.removeItem('fm_bioCred'); }catch(e){}
+  try{ saveToStorage('rememberedSession', null); }catch(e){}
   location.reload();
 }
 // ---------- 🔁 لائسنس آئینہ: مالک کا فون پیکج/مدت دکان کے کلاؤڈ میں رکھتا ہے، ملازم کا فون وہیں سے لیتا ہے ----------
