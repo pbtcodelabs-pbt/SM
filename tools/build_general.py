@@ -729,9 +729,9 @@ s=s[:k1]+'<img src="icons/icon-192.png" alt="" style="display:block; width:64px;
 rep('    <div id="loginVersionBadge"','    <div id="smPlanBadge" style="text-align:center; color:#fde68a; font-size:12.5px; font-weight:800; margin:0 0 6px; font-family:Arial,sans-serif;"></div>\n    <div id="smLoginShop" style="text-align:center; color:#fff; font-size:22px; font-weight:800; margin:4px 0 8px; font-family:\'JameelNooriNastaleeqKasheeda\',\'JameelNooriNastaleeq\',serif; text-shadow:0 2px 4px rgba(0,0,0,.4);">سبزی منڈی</div>\n    <div id="loginVersionBadge"')
 
 # ---------- 🔐🧹 SM110TH022 حفاظتی صفائی (ہر بلڈ پر خود لگتی ہے) ----------
-# 1) ڈویلپر پینل کا ڈیفالٹ پاسورڈ بدلا (پرانا 6 ہندسوں والا ہر گاہک کی ایپ میں کھلا تھا)؛ پاسورڈ ریپو میں نہیں، صرف ہیش یہاں
-s=s.replace('8b5a43764420e5af43f7c4623ad3a6699a628be06269051d38f494f9f4b22a9a','1bc34201e0c395cc1ed2021784233cbfbe636288640a177959dab6f721682b8b')
-s=s.replace('// ڈیفالٹ پاسورڈ: 857766 — ہدایت FM3SEPTH12','// ڈیفالٹ پاسورڈ: (مالک کے پاس، ریپو میں نہیں)')
+# 1) ڈویلپر پاسورڈ: FM210FR276 سے دونوں ایپس میں ایک ہی ماسٹر ڈویلپر پاسورڈ — FM سے ہی آتا ہے، یہاں کچھ نہیں بدلنا
+#    (پاسورڈ صرف مالک کے پاس — ریپو/نوٹس میں کبھی نہ لکھیں؛ کوڈ میں صرف ہیش)۔ ایڈمن PIN والا ڈویلپر بائی پاس FM میں ہی ختم ہو چکا
+assert 'DEV_BYPASS_PIN = ' not in s, 'FM میں پرانا ڈویلپر بائی پاس واپس آ گیا'
 # 2) URL سے ڈویلپر پاسورڈ ری سیٹ کا خفیہ لنک ختم (سورس میں سب کو نظر آتا تھا)
 _a=s.find("if(p.get('devpwreset') === 'saddamFM19reset'){")
 if _a!=-1:
