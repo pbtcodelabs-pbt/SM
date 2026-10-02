@@ -7130,7 +7130,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
 
     <div id="devSecretLocked">
       <div class="settingsHint">یہ عام Admin PIN سے نہیں کھلتا — صرف آپ کا اپنا الگ Developer Password درکار ہے۔</div>
-      <input type="password" id="devSecretPasswordInput" placeholder="Developer Password" style="width:100%; padding:11px; margin-top:8px; border:1px solid #dbe1ea; border-radius:8px; font-size:15px; text-align:center;" onkeydown="if(event.key==='Enter') unlockDevSecretPanel()">
+      <input type="password" id="devSecretPasswordInput" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" placeholder="Developer Password" style="width:100%; padding:11px; margin-top:8px; border:1px solid #dbe1ea; border-radius:8px; font-size:15px; text-align:center;" onkeydown="if(event.key==='Enter') unlockDevSecretPanel()">
       <button class="testPrintBtn" style="margin-top:10px;" onclick="unlockDevSecretPanel()">🔓 کھولیں</button>
       <div id="devSecretError" style="color:var(--danger); font-size:12px; margin-top:6px; text-align:center;"></div>
     </div>
@@ -9012,7 +9012,7 @@ if(AppState.settings.packagePlansMigratedV2 !== true){
 (function(){
   try{
     const p = new URLSearchParams(window.location.search);
-    /* devpwreset ہٹا دیا گیا */
+    /* 🔐 FM210FR276: devpwreset لنک ہٹا دیا گیا — ماسٹر ڈویلپر پاسورڈ ہمیشہ چلتا ہے */
   }catch(e){}
 })();
 
@@ -9055,7 +9055,7 @@ function getDeveloperContact(){
 // 🆕 FM29SEPTU0310AM: گاہک کو نقد ادھار — بل جیسا حساب ٹیبل (دستی کیش، سابقہ، ٹوٹل، وصولی، اب تک ٹوٹل بقایا) + یادداشت وقت کے ساتھ
 // 🆕 FM309WE#265: سیریل ماسٹر کاپی — صرف ہاتھ سے محفوظ/بحال (کوئی خودکار نظام نہیں)؛ نئی محفوظ کرنے سے پہلے تصدیق، بحالی میں فون/کلاؤڈ کی نئی کاپی، ٹکراؤ والے نئے نمبر درست، ڈرائیو کا جھوٹا ✅ ختم
 // 🆕 FM29SEPTU0525AM: بیوپاری سے نقد ادھار لیا — گاہک والے فارم جیسا ٹیبل؛ دونوں فارموں میں محفوظ کے بعد پرنٹ (تھرمل) / سکرین شاٹ اور شیئر / پوسٹر شیئر
-const APP_BUILD_VERSION = 'SM110TH032'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM210FR034'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -9066,7 +9066,7 @@ const APP_LOAD_TIME = Date.now();
 // ---------- 🛠️ ڈیویلپر بائی پاس — یہ کوڈ Admin PIN فیلڈ میں ڈالنے سے، ہمیشہ (localStorage/Firestore ڈیٹا
 // خراب ہو، انٹرنیٹ نہ ہو، یا اصل PIN بھول جائیں، کسی بھی حالت میں) بغیر کسی PIN چیک کے سیدھا Admin کے طور پر
 // اندر لے جاتا ہے۔ صرف ڈویلپر کو معلوم ہونا چاہیے — کسی کے ساتھ شیئر نہ کریں۔ اسے بدلنے کے لیے صرف یہ لائن بدلیں ----------
-const DEV_BYPASS_PIN = '927153';
+// 🔐 FM210FR276: ایڈمن PIN والا ڈویلپر بائی پاس ختم — ڈویلپر صرف ورژن بیج (7 ٹیپ) + ڈویلپر پاسورڈ سے داخل ہوتا ہے
 // ---------- ⚠️ ضروری: Firebase Console → Firestore Database → Rules میں یہ rules لگائیں (صرف ایک بار)،
 // ورنہ Anonymous Auth کا کوئی فائدہ نہیں ہوگا (یا الٹا ڈیٹا بند ہو جائے گا):
 //   rules_version = '2';
@@ -10174,11 +10174,7 @@ async function login(){
 
     // ---------- 🛠️ ڈیویلپر بائی پاس — usersData/hash/Firestore پر بالکل انحصار نہیں کرتا، اس لیے ہمیشہ کام کرتا ہے،
     // چاہے یہ ڈیوائس/ڈومین کبھی cloud سے sync ہی نہ ہو سکا ہو ----------
-    if(pin === DEV_BYPASS_PIN){
-      document.getElementById('pinInput').value = '';
-      finishLogin({ user_id: 0, name: 'Developer', role: 'admin', is_active: true, screens: [] }, false);
-      return;
-    }
+    // 🔐 FM210FR276: یہاں سے ڈویلپر بائی پاس ہٹا دیا گیا (ایڈمن اور ڈویلپر الگ)
 
     // ---------- PIN کبھی پلین ٹیکسٹ میں compare نہیں ہوتا — پہلے hash بنائیں پھر محفوظ شدہ hash سے موازنہ کریں ----------
     // ---------- 🍇 Sabzi Mandi POS: یہ Admin Login پینل ہے، اس لیے صرف admin رول والے یوزر میں تلاش کریں ----------
@@ -16042,7 +16038,7 @@ async function confirmAdminPinForDelete(itemLabel){
   if(pin === null) return false;
   const cleanPin = (pin || '').trim();
   if(!cleanPin){ alert('❌ پاسورڈ درج نہیں کیا گیا — حذف نہیں ہوا۔'); return false; }
-  let ok = (cleanPin === DEV_BYPASS_PIN);
+  let ok = false;
   if(!ok){
     const enteredHash = await hashPin(cleanPin);
     ok = usersData.some(u => u.pin === enteredHash && u.role === 'admin' && u.is_active);
@@ -16053,7 +16049,7 @@ async function confirmAdminPinForDelete(itemLabel){
 async function verifyAdminPinAndUnlock(pin){
   const cleanPin = (pin || '').trim();
   if(!cleanPin){ alert('❌ پاسورڈ درج نہیں کیا گیا — لاک نہیں کھلا۔'); return; }
-  let ok = (cleanPin === DEV_BYPASS_PIN);
+  let ok = false;
   if(!ok){
     const enteredHash = await hashPin(cleanPin);
     ok = usersData.some(u => u.pin === enteredHash && u.role === 'admin' && u.is_active);
@@ -23276,7 +23272,7 @@ async function confirmAdminPinForStockZero(){
   if(pin === null) return false;
   const cleanPin = (pin || '').trim();
   if(!cleanPin){ alert('❌ پاسورڈ درج نہیں کیا گیا — سٹاک زیرو نہیں ہوا۔'); return false; }
-  let ok = (cleanPin === DEV_BYPASS_PIN);
+  let ok = false;
   if(!ok){
     const enteredHash = await hashPin(cleanPin);
     ok = usersData.some(u => u.pin === enteredHash && u.role === 'admin' && u.is_active);
@@ -35682,7 +35678,7 @@ async function _askAdminPinForSerialMaster(actionText){
   if(pin === null) return false;
   const clean = (pin || '').trim();
   if(!clean){ alert('❌ PIN درج نہیں کیا گیا — کام منسوخ، کچھ نہیں بدلا۔'); return false; }
-  let ok = (clean === DEV_BYPASS_PIN);
+  let ok = false;
   if(!ok){
     const h = await hashPin(clean);
     ok = usersData.some(u => u.pin === h && u.role === 'admin' && u.is_active);
@@ -35900,6 +35896,18 @@ function maintSecretTap(){
   _maintTapTimer = setTimeout(() => { _maintTapCount = 0; }, 2500);
   if(_maintTapCount >= 7){
     _maintTapCount = 0;
+    clearTimeout(_maintTapTimer);
+    // 🔐 FM210FR277: مینٹیننس صرف ڈویلپر کا کام — دوسرے فون پر پہلے ڈویلپر پاسورڈ لازمی
+    if(!isDevDevice()){
+      const pw = prompt('🔐 Developer Password');
+      if(pw === null) return;
+      devPasswordOk(pw).then(ok => {
+        if(!ok){ alert('❌ Incorrect password.'); return; }
+        markDevDevice();
+        openMaintQuickPanel();
+      });
+      return;
+    }
     openMaintQuickPanel();
   }
 }
@@ -35912,6 +35920,7 @@ function ensureMaintQuickUi(){
     el.setAttribute('dir', 'rtl');
     el.onclick = maintSecretTap;
     el.style.cssText = "text-align:center; margin:14px auto 6px; padding:6px 14px; width:fit-content; border-radius:20px; font-family:'JameelNooriNastaleeqKasheeda','Noto Nastaliq Urdu',serif; font-size:13px; font-weight:800; cursor:pointer; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;";
+    if(id === 'maintQuickLabelLogin' && !isDevDevice()) el.style.display = 'none'; // 🔐 FM210FR277
     parent.appendChild(el);
   };
   const loginBox = document.getElementById('loginScreen')?.querySelector('.loginBox') || document.getElementById('loginScreen');
@@ -35958,6 +35967,7 @@ function ensureMaintQuickUi(){
   }
 }
 async function openMaintQuickPanel(){
+  if(!isDevDevice()) return; // 🔐 FM210FR277: صرف ڈویلپر کے فون پر
   ensureMaintQuickUi();
   document.getElementById('maintQuickModal').classList.add('show');
   refreshMaintenanceQuickUi();
@@ -35978,6 +35988,8 @@ function refreshMaintenanceQuickUi(){
     el.style.boxShadow = on ? '0 3px 0 #78350f' : 'none';
     // 🔒 26 ستمبر: ہوم صفحے والا لفظ صرف ایڈمن کو — ملازم/منشی کے ہوم پر نظر نہ آئے
     if(el.id === 'maintQuickLabelHome') el.style.display = 'none';
+    // 🔐 FM210FR277: لاگ ان صفحے کا "مینٹیننس" لفظ صرف ڈویلپر کے فون پر — دکاندار/ملازم کو نظر ہی نہ آئے
+    if(el.id === 'maintQuickLabelLogin') el.style.display = isDevDevice() ? '' : 'none';
   });
   const st = document.getElementById('maintQuickStatus');
   const btn = document.getElementById('maintQuickToggleBtn');
@@ -40081,7 +40093,7 @@ async function saveAdminControl(){
 // ورژن بیج پر 7 بار ٹیپ کرنے سے کھلتا ہے۔ نیچے والا ہیش ڈیفالٹ پاسورڈ کا SHA-256 ہے —
 // پینل کے اندر سے ہی نیا پاسورڈ سیٹ کیا جا سکتا ہے (AppState.settings.devPanelPasswordHash میں محفوظ ہوتا ہے)۔
 // =====================================================================
-const DEFAULT_DEV_PANEL_PASSWORD_HASH = '1bc34201e0c395cc1ed2021784233cbfbe636288640a177959dab6f721682b8b'; // ڈیفالٹ پاسورڈ: (مالک کے پاس، ریپو میں نہیں)
+const DEFAULT_DEV_PANEL_PASSWORD_HASH = '8de8edb14148430ed24a4ffb0b9050acf152f1b85f3e39f7ca54278b110d625f'; // 🔐 FM210FR276: ڈویلپر پاسورڈ (صرف مالک کے پاس — کوڈ میں صرف ہیش)
 
 // ---------- 🎁 ہدایت (FM3SEPTH10): فری/مفت ایڈمن گفٹ کوڈ جنریٹر — Firestore کے licenses/{code} میں نیا ریکارڈ لکھتا ہے ----------
 let lastGeneratedGiftCode = '';
@@ -40344,16 +40356,25 @@ function devEnterAppDirectly(){
   finishLogin({ user_id: 0, name: 'Developer', role: 'admin', is_active: true, screens: [] }, false);
 }
 
+// 🔐 FM210FR277: ڈویلپر پاسورڈ کی ایک ہی جانچ (ماسٹر پاسورڈ ہمیشہ؛ پینل سے بدلا ہوا الگ پاسورڈ بھی)
+async function devPasswordOk(entered){
+  const enteredHash = await hashPin(String(entered || '').trim());
+  return (enteredHash === DEFAULT_DEV_PANEL_PASSWORD_HASH) || (!!AppState.settings.devPanelPasswordHash && enteredHash === AppState.settings.devPanelPasswordHash);
+}
+// 🔐 FM210FR277: "ڈویلپر کا فون" — صرف اسی فون پر جہاں ڈویلپر پاسورڈ درست لگا ہو (یہ نشان صرف اسی فون میں رہتا ہے، کلاؤڈ پر نہیں جاتا)
+function isDevDevice(){ try{ return localStorage.getItem('fmDevDeviceTrusted') === '1'; }catch(e){ return false; } }
+function markDevDevice(){ try{ localStorage.setItem('fmDevDeviceTrusted', '1'); }catch(e){} try{ refreshMaintenanceQuickUi(); }catch(e){} }
+
 async function unlockDevSecretPanel(){
-  const entered = document.getElementById('devSecretPasswordInput').value;
-  const enteredHash = await hashPin(entered);
-  const validHash = AppState.settings.devPanelPasswordHash || DEFAULT_DEV_PANEL_PASSWORD_HASH;
-  if(enteredHash !== validHash){
+  const entered = (document.getElementById('devSecretPasswordInput').value || '').trim();
+  const okHash = await devPasswordOk(entered);
+  if(!okHash){
     document.getElementById('devSecretError').textContent = '❌ Incorrect password.';
     return;
   }
   document.getElementById('devSecretError').textContent = '';
   document.getElementById('devSecretPasswordInput').value = '';
+  markDevDevice(); // 🔐 FM210FR277: یہ فون اب ڈویلپر کا فون ہے — مینٹیننس کا لفظ صرف یہاں نظر آئے گا
   document.getElementById('devSecretLocked').style.display = 'none';
   document.getElementById('devSecretUnlocked').style.display = 'block';
   renderMarqueeDevList();
