@@ -780,6 +780,20 @@ rep("  if(AppState.settings.pinLockEnabled === false){\n    const adminUser = us
     "  if(AppState.settings.pinLockEnabled === false && !AppState.settings.smJoinedAsStaff){ // 🧑‍💼 SM210FR036\n    const adminUser = usersData.find(u => u.role === 'admin' && u.is_active);")
 rep("  try{ _migratePhoneOwner(); if(user && !isPhoneOwnerUser(user)){ saveToStorage('rememberedSession', null); return false; } }catch(e){}",
     "  if(user && user.role === 'admin' && AppState.settings.smJoinedAsStaff){ saveToStorage('rememberedSession', null); return false; } // 🧑‍💼 SM210FR036\n  try{ _migratePhoneOwner(); if(user && !isPhoneOwnerUser(user)){ saveToStorage('rememberedSession', null); return false; } }catch(e){}")
+# ---------- 🧑‍💼 SM210FR037: ملازم فون پر پرانا "ایڈمن فون کا مالک" نہ رہے — ورنہ ملازم کا لاگ ان عارضی سمجھا جاتا اور ریفریش پر لاگ آؤٹ ہوتا ----------
+rep("""function _migratePhoneOwner(){
+  try{
+    if(getPhoneOwner()) return;
+    const users = (usersData || []).filter(u => u.is_active);
+    const adminSign = !!(AppState.settings && (AppState.settings.lastGDriveBackupAt || AppState.settings.gdriveAccountEmail));
+    if(adminSign){""", """function _migratePhoneOwner(){
+  try{
+    // 🧑‍💼 SM210FR037: "دکان سے جڑیں" والے ملازم فون پر پرانی دکان کا ایڈمن "فون کا مالک" نہ رہے
+    if(AppState.settings && AppState.settings.smJoinedAsStaff){ const _o = getPhoneOwner(); if(_o && _o.role === 'admin'){ try{ localStorage.removeItem('fm_phoneOwner'); }catch(e){} } }
+    if(getPhoneOwner()) return;
+    const users = (usersData || []).filter(u => u.is_active);
+    const adminSign = !!(AppState.settings && (AppState.settings.lastGDriveBackupAt || AppState.settings.gdriveAccountEmail)) && !(AppState.settings && AppState.settings.smJoinedAsStaff);
+    if(adminSign){""")
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
