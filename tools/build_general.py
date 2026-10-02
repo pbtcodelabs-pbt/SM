@@ -686,6 +686,10 @@ async function smJoinAsStaff(){
     AppState.settings.businessPhone = prev.p; AppState.settings.smShopCode = prev.c; AppState.settings.smRegistered = prev.r; AppState.settings.smJoinedAsStaff = prev.j; AppState.settings.smPlan = prev.pl;
     saveToStorage('settings', AppState.settings); return;
   }
+  // 🧑‍💼 SM210FR036: یہ فون اب ملازم کا — پرانی دکان کا "فون کا مالک"/یاد رکھا ایڈمن سیشن/فنگر پرنٹ صاف، تاکہ ایڈمن کا خانہ نہ کھلے
+  try{ localStorage.removeItem('fm_phoneOwner'); }catch(e){}
+  try{ localStorage.removeItem('fm_bioCred'); }catch(e){}
+  try{ saveToStorage('rememberedSession', null); }catch(e){}
   location.reload();
 }
 // ---------- 🔁 لائسنس آئینہ: مالک کا فون پیکج/مدت دکان کے کلاؤڈ میں رکھتا ہے، ملازم کا فون وہیں سے لیتا ہے ----------
@@ -756,6 +760,26 @@ rep("<span class=\"sideIcon\">📜</span><span class=\"sideLabel\">Transactions<
 _js2=open(_p.join(ROOT,'tools','sm_customer_delete.js'),encoding='utf-8').read()
 _k2=s.rindex('</body>')
 s=s[:_k2]+'<script>\n/* SM_CUSTOMER_DELETE_BEGIN */\n'+_js2+'\n/* SM_CUSTOMER_DELETE_END */\n</script>\n'+s[_k2:]
+# ---------- 🧑‍💼 SM210FR036: ملازم کے طور پر جڑے فون پر لاگ ان میں صرف ملازم کا خانہ (ایڈمن کا نہیں) ----------
+rep("function applyLoginDeviceLock(){", r"""function applyLoginDeviceLock(){
+  _origApplyLoginDeviceLock();
+  // 🧑‍💼 SM210FR036: جو فون "دکان سے جڑیں" سے ملازم بنا، اس پر ایڈمن کا خانہ نہیں — صرف ملازم کا (7 ٹیپ سے سب خانے پھر بھی کھل سکتے ہیں)
+  try{
+    if(!(AppState.settings && AppState.settings.smJoinedAsStaff) || _loginShowAll) return;
+    const rows = document.querySelectorAll('#loginPinWrap > .loginRoleRow');
+    const adminRow = rows[0], staffRow = rows[1];
+    if(!adminRow || !staffRow) return;
+    const o = _phoneOwnerUser();
+    if(o && o.role === 'salesman') return; // پہلے سے اپنے نام پر لاک
+    adminRow.style.display = 'none'; staffRow.style.display = '';
+  }catch(e){}
+}
+function _origApplyLoginDeviceLock(){""")
+# ---------- 🧑‍💼 SM210FR036: ملازم کے فون پر کبھی خودکار ایڈمن لاگ ان نہیں (نہ PIN Lock بند ہونے سے، نہ پرانے یاد رکھے سیشن سے) ----------
+rep("  if(AppState.settings.pinLockEnabled === false){\n    const adminUser = usersData.find(u => u.role === 'admin' && u.is_active);",
+    "  if(AppState.settings.pinLockEnabled === false && !AppState.settings.smJoinedAsStaff){ // 🧑‍💼 SM210FR036\n    const adminUser = usersData.find(u => u.role === 'admin' && u.is_active);")
+rep("  try{ _migratePhoneOwner(); if(user && !isPhoneOwnerUser(user)){ saveToStorage('rememberedSession', null); return false; } }catch(e){}",
+    "  if(user && user.role === 'admin' && AppState.settings.smJoinedAsStaff){ saveToStorage('rememberedSession', null); return false; } // 🧑‍💼 SM210FR036\n  try{ _migratePhoneOwner(); if(user && !isPhoneOwnerUser(user)){ saveToStorage('rememberedSession', null); return false; } }catch(e){}")
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
