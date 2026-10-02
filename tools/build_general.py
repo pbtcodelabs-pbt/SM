@@ -94,10 +94,12 @@ s=re.sub(r"const FIREBASE_API_KEY = '[^']*';", "const FIREBASE_API_KEY = 'AIzaSy
 # ---------- 1c) ہر دکان کا ڈیٹا الگ: shopData/ → shops/<موبائل>/data/ ----------
 s=s.replace("'shopData/", "smShopBase() + '").replace("`shopData/", "`${smShopBase()}")
 # ---------- 2) آئیکن `icons/` اور فونٹ `fonts/` فولڈر میں (صاف ستھرا ریپو) ----------
+#    (FM210FR281 سے FM خود بھی icons/ اور fonts/ میں ہے — تب یہ قدم کچھ نہیں بدلتا، صرف تصدیق کرتا ہے)
 for f in ['favicon-32.png','icon-180.png','icon-192.png']:
-    rep(f'href="{f}"', f'href="icons/{f}"')
-rep("url('./JameelNooriNastaleeq-Regular.ttf')","url('./fonts/JameelNooriNastaleeq-Regular.ttf')")
-rep("url('./JameelNooriNastaleeq-Kasheeda.ttf')","url('./fonts/JameelNooriNastaleeq-Kasheeda.ttf')")
+    if f'href="icons/{f}"' not in s: rep(f'href="{f}"', f'href="icons/{f}"')
+for f in ['JameelNooriNastaleeq-Regular.ttf','JameelNooriNastaleeq-Kasheeda.ttf']:
+    if f"url('./fonts/{f}')" not in s: rep(f"url('./{f}')", f"url('./fonts/{f}')")
+    assert f"url('./fonts/{f}')" in s
 
 # ---------- 3) زبردستی والا صدام کا نام/نمبر ہٹائیں ----------
 rep("AppState.settings.businessName = 'صدام حسین فروٹ منڈی';\nAppState.settings.businessPhone = '03425556364';",
