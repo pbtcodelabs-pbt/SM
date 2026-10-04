@@ -872,17 +872,62 @@ rep("  const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) 
   }catch(e){}
   const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) ? currentUser.screens : [];""")
 # ---------- ☁️ SM410SU045: CSV سے امپورٹ کی گئی سبزیاں کلاؤڈ پر نہیں جاتی تھیں — اس لیے ملازم کے فون پر نظر نہیں آتی تھیں ----------
-rep("  backfillMissingProductSerials(); // ---------- امپورٹ کی گئی نئی سبزیوں کو بھی سیریل نمبر مل جائے ---------- -->\n",
-    "  backfillMissingProductSerials(); // ---------- امپورٹ کی گئی نئی سبزیوں کو بھی سیریل نمبر مل جائے ---------- -->\n"
-    "  // ☁️ SM410SU045: امپورٹ فوراً فون میں محفوظ + کلاؤڈ پر، تاکہ ملازمین کے فون پر بھی سبزیاں آئیں\n"
-    "  try{ persistAllData(); }catch(e){}\n"
-    "  try{ AppState.settings.productsPendingSync = true; pushProductsToCloud(); }catch(e){}\n")
+# (SM410SU046: امپورٹ کے بعد محفوظ + کلاؤڈ اب FM ماسٹر FM410SU302 میں ہے)
 _fp = s.index('async function fetchProductsFromCloud(silent){')
 _404 = "    if(res.status === 404) return false; // ---------- ابھی تک کبھی کلاؤڈ پر محفوظ نہیں ہوا ----------"
 _k4 = s.index(_404, _fp)
 assert _k4 - _fp < 3000
 s = s[:_k4] + ("    // ☁️ SM410SU045: نئی دکان — کلاؤڈ پر سبزیوں کی فہرست ابھی بنی ہی نہیں؛ مالک کے فون پر سبزیاں ہوں تو اسی وقت بھیج دیں\n"
                "    if(res.status === 404){ try{ if(AppState.currentRole === 'admin' && Array.isArray(productsData) && productsData.length){ AppState.settings.productsPendingSync = true; setTimeout(() => { try{ pushProductsToCloud(); }catch(e){} }, 400); } }catch(e){} return false; }") + s[_k4+len(_404):]
+# ---------- 📦 SM410SU046: پہلے والی CSV امپورٹ سے بنی "ایک سبزی کے کئی ویرینٹ" (پیاز لال: شاپر + فی کلو) کو
+# صدام کی ایپ (ماسٹر) کی طرح الگ الگ سبزیوں میں بانٹ دیں — مالک کے فون پر صرف ایک بار، پھر کلاؤڈ پر ----------
+_split_fix = r"""<script>
+/* SM_SPLIT_VARIANTS_BEGIN */
+function smSplitMultiVariantProducts(){
+  if(typeof AppState === 'undefined' || AppState.currentRole !== 'admin') return false;
+  if(AppState.settings.smSplitV046) return false;
+  if(!Array.isArray(productsData) || !productsData.length) return false;
+  let made = 0;
+  const extra = [];
+  productsData.forEach(p => {
+    if(!p || !Array.isArray(p.variants) || p.variants.length < 2) return;
+    const rest = p.variants.slice(1);
+    p.variants = [p.variants[0]];
+    rest.forEach(v => {
+      const np = JSON.parse(JSON.stringify(Object.assign({}, p, { variants: [] })));
+      delete np.serial_no;
+      np.product_id = nextProductId++;
+      np.variants = [v];
+      extra.push(np);
+      made++;
+    });
+  });
+  AppState.settings.smSplitV046 = true;
+  if(made){
+    extra.forEach(np => productsData.push(np));
+    try{ backfillMissingProductSerials(); }catch(e){}
+    try{ persistAllData(); }catch(e){}
+    AppState.settings.productsPendingSync = true;
+    try{ pushProductsToCloud(); }catch(e){}
+    try{ refreshAllScreens(); }catch(e){}
+    console.log('📦 SM410SU046: ' + made + ' پیکنگ الگ سبزیوں میں بدلی گئیں');
+  }
+  try{ saveToStorage('settings', AppState.settings); }catch(e){}
+  return made;
+}
+setInterval(function(){
+  try{
+    if(typeof AppState !== 'undefined' && AppState.currentRole === 'admin' && !AppState.settings.smSplitV046
+       && document.getElementById('app') && document.getElementById('app').style.display !== 'none'){
+      smSplitMultiVariantProducts();
+    }
+  }catch(e){}
+}, 6000);
+/* SM_SPLIT_VARIANTS_END */
+</script>
+"""
+_k5=s.rindex('</body>')
+s=s[:_k5]+_split_fix+s[_k5:]
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
