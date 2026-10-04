@@ -538,6 +538,21 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   /* ---------- 🔎 ہدایت (FM3SEPTH10): جاری کردہ کوڈز کی فہرست — حالت فلٹر بٹن ---------- */
   /* ---------- 🎬 ہدایت (FM3SEPTH10): ٹک لگانے پر قطار/کارڈ آہستہ سے دائیں طرف سلائیڈ ہو کر غائب ---------- */
   .slideOutRow{ transform:translateX(100%); opacity:0; transition:transform .28s ease, opacity .28s ease; pointer-events:none; }
+
+  /* ---------- 💨 FM210FR282: حاضر/غیر حاضر کرتے وقت — قطار دھواں بن کر دھندلی ہوتی اور سلائیڈ ہو کر غائب (یا ابھر کر آتی) ---------- */
+  @keyframes vmSlideOutR{ 0%{transform:translateX(0) scale(1); opacity:1; filter:blur(0)} 35%{transform:translateX(6%) scale(1.01); opacity:.85; filter:blur(1px)} 100%{transform:translateX(105%) scale(.94); opacity:0; filter:blur(7px)} }
+  @keyframes vmSlideOutL{ 0%{transform:translateX(0) scale(1); opacity:1; filter:blur(0)} 35%{transform:translateX(-6%) scale(1.01); opacity:.85; filter:blur(1px)} 100%{transform:translateX(-105%) scale(.94); opacity:0; filter:blur(7px)} }
+  .vmFxOutR{ animation:vmSlideOutR .75s ease-in forwards; pointer-events:none; }
+  .vmFxOutL{ animation:vmSlideOutL .75s ease-in forwards; pointer-events:none; }
+  tr.vmFxOutR, tr.vmFxOutL{ animation:none; }
+  tr.vmFxOutR > td{ animation:vmSlideOutR .75s ease-in forwards; }
+  tr.vmFxOutL > td{ animation:vmSlideOutL .75s ease-in forwards; }
+  @keyframes vmSmokeRise{ 0%{transform:translate(0,0) scale(.35); opacity:0} 20%{opacity:.85} 100%{transform:translate(var(--vmdx,0px),-46px) scale(2.3); opacity:0} }
+  .vmSmokePuff{ position:fixed; z-index:99999; width:34px; height:34px; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle at 40% 40%, rgba(235,235,235,.95), rgba(150,150,150,.55) 55%, rgba(120,120,120,0) 72%);
+    filter:blur(3px); animation:vmSmokeRise .85s ease-out forwards; }
+  .vmSmokePuff.vmGreen{ background:radial-gradient(circle at 40% 40%, rgba(220,252,231,.95), rgba(74,222,128,.5) 55%, rgba(34,197,94,0) 72%); }
+  .vmPresChk{ width:22px; height:22px; margin:0; cursor:pointer; accent-color:#b91c1c; }
   .codeStatusFilterBtn{background:#f1f5f9; color:var(--text);}
   .codeStatusFilterBtn.active{background:var(--primary-dark); color:#fff;}
   .dobPicker{display:flex; gap:6px; align-items:center; margin:8px 0;}
@@ -965,17 +980,21 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   #drTable .drNote{ font-size:.78em; color:#78350f; text-align:right; line-height:1.5; }
   /* ---------- FM110TH272: کالم چوڑے (6 ہندسے + کاما صاف پڑھے جائیں)، کوئی خانہ نہ کٹے، باقی جگہ کے لیے سائیڈ سکرول؛ نوٹ کا خانہ برقرار ---------- */
   @media screen{
-    #drTable{ width:84em !important; min-width:84em !important; table-layout:fixed !important; }
-    #drTable col:nth-child(1){ width:3.6em !important; }
-    #drTable col:nth-child(2){ width:11em !important; }
-    #drTable col:nth-child(3), #drTable col:nth-child(4), #drTable col:nth-child(5), #drTable col:nth-child(6), #drTable col:nth-child(7), #drTable col:nth-child(8){ width:8em !important; }
-    #drTable col:nth-child(9){ width:4.4em !important; }
-    #drTable col:nth-child(10){ width:15em !important; }
+    /* ---------- FM310SA288: ہر کالم صرف اپنے مواد جتنا (نام کا کالم سب سے لمبے نام جتنا)، بچی ہوئی ساری جگہ آخری "نوٹ" کالم کو ---------- */
+    #drTable{ width:100% !important; min-width:0 !important; table-layout:auto !important; }
+    #drTable col{ width:auto !important; }
+    #drTable th, #drTable td{ padding:7px 5px !important; white-space:nowrap !important; word-break:normal !important; width:1%; }
+    #drTable th{ white-space:normal !important; font-size:.88em; line-height:1.25; }
+    #drTable th:last-child, #drTable td:last-child{ width:auto !important; white-space:normal !important; word-break:break-word !important; }
+    #drTable td:nth-child(2){ text-align:right; }
     #drTable td .drNum{ font-size:1em !important; letter-spacing:0 !important; }
     #drTable td.drShort .drNum{ font-size:1.05em !important; }
-    #drTable th, #drTable td{ padding:7px 3px !important; }
-    #drTable th{ font-size:.9em; }
   }
+  .drZoomBtn{ width:34px; height:38px; border-radius:10px; border:1px solid #b8c4d0; background:linear-gradient(#ffffff,#e3e9f0); box-shadow:0 3px 0 #a9b6c4, 0 5px 7px rgba(15,23,42,.22); font-size:21px; font-weight:900; color:#0f3d3e; line-height:1; cursor:pointer; padding:0; }
+  .drZoomBtn:active{ transform:translateY(2px); box-shadow:0 1px 0 #a9b6c4, 0 2px 3px rgba(15,23,42,.2); }
+  .drGreenSel{ background:#15803d !important; color:#fff !important; border:1px solid #166534 !important; font-weight:800; }
+  .drGreenSel.drPast{ background:#92400e !important; border-color:#78350f !important; }
+  .drGreenSel option{ background:#fff; color:#111; }
   /* ---------- 🧾 FM299TU#262 (ہدایت): آرڈر بکنگ — اوپر کے بٹن ایک ہی لائن میں (پہلے آرڈر مکمل، پھر کسٹمر، پھر منڈی سیل
      ریکارڈ، پھر سٹاک رپورٹ) تاکہ جگہ بچے؛ جدول کی ہر قطار اوپر سے نیچے موٹی + قطاروں کے درمیان فاصلہ، تاکہ انگلی
      غلطی سے دوسری قطار کے بٹن پر نہ لگے۔ چوڑائی/کالم وہی — کوئی افقی سکرول نہیں ---------- */
@@ -3411,12 +3430,13 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
          ہے) — کوڈ محفوظ ہے، مستقبل میں ضرورت پڑنے پر واپس دکھایا جا سکتا ہے ---------- -->
     <div class="navItem admin-only" data-screen="products" data-navkey="products" data-navlabel="Products" onclick="goTo('products')" style="display:none; background:#EA580C; color:#fff;">📦 پراڈکٹس<span class="navDragHandle">⠿</span></div>
     <!-- ---------- 🔄 ہدایت (FM3SEPTH10): "پرچیز آرڈر" ٹیب دوبارہ فعال — سپلائر سے خرید و اسٹاک وصولی ---------- -->
-    <div class="navItem admin-only" data-screen="purchaseorders" data-navkey="purchaseorders" data-navlabel="Purchase Orders" onclick="goTo('purchaseorders')" style="background:#C026D3; color:#fff;">📦 پرچیز آرڈر<span class="navDragHandle">⠿</span></div>
+    <div class="navItem admin-only" data-screen="purchaseorders" data-navkey="purchaseorders" data-navlabel="Supplier Purchases" onclick="goTo('purchaseorders')" style="background:#C026D3; color:#fff;">📦 بیوپاری خریداری<span class="navDragHandle">⠿</span></div>
     <div class="navItem admin-hide-only" data-screen="recoveryList" data-navkey="recoveryList" data-navlabel="Recovery List" onclick="goTo('recoveryList')" style="background:#16A34A; color:#fff;">💰 ریکوری لسٹ<span class="navDragHandle">⠿</span></div>
     <!-- ---------- 🔒 ہدایت (FM13SEPSU): ایڈمن کے مینیو میں نام الگ — تاکہ الجھن نہ ہو کہ یہ ملازم والی
          "ریکوری لسٹ" جیسی ہی چیز ہے؛ دونوں ایک ہی سکرین (data-screen="recoveryList") کھولتے ہیں، مگر رول کے
          مطابق مختلف مواد نظر آتا ہے ---------- -->
     <div class="navItem admin-only" data-screen="recoveryList" data-navkey="recoveryConfirm" data-navlabel="Recovery Confirmation" onclick="goTo('recoveryList')" style="background:#16A34A; color:#fff;">💰 وصولی کھاتے اپڈیٹ<span class="navDragHandle">⠿</span></div>
+    <div class="navItem admin-only" data-screen="safevault" data-navkey="safevault" data-navlabel="Safe Almari" onclick="goTo('safevault')" style="background:#7c2d12; color:#fff;">🗄️ سیف الماری<span class="navDragHandle">⠿</span></div>
     <!-- ---------- 🔒 ہدایت (FM13SEPSU): "روزانہ ریکوری لسٹ" پہلے صرف رپورٹس سینٹر کے اندر چھپی ہوئی تھی —
          اب اپنا الگ مینیو آئٹم، تاکہ یہ مخصوص ملازم (یوزرز سکرین کی اجازتی فہرست) کو الاٹ کی جا سکے ---------- -->
     <div class="navItem" data-screen="dailyRecovery" data-navkey="dailyRecovery" data-navlabel="Daily Recovery List" onclick="goTo('dailyRecovery')" style="background:#0D9488; color:#fff;">📋 روزانہ ریکوری لسٹ<span class="navDragHandle">⠿</span></div>
@@ -4194,9 +4214,13 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
                🔒 FM22SEPTU09: یہ بٹن اب مکمل چھپا دیا — نیچے ڈراپ ڈاؤن میں وہی عمل پہلے سے ایک انٹری کے طور پر موجود ہے ---------- -->
           <button type="button" onclick="openMunshiStockLogReport()" title="🧑‍🌾 منشی کا شامل کردہ سٹاک دیکھیں" style="flex:0 0 auto; padding:4px 6px; background:linear-gradient(180deg,#f59e0b,#b45309); color:#fff; border:none; border-radius:8px; font-weight:800; font-size:9px; white-space:nowrap; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.15);">🧑‍🌾 منشی سٹاک</button>
         </div>
-        <div class="categoryDropdownWrap" id="stockAdjReportsDropdownWrap" style="margin:0; flex:1 1 100%; min-width:0; max-width:none;">
-          <button type="button" class="categoryDropdownBtn" onclick="toggleStockAdjReportsDropdown(event)" style="width:100%; justify-content:center; padding:9px 3px; font-size:10.5px; font-weight:900; max-width:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-radius:10px;">
-            <span>📊 رپورٹ</span>
+        <!-- ---------- 🗜️ FM310SA283 (ہدایت): ایک ہی لائن میں تین برابر بٹن — دائیں: حاضر سبزیاں، درمیان: غیر حاضر سبزیاں، بائیں: رپورٹ ---------- -->
+        <div dir="rtl" style="display:flex; gap:6px; align-items:stretch; flex:1 1 100%; min-width:0; margin:0 0 6px;">
+        <button id="saProdPresenceBtnPresent" type="button" onclick="setProductPresenceFilter('present')" style="flex:1 1 0; min-width:0; height:38px; box-sizing:border-box; padding:0 4px; border-radius:10px; border:none; font-size:11.5px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.12);">🟢 حاضر سبزیاں</button>
+        <button id="saProdPresenceBtnAbsent" type="button" onclick="setProductPresenceFilter('absent')" style="flex:1 1 0; min-width:0; height:38px; box-sizing:border-box; padding:0 4px; border-radius:10px; border:none; font-size:11.5px; font-weight:900; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.12);">🔴 غیر حاضر سبزیاں</button>
+        <div class="categoryDropdownWrap" id="stockAdjReportsDropdownWrap" style="margin:0; flex:1 1 0; min-width:0; max-width:none; display:block;">
+          <button type="button" class="categoryDropdownBtn" onclick="toggleStockAdjReportsDropdown(event)" style="width:100%; height:38px; box-sizing:border-box; justify-content:center; padding:0 4px; font-size:11.5px; font-weight:900; max-width:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.12);">
+            <span>📊 رپورٹس</span>
             <span class="categoryDropdownArrow">▾</span>
           </button>
           <div class="categoryDropdownPanel" id="stockAdjReportsDropdownPanel">
@@ -4238,11 +4262,6 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
                 <span class="cdiName">📦 انوینٹری ٹریک کریں</span>
               </label>
             </div>
-            <!-- ---------- 🔓 ہدایت (FM21SEPMO0M): حاضر/غیر حاضر نظام دوبارہ بحال (FM16SEPWE0518AM2 والا ہائیڈ واپس لیا) ---------- -->
-            <div style="display:flex; gap:6px; padding:4px 0;">
-              <button id="saProdPresenceBtnPresent" onclick="setProductPresenceFilter('present')" style="flex:1; padding:7px; border-radius:8px; border:none; font-size:11px; font-weight:800; cursor:pointer;">🟢 حاضر</button>
-              <button id="saProdPresenceBtnAbsent" onclick="setProductPresenceFilter('absent')" style="flex:1; padding:7px; border-radius:8px; border:none; font-size:11px; font-weight:800; cursor:pointer;">🔴 غیر حاضر</button>
-            </div>
             <!-- ---------- 🆕🔒 ہدایت (FM21SEPMO0N): سٹاک زیرو کرنے کے دو بٹن — منشی کا رپورٹ چیک کرنے کے
                  بعد اس کا سٹاک زیرو کرنے کے لیے، اور ایڈمن کا اپنا عمومی زیرو بٹن۔ دونوں ایک ہی محفوظ فنکشن
                  (zeroAllStock) بلاتے ہیں — دو وارننگ + ایڈمن پن، تینوں پاس ہوں تبھی سٹاک زیرو ہوگا ---------- -->
@@ -4251,6 +4270,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
               <button type="button" onclick="closeStockAdjReportsDropdown(); zeroAllStock();" style="padding:9px; background:linear-gradient(180deg,#dc2626,#7f1d1d); color:#fff; border:none; border-radius:8px; font-weight:800; font-size:11.5px; cursor:pointer;">🔑 ایڈمن: تمام سٹاک زیرو کریں</button>
             </div>
           </div>
+        </div>
         </div>
       </div>
 
@@ -4999,6 +5019,11 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <button type="button" onclick="openPoLowStockPicker()" style="display:none; width:100%; padding:11px; margin-bottom:10px; background:#fff7ed; color:#c2410c; border:1.5px dashed #fdba74; border-radius:10px; font-weight:700; cursor:pointer; font-family:inherit;">📥 کم سٹاک آئٹمز سے حاصل کریں</button>
         <div class="billingCategoryRail" id="poCategoryRail" style="margin-bottom:8px;"></div>
         <div style="width:100%; margin-bottom:8px; font-size:11.5px; font-weight:700; color:var(--muted); text-align:center;">↕️ ترتیب: سیریل نمبر کے مطابق — بالکل 🧮 سٹاک مینجمنٹ جیسی (پکی، کبھی نہیں بدلتی)</div>
+        <!-- ---------- ☑️ FM310SA283 (ہدایت): چالان فیڈ کرتے وقت سبزی حاضر/غیر حاضر کرنے کا نظام — خالی ٹک ڈبہ ---------- -->
+        <div id="poPresenceBtnRow" dir="rtl" style="display:none; gap:8px; margin-bottom:8px;">
+          <button type="button" id="poPresenceBtnPresent" onclick="setPoPresenceMode('present')" style="flex:1; padding:9px 4px; border:none; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer;">🟢 حاضر سبزیاں</button>
+          <button type="button" id="poPresenceBtnAbsent" onclick="setPoPresenceMode('absent')" style="flex:1; padding:9px 4px; border:none; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer;">🔴 غیر حاضر سبزیاں</button>
+        </div>
         <div id="poBrowseList" style="margin-bottom:10px;"></div>
 
         <div class="searchRow" style="margin-bottom:8px;">
@@ -5442,23 +5467,43 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     <div class="screen admin-only" id="screen-purchaseorders" dir="rtl" style="font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','PDMSMultan','Noto Nastaliq Urdu',serif;">
       <div class="pageTitle">📦 بیوپاری خریداری</div>
 
-      <div class="modeToggle" style="width:100%; margin-bottom:10px;">
-        <button id="poFilterall" class="active" onclick="setPoListFilter('all')" style="flex:1;">سب</button>
-        <button id="poFilterpending" onclick="setPoListFilter('pending')" style="flex:1;">⏳ زیرِ التوا</button>
-        <button id="poFilterreceived" onclick="setPoListFilter('received')" style="flex:1;">✅ موصول شدہ</button>
+      <!-- ---------- 📦 FM410SU301: فلٹر اب اوپر سے نیچے سیدھی قطاروں میں، کم سے کم جگہ — نیچے زیادہ بل نظر آئیں ---------- -->
+      <style>
+        #screen-purchaseorders .poCapRow{display:grid; gap:6px; margin-bottom:6px;}
+        #screen-purchaseorders .poCapRow.c3{grid-template-columns:repeat(3,1fr);}
+        #screen-purchaseorders .poCapRow.c2{grid-template-columns:repeat(2,1fr);}
+        #screen-purchaseorders .poCap{height:34px; border:1.5px solid #d8c2e6; background:#fff; color:#6b21a8; border-radius:17px; font-size:14.5px; font-weight:700; font-family:inherit; cursor:pointer; padding:0 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; line-height:1;}
+        #screen-purchaseorders .poCap.active{background:#C026D3; border-color:#C026D3; color:#fff;}
+        #screen-purchaseorders select.poCap{appearance:none; -webkit-appearance:none; text-align-last:center; padding:0 8px;}
+        #screen-purchaseorders .poCap.pay{background:#15803d; border-color:#15803d; color:#fff;}
+        #screen-purchaseorders .poSum{display:flex; justify-content:space-between; align-items:center; background:#f5f3ff; border-radius:12px; padding:6px 12px; margin:2px 0 8px; font-size:13.5px; font-weight:700; color:#6b21a8;}
+        #screen-purchaseorders .poCard{background:#fff; border:1.5px solid #ece4f3; border-radius:14px; padding:9px 11px; margin-bottom:7px; box-shadow:0 1px 4px rgba(0,0,0,.05);}
+        #screen-purchaseorders .poCard .poTop{display:flex; justify-content:space-between; align-items:center; gap:6px;}
+        #screen-purchaseorders .poCard .poName{font-size:16.5px; font-weight:800; color:#1f2937;}
+        #screen-purchaseorders .poCard .poMeta{font-size:12.5px; color:#6b7280; margin-top:2px;}
+        #screen-purchaseorders .poCard .poBal{font-size:13px; font-weight:800; margin-top:3px;}
+        #screen-purchaseorders .poActs{display:flex; flex-wrap:wrap; gap:5px; margin-top:7px;}
+        #screen-purchaseorders .poActs button{height:32px; padding:0 12px; border:none; border-radius:16px; font-size:13px; font-weight:700; font-family:inherit; cursor:pointer;}
+      </style>
+      <div class="poCapRow c3">
+        <button id="poFilterall" class="poCap active" onclick="setPoListFilter('all')">سب</button>
+        <button id="poFilterpending" class="poCap" onclick="setPoListFilter('pending')">⏳ زیرِ التوا</button>
+        <button id="poFilterreceived" class="poCap" onclick="setPoListFilter('received')">✅ موصول شدہ</button>
       </div>
-
-      <div class="partyToolbar">
-        <select id="poSortSelect" onchange="renderPurchaseOrdersScreen()" dir="rtl" style="flex:1; padding:10px; border-radius:10px; border:1px solid #dbe1ea; font-size:15px; font-family:inherit;">
+      <div class="poCapRow c2">
+        <select id="poSortSelect" class="poCap" onchange="renderPurchaseOrdersScreen()" dir="rtl">
           <option value="newest">🕐 نئے پہلے</option>
           <option value="oldest">🕐 پرانے پہلے</option>
         </select>
-        <select id="poSupplierFilterSelect" onchange="renderPurchaseOrdersScreen()" dir="rtl" style="flex:1; padding:10px; border-radius:10px; border:1px solid #dbe1ea; font-size:15px; font-family:inherit;">
-          <option value="all">🏭 تمام سپلائرز</option>
+        <select id="poSupplierFilterSelect" class="poCap" onchange="renderPurchaseOrdersScreen()" dir="rtl">
+          <option value="all">🏭 تمام بیوپاری</option>
         </select>
       </div>
+      <div class="poCapRow" style="grid-template-columns:1fr;">
+        <button type="button" class="poCap pay" onclick="poPayFromTop()">💵 بیوپاری کو پیمنٹ</button>
+      </div>
 
-      <div class="billSummaryBar" id="poSummaryBar"></div>
+      <div class="poSum" id="poSummaryBar"></div>
 
       <div id="poListWrap"></div>
     </div>
@@ -5981,7 +6026,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
          لسٹ (اردو نام + تعداد)۔ Submit کرنے پر ایڈوانس آرڈر کی طرح ایڈمن کے پاس ریویو کے لیے چلا جاتا ہے۔
          ===================================================================== -->
     <div class="screen customer-only" id="screen-orderTaking" style="font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','PDMSMultan','Noto Nastaliq Urdu',serif;">
-      <div class="pageTitle" style="text-align:center; font-weight:900; font-size:24px;">🧾 آرڈر بکنگ</div>
+      <div class="pageTitle" style="text-align:center; font-weight:900; font-size:18px; margin-bottom:8px; padding-bottom:5px;">🧾 آرڈر بکنگ</div>
 
       <!-- STEP 1: پہلے کسٹمر منتخب کریں — ایریا ریکارڈ سے خودبخود آ جائے گا -->
       <div id="otStepCustomer">
@@ -5990,34 +6035,24 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <!-- ---------- 📝 ہدایت (FM10SEPTH04:12PM): ڈرافٹ آرڈرز کی الگ فہرست — جب تک ایڈمن کو حتمی طور پر
              نہ بھیجا جائے، ملازم یہاں سے دیکھ/ترمیم/حذف کر سکتا ہے ---------- -->
         <!-- ---------- 🔽 ہدایت (FM11SEP): پہلے یہ دو بڑے فُل-وڈتھ بار تھے، اب چھوٹے کمپیکٹ بٹن ایک ہی لائن میں ---------- -->
-        <div style="display:flex; gap:8px; margin-bottom:10px;">
-          <button type="button" onclick="openMyDraftOrders()" style="flex:1; padding:10px 6px; background:linear-gradient(180deg,#c2790f,#8a530a); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.15); white-space:nowrap;">📝 ڈرافٹ</button>
-          <button type="button" onclick="openMySentOrders()" style="flex:1; padding:10px 6px; background:linear-gradient(180deg,#0f766e,#0b4a45); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.15); white-space:nowrap;">✅ فائنل سینڈ آرڈر</button>
+        <!-- ---------- 🗜️ FM310SA283 (ہدایت): آرڈر بکنگ صفحہ کمپیکٹ — صرف دو لائنیں:
+             لائن 1: ڈرافٹ | فائنل بھیجے گئے آرڈر
+             لائن 2: (بائیں) 📥 چالان فیڈ | (درمیان) سرچ بار | (دائیں) ➕ نیا کسٹمر
+             حاضر/غیر حاضر والے بٹن، بڑے سبز "نیا کسٹمر ایڈ کریں" اور بڑے نارنجی چالان بٹن ختم ---------- -->
+        <div style="display:flex; gap:6px; margin-bottom:6px;">
+          <button type="button" onclick="openMyDraftOrders()" style="flex:1; padding:7px 4px; background:linear-gradient(180deg,#c2790f,#8a530a); color:#fff; border:none; border-radius:9px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.15); white-space:nowrap;">📝 ڈرافٹ</button>
+          <button type="button" onclick="openMySentOrders()" style="flex:1; padding:7px 4px; background:linear-gradient(180deg,#0f766e,#0b4a45); color:#fff; border:none; border-radius:9px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.15); white-space:nowrap;">✅ فائنل سینڈ آرڈر</button>
         </div>
-        <!-- ---------- 🔓 ہدایت (FM15SEPTU): سرچ بار واپس بحال — فلٹر بٹنوں کے ساتھ ہی، تاکہ سکرول کیے
-             بغیر ٹائپ کر کے سیدھا کسٹمر مل جائے (سیریل نمبر یا نام دونوں سے) ---------- -->
-        <!-- ---------- 🆕 ہدایت (19 ستمبر، شام): منشی/آرڈر لینے والے کو یہیں سے نیا کسٹمر شامل کرنے کی اجازت ---------- -->
-        <!-- ---------- 🆕 ہدایت (19 ستمبر، شام): "نیا سٹاک" اور "نیا کسٹمر" دونوں بٹن ہوم پیج پر —
-             ایک ہی لائن میں برابر تقسیم، نیا سٹاک دائیں طرف، نیا کسٹمر بائیں طرف ---------- -->
-        <div style="display:flex; gap:8px; width:86%; max-width:340px; margin:0 auto 10px;" dir="rtl">
-          <!-- 🧾 26 ستمبر (دوپہر): منشی کا ایک ہی سادہ بٹن — صرف سبزی اور مقدار، نہ بیوپاری نہ قیمت -->
-          <button type="button" onclick="openStockFeedModal()" style="flex:1; padding:12px 4px; background:linear-gradient(180deg,#f59e0b,#b45309); color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:800; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.15);">📥 مال آیا (چالان فیڈ کریں)</button>
+        <div dir="ltr" style="display:flex; gap:5px; align-items:stretch; margin:0 0 6px;">
+          <button type="button" onclick="openStockFeedModal()" style="flex:0 0 auto; padding:6px 7px; background:linear-gradient(180deg,#f59e0b,#b45309); color:#fff; border:none; border-radius:9px; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.15); white-space:nowrap; line-height:1.3;">📥 چالان فیڈ</button>
+          <input type="text" id="otCustSearch" dir="rtl" placeholder="🔍 کسٹمر کا نام یا نمبر" oninput="renderOtCustomerList(this.value)"
+                 style="flex:1 1 auto; min-width:0; padding:6px 6px; border:2px solid var(--primary); border-radius:9px; font-size:13px; font-weight:800; text-align:center; box-sizing:border-box;">
+          <button type="button" onclick="openOtNewCustomer()" style="flex:0 0 auto; padding:6px 7px; background:linear-gradient(180deg,#22c55e,#15803d); color:#fff; border:none; border-radius:9px; font-size:11px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.15); white-space:nowrap; line-height:1.3;">➕ نیا کسٹمر</button>
         </div>
-        <div style="display:flex; gap:8px; width:86%; max-width:340px; margin:0 auto 10px;" dir="rtl">
-          <button type="button" onclick="openOtNewCustomer()" style="flex:1; padding:11px 4px; background:linear-gradient(180deg,#22c55e,#15803d); color:#fff; border:none; border-radius:12px; font-size:12.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.15); white-space:nowrap;">➕ نیا کسٹمر ایڈ کریں</button>
-        </div>
-        <!-- ---------- 🟢🔴 ہدایت (22 ستمبر): منشی خود بھی یہیں سے سبزیاں حاضر/غیر حاضر کر سکے —
-             بالکل ایڈمن والا نظام، اسی سلائیڈ (سوائپ) طریقے سے ---------- -->
-        <div id="otPresenceBtnRow" class="admin-only-flex" style="display:flex; gap:8px; width:86%; max-width:340px; margin:0 auto 10px;" dir="rtl">
-          <button type="button" id="otPresenceBtnPresent" onclick="openOtPresenceModal('present')" style="flex:1; padding:10px 4px; background:linear-gradient(180deg,#22c55e,#15803d); color:#fff; border:none; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.15); white-space:nowrap;">🟢 حاضر سبزیاں</button>
-          <button type="button" id="otPresenceBtnAbsent" onclick="openOtPresenceModal('absent')" style="flex:1; padding:10px 4px; background:linear-gradient(180deg,#ef4444,#b91c1c); color:#fff; border:none; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,.15); white-space:nowrap;">🔴 غیر حاضر سبزیاں</button>
-        </div>
-        <input type="text" id="otCustSearch" placeholder="🔍 کسٹمر کا نام یا سیریل نمبر لکھیں" oninput="renderOtCustomerList(this.value)"
-               style="width:86%; max-width:340px; display:block; margin:0 auto 10px; padding:11px; border:2px solid var(--primary); border-radius:12px; font-size:14.5px; font-weight:800; text-align:center; box-sizing:border-box;">
-        <div style="display:flex; gap:6px; margin-bottom:10px;">
-          <button type="button" id="otAreaFilterRetail" onclick="setOtAreaFilter('retail')" style="flex:1; padding:11px 4px; background:#b91c1c; color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 3px 8px rgba(0,0,0,.15);">🏷️ اسلام آباد</button>
-          <button type="button" id="otAreaFilterWholesale" onclick="setOtAreaFilter('wholesale')" style="flex:1; padding:11px 4px; background:#15803d; color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 3px 8px rgba(0,0,0,.15);">📦 راولپنڈی</button>
-          <button type="button" id="otAreaFilterToday" onclick="setOtAreaFilter('today')" style="flex:1; padding:11px 4px; background:#0369a1; color:#fff; border:none; border-radius:10px; font-size:12.5px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 3px 8px rgba(0,0,0,.15);">🛒 آج کے خریدار</button>
+        <div style="display:flex; gap:6px; margin-bottom:6px;">
+          <button type="button" id="otAreaFilterRetail" onclick="setOtAreaFilter('retail')" style="flex:1; padding:7px 4px; background:#b91c1c; color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 3px 8px rgba(0,0,0,.15);">🏷️ اسلام آباد</button>
+          <button type="button" id="otAreaFilterWholesale" onclick="setOtAreaFilter('wholesale')" style="flex:1; padding:7px 4px; background:#15803d; color:#fff; border:none; border-radius:10px; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 3px 8px rgba(0,0,0,.15);">📦 راولپنڈی</button>
+          <button type="button" id="otAreaFilterToday" onclick="setOtAreaFilter('today')" style="flex:1; padding:7px 4px; background:#0369a1; color:#fff; border:none; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; box-shadow:0 3px 8px rgba(0,0,0,.15);">🛒 آج کے خریدار</button>
         </div>
         <div id="otCustomerListWrap" style="max-height:65vh; overflow-y:auto; padding-bottom:20px;"></div>
       </div>
@@ -6133,6 +6168,12 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
           <span style="flex:0 0 auto; font-weight:800; font-size:13px; color:#92400e;">🧾 مال کہاں سے آیا:</span>
           <select id="otAddStockSource" style="flex:1; min-width:0; padding:7px; border:1.5px solid #f59e0b; border-radius:8px; font-size:13px; font-weight:800; background:#fff;"></select>
         </div>
+        <!-- ---------- ☑️ FM210FR282 (ہدایت): چالان/نیا سٹاک فیڈ کرتے وقت سبزی حاضر/غیر حاضر کرنے کا نظام —
+             ہر سبزی کے ساتھ خالی ٹک ڈبہ؛ ٹک لگاتے ہی دھواں + سلائیڈ کے ساتھ دوسری فہرست میں چلی جاتی ہے ---------- -->
+        <div dir="rtl" style="display:flex; gap:8px; margin-bottom:10px;">
+          <button type="button" id="otAddStockBtnPresent" onclick="setOtAddStockPresenceMode('present')" style="flex:1; padding:10px 4px; border:none; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer;">🟢 حاضر سبزیاں</button>
+          <button type="button" id="otAddStockBtnAbsent" onclick="setOtAddStockPresenceMode('absent')" style="flex:1; padding:10px 4px; border:none; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer;">🔴 غیر حاضر سبزیاں</button>
+        </div>
         <input type="text" id="otAddStockSearchInput" placeholder="🔍 نام لکھیں یا سیریل نمبر" oninput="renderOtAddStockList(this.value)"
                style="width:100%; padding:10px; border:2px solid var(--primary); border-radius:10px; font-size:13.5px; font-weight:700; text-align:center; margin-bottom:10px; box-sizing:border-box;">
         <div id="otAddStockListWrap"></div>
@@ -6148,7 +6189,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     <div class="modalOverlay" id="otPresenceModal" onclick="if(event.target===this) closeOtPresenceModal()">
       <div class="modalBox" style="max-width:460px; max-height:90vh; overflow-y:auto; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','PDMSMultan','Noto Nastaliq Urdu',serif;">
         <h3 id="otPresenceModalTitle" style="margin-top:0;">🟢 حاضر سبزیاں</h3>
-        <div dir="rtl" style="text-align:center; font-size:12px; font-weight:700; color:var(--muted); background:#f8fafc; border-radius:8px; padding:6px 8px; margin-bottom:10px;">➡️⬅️ سبزی کی قطار کو انگلی سے سرکائیں (سلائیڈ کریں) تاکہ اس کی حالت بدل جائے</div>
+        <div dir="rtl" style="text-align:center; font-size:12px; font-weight:700; color:var(--muted); background:#f8fafc; border-radius:8px; padding:6px 8px; margin-bottom:10px;">☑️ سبزی کے خالی ڈبے پر ٹک لگائیں — وہ دوسری فہرست میں چلی جائے گی</div>
         <input type="text" id="otPresenceSearchInput" placeholder="🔍 نام لکھیں یا سیریل نمبر" oninput="renderOtPresenceList(this.value)"
                style="width:100%; padding:10px; border:2px solid var(--primary); border-radius:10px; font-size:13.5px; font-weight:700; text-align:center; margin-bottom:10px; box-sizing:border-box;">
         <div id="otPresenceListWrap"></div>
@@ -6257,6 +6298,12 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       </div>
     </div>
 
+    <!-- ---------- 🗄️ سیف الماری (FM410SU298): ایڈمن PIN سے کھلنے والی مستقل الماری — بل / آرڈرز / ریکوری ---------- -->
+    <div class="screen admin-only" id="screen-safevault">
+      <div class="pageTitle">🗄️ سیف الماری</div>
+      <div id="svRoot" dir="rtl" style="text-align:right;"></div>
+    </div>
+
     <!-- =====================================================================
          💰 RECOVERY LIST — ملازم کے لیے: کسٹمرز سے آج جو ادھار وصول ہوا وہ درج کرے، بغیر اصل
          کھاتہ (Ledger) سکرین دیکھے۔ ایڈمن کے لیے: تمام ملازمین کی جمع کرائی گئی وصولی، طریقہ ادائیگی کے
@@ -6319,12 +6366,12 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
          مکمل نستعلیق، RTL، کمپیکٹ کنٹرولز، فونٹ/زوم/الائنمنٹ سلیکٹر، پرنٹ/PDF + واٹس ایپ شیئر (تصویر کی شکل میں)۔
          ===================================================================== -->
     <div class="screen" id="screen-dailyRecovery" dir="rtl" style="font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','PDMSMultan','Noto Nastaliq Urdu',serif;">
-      <div class="pageTitle" style="text-align:right;">📋 روزانہ ریکوری لسٹ</div>
-      <div class="settingsHint" style="margin-top:-6px; text-align:right;">یہ صرف ریکوری (ادھار) کی فہرست ہے — نقد فروخت کہیں شامل نہیں ہوتی۔ "آج کا مال" صرف اسی حصے کا ہے جو آج ادھار گیا۔ "تازہ مکمل بقایہ" ہمیشہ اصل، تازہ بقایا ہے۔</div>
+      <div class="pageTitle" style="text-align:right; margin:-10px 0 8px; padding-bottom:6px; display:flex; align-items:center; justify-content:space-between; gap:8px;"><span>📋 روزانہ ریکوری لسٹ</span><button type="button" onclick="runCloudHealthCheck()" style="border:1px solid #cbd5e1; border-radius:999px; background:#fff; color:#334155; font-size:12px; font-weight:700; padding:3px 10px; cursor:pointer; flex:0 0 auto;">🩺 کلاؤڈ چیک</button></div>
+      <div id="drDayBar" dir="rtl" style="display:flex; gap:5px; align-items:center; margin:2px 0 6px; flex-wrap:nowrap; overflow-x:auto;"></div>
 
       <!-- ---------- کمپیکٹ کنٹرول پٹی — ترتیب / فونٹ / سائز(زوم) / نمبروں کی سیدھ / پرنٹ / شیئر ---------- -->
-      <div id="drControlsBar" style="display:flex; gap:6px; align-items:center; margin:10px 0 12px; flex-wrap:wrap;">
-        <select id="drSortSelect" onchange="renderDailyRecoveryScreen()" title="ترتیب" style="width:150px; padding:6px 8px; border:1px solid #dbe1ea; border-radius:8px; font-size:11.5px;">
+      <div id="drControlsBar" style="display:flex; gap:5px; align-items:center; margin:4px 0 8px; flex-wrap:nowrap; overflow-x:auto; padding:2px 0 6px;">
+        <select id="drSortSelect" onchange="renderDailyRecoveryScreen()" title="ترتیب" style="width:88px; flex:0 0 auto; padding:4px 1px; border:1px solid #dbe1ea; border-radius:8px; font-size:10.5px; height:38px;">
           <option value="todayFirst">🔥 آج والے اوپر</option>
           <option value="az">🔤 نام A→Z</option>
           <option value="za">🔤 نام Z→A</option>
@@ -6335,24 +6382,21 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
           <option value="shortFirst">⚠️ کم وصولی والے اوپر</option>
           <option value="shortOnly">⚠️ صرف کم وصولی والے</option>
         </select>
-        <select id="drFontSelect" onchange="renderDailyRecoveryScreen()" title="فونٹ" style="width:130px; padding:6px 8px; border:1px solid #dbe1ea; border-radius:8px; font-size:11.5px;"></select>
-        <select id="drNumAlignSelect" onchange="renderDailyRecoveryScreen()" title="رقموں کی سیدھ" style="width:100px; padding:6px 8px; border:1px solid #dbe1ea; border-radius:8px; font-size:11.5px;">
+        <select id="drFontSelect" onchange="renderDailyRecoveryScreen()" title="فونٹ" style="width:88px; flex:0 0 auto; padding:4px 1px; border:1px solid #dbe1ea; border-radius:8px; font-size:10.5px; height:38px;"></select>
+        <select id="drNumAlignSelect" onchange="renderDailyRecoveryScreen()" title="رقموں کی سیدھ" style="width:76px; flex:0 0 auto; padding:4px 1px; border:1px solid #dbe1ea; border-radius:8px; font-size:10.5px; height:38px;">
           <option value="center">↔️ درمیان</option>
           <option value="right">➡️ دائیں</option>
           <option value="left">⬅️ بائیں</option>
         </select>
-        <div style="display:flex; align-items:center; gap:3px;">
-          <button type="button" onclick="adjustDrZoom(-10)" style="width:26px; height:26px; border-radius:6px; border:1px solid #dbe1ea; background:#fff; cursor:pointer; font-size:13px;">−</button>
-          <span id="drZoomVal" style="font-size:11px; font-weight:700; width:34px; text-align:center;">100%</span>
-          <button type="button" onclick="adjustDrZoom(10)" style="width:26px; height:26px; border-radius:6px; border:1px solid #dbe1ea; background:#fff; cursor:pointer; font-size:13px;">+</button>
+        <div style="display:flex; align-items:center; gap:8px; flex:0 0 auto; margin-right:auto;" dir="rtl">
+          <button type="button" class="drZoomBtn" onclick="adjustDrZoom(-10)" title="چھوٹا">−</button>
+          <span id="drZoomVal" style="font-size:11px; font-weight:800; width:34px; text-align:center;">100%</span>
+          <button type="button" class="drZoomBtn" onclick="adjustDrZoom(10)" title="بڑا">+</button>
         </div>
-        <button type="button" onclick="printDailyRecoveryReport()" style="padding:6px 10px; border-radius:8px; border:none; background:var(--primary-dark); color:#fff; font-size:11.5px; font-weight:700; cursor:pointer;">🖨️ پرنٹ / PDF</button>
-        <button type="button" onclick="shareDailyRecoveryImage()" style="padding:6px 10px; border-radius:8px; border:none; background:#25D366; color:#fff; font-size:11.5px; font-weight:700; cursor:pointer;">📤 واٹس ایپ شیئر</button>
       </div>
 
       <!-- ---------- 📊 FM299TU#261 (ہدایت): آج کی ریکوری کا خلاصہ — سب سے اوپر ---------- -->
-      <div id="drSummary" dir="rtl" style="margin:0 0 10px;"></div>
-      <div style="text-align:left; margin:-4px 0 8px;"><button type="button" onclick="runCloudHealthCheck()" style="border:1px solid #cbd5e1; border-radius:999px; background:#fff; color:#334155; font-size:12px; padding:3px 10px; cursor:pointer;">🩺 کلاؤڈ چیک</button></div>
+      <div id="drSummary" dir="rtl" style="margin:0 0 8px;"></div>
       <div id="drTableWrap" style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
         <!-- ---------- 📋 FM299TU#264 (ہدایت): ہر خانے کے گرد لکیریں، جدول سکرین کے اندر (سائیڈ سکرول کے بغیر)،
              کم وصولی کا کالم الگ سرخ، اور آخری کالم میں ریکوری والے کا لکھا نوٹ (یہاں لکھنے کا خانہ نہیں) ---------- -->
@@ -8177,6 +8221,7 @@ function persistAllData(){
   if(typeof expenseData !== 'undefined') saveToStorage('expenses', expenseData);
   if(typeof nextExpenseId !== 'undefined') saveToStorage('nextExpenseId', nextExpenseId);
   if(typeof marqueeSettings !== 'undefined') saveToStorage('marqueeSettings', marqueeSettings);
+  try{ if(typeof svTick === 'function') svTick(); }catch(e){} // 🗄️ سیف الماری: ہر 3 سیکنڈ میں نئی چیزوں کی کاپی
   try{ if(typeof extraSyncScheduleCheck === 'function') extraSyncScheduleCheck(); }catch(e){}
 }
 setInterval(persistAllData, 1500); // ---------- ہر 1.5 سیکنڈ بعد خودکار محفوظ (fail-safe) ----------
@@ -9055,7 +9100,21 @@ function getDeveloperContact(){
 // 🆕 FM29SEPTU0310AM: گاہک کو نقد ادھار — بل جیسا حساب ٹیبل (دستی کیش، سابقہ، ٹوٹل، وصولی، اب تک ٹوٹل بقایا) + یادداشت وقت کے ساتھ
 // 🆕 FM309WE#265: سیریل ماسٹر کاپی — صرف ہاتھ سے محفوظ/بحال (کوئی خودکار نظام نہیں)؛ نئی محفوظ کرنے سے پہلے تصدیق، بحالی میں فون/کلاؤڈ کی نئی کاپی، ٹکراؤ والے نئے نمبر درست، ڈرائیو کا جھوٹا ✅ ختم
 // 🆕 FM29SEPTU0525AM: بیوپاری سے نقد ادھار لیا — گاہک والے فارم جیسا ٹیبل؛ دونوں فارموں میں محفوظ کے بعد پرنٹ (تھرمل) / سکرین شاٹ اور شیئر / پوسٹر شیئر
-const APP_BUILD_VERSION = 'SM210FR040'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 FM310SA287: روزانہ ریکوری لسٹ — کاروباری تاریخ (ایڈمن کے ڈیٹ اینڈ کرنے تک نہیں بدلتی، دو بار تصدیق)، پچھلی تاریخ PIN سے کھلے/دوبارہ لاک، ایک لائن بٹن اور خلاصہ، وضاحتی پیغام ختم
+// 🆕 FM310SA288: ریکوری لسٹ — تاریخ سبز/سفید، PDF/شیئر اوپر کی لائن میں، بڑے ابھرے زوم بٹن، جدول کالم مواد کے برابر (نام کا کالم سب سے لمبے نام جتنا، باقی جگہ نوٹ کو)
+// 🆕 FM310SA289: ریکوری لسٹ — کلاؤڈ چیک بٹن عنوان کی لائن میں بائیں کونے پر، باقی صفحہ اوپر
+// 🆕 FM310SA290: رابطہ کالم — کال/واٹس ایپ بٹن ہمیشہ نظر آئیں (نمبر نہ ہو تو دھندلے، دبانے پر پیغام)، ساتھ ساتھ ایک قطار میں
+// 🆕 FM310SA292: (1) سیلزمین کے بل کی منظوری پر مزدوری/اضافی چارجز جمع (2) Record Payment میں بینک/والٹ سے کیش نہ بدلے (3) Void پر واپس شدہ مقدار دوبارہ سٹاک میں نہ جائے (4) ادھار بل کی واپسی پہلے بقایا سے کٹے (5) ریکوری دوبارہ کنفرم نہ ہو
+// 🆕 FM310SA291: غیر حاضر سبزی میں سٹاک ہو تو غیر حاضر نہیں ہوگی (وارننگ)، اور غیر حاضر سبزیاں رپورٹوں/پرنٹ فہرستوں سے غائب
+// 🆕 FM410SU301: 📦 "بیوپاری خریداری" مینیو/ہوم میں واپس (نام ایک ہی)، سکرین سے ہی بیوپاری کو پیمنٹ، فلٹر کیپسول عمودی اور کم جگہ میں
+// 🆕 FM410SU299: سیف الماری — اردو ہنٹ ختم، پوری الماری دائیں سے بائیں (RTL)، آئٹم فہرست صاف ستھری
+// 🆕 FM410SU298: 🗄️ سیف الماری — منشی کے بل، آرڈر ٹیکنگ کے آرڈرز اور ریکوری رپورٹس کی مستقل کاپی، ایڈمن PIN سے بند، حذف تین وارننگ + PIN کے بعد، تاریخ/مہینہ/سال فلٹر
+// 🆕 FM410SU297: بل کی "ابھی وصول" لائن — اگلا بل بننے کے بعد بھی پرانے بل پر وصولی وہی رہے (اس کے وقت سے اگلے بل کے وقت تک کی وصولیاں)
+// 🆕 FM410SU296: بل کی "ابھی وصول" لائن — منسوخ بل کو آخری بل نہ گننا، اور تصدیق شدہ وصولی ریکوری لسٹ کی انٹری سے بھی گننا
+// 🆕 FM410SU295: چالان وار جدول کے کالم کے نام — "ریٹ" کی جگہ "خرید ریٹ" اور "قیمتیں فروخت" کی جگہ "فروخت ریٹ"
+// 🆕 FM410SU294: چالان وار "باقی سٹاک" خانہ — صفر سے زیادہ ہو تو سرخ بیک گراؤنڈ
+// 🆕 FM410SU293: خرید اور چالان رپورٹ — "سیل ہوا" کالم کی جگہ "قیمتیں فروخت" (اسلام آباد ریٹ)، اور چالان وار خانے میں سبزی کے نیچے بیوپاری کا نام موٹا اور صاف
+const APP_BUILD_VERSION = 'SM410SU041'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -9745,7 +9804,9 @@ const HOME_SHORTCUT_OPTIONS = [
   {key:'advanceorders', icon:'📝', label:'Pending Orders', screen:'advanceorders'},
   {key:'customers',     icon:'👥', label:'گاہک',      screen:'customers'},
   {key:'suppliers',     icon:'🚚', label:'بیوپاری',      screen:'suppliers'},
+  {key:'purchaseorders', icon:'📦', label:'بیوپاری خریداری', screen:'purchaseorders'},
   {key:'recoveryList',  icon:'💰', label:'وصولی لسٹ',  screen:'recoveryList'},
+  {key:'safevault',     icon:'🗄️', label:'سیف الماری', screen:'safevault'},
   // ---------- 🍇 ہدایت پر: Dashboard, Categories, Purchase Orders, Stock Adjustment, Trends —
   // یہ پانچوں ہوم شارٹ کٹ آپشنز سے مکمل ہٹا دیے گئے ہیں (کوڈ/فیچر محفوظ ہے، صرف سامنے نہیں دکھائے جا رہے) ----------
   {key:'billhistory',   icon:'🧾', label:'پرانے بل',   screen:'billhistory'},
@@ -9845,6 +9906,7 @@ function renderHomeIconGrid(){
     // ---------- 🔒 ہدایت (FM15SEPTU3): "پراڈکٹس" کا ہوم آئیکن مکمل چھپا دیا (سٹاک مینجمنٹ اب وہی کام
     // کرتی ہے) — کوڈ/فنکشن/ASSIGNABLE_SCREENS اندراج بالکل محفوظ ہے، صرف یہاں سے فلٹر کیا گیا ---------- -->
     if(key === 'products') return null;
+    // 📦 FM410SU301: "بیوپاری خریداری" ہوم آئیکن واپس (ہدایت) — بیوپاری کے اندر والی "خریداری" ویسے ہی قائم
     const def = ASSIGNABLE_SCREENS.find(s => s.key === key);
     if(!def) return null;
     const spaceIdx = def.label.indexOf(' ');
@@ -11585,6 +11647,144 @@ function flashSavedInput(el){
   el._flashTimer = setTimeout(() => { el.style.backgroundColor = prevBg || '#fff'; }, 550);
 }
 
+
+// =====================================================================
+// ☑️💨 FM210FR282 — ہدایت: سلائیڈ (سوائپ) والا حاضر/غیر حاضر نظام مکمل ختم۔ اب ہر جگہ خالی ڈبہ — ٹک لگاتے ہی
+// سبزی دوسری فہرست (حاضر ⟷ غیر حاضر) میں چلی جاتی ہے، دھواں بن کر ابھرتی اور سلائیڈ ہو کر ختم ہوتی نظر آتی ہے۔
+// ڈبہ ہمیشہ خالی ہی دکھتا ہے (غیر حاضر فہرست میں بھی) — ٹک لگانا = "دوسری طرف بھیجو" ----------
+function vmPresenceFx(rowEl, toAbsent, done){
+  let finished = false;
+  const finish = () => { if(finished) return; finished = true; try{ done && done(); }catch(e){ console.error(e); } };
+  if(!rowEl){ finish(); return; }
+  try{
+    const r = rowEl.getBoundingClientRect();
+    for(let i = 0; i < 7; i++){
+      const puff = document.createElement('div');
+      puff.className = 'vmSmokePuff' + (toAbsent ? '' : ' vmGreen');
+      const x = r.left + Math.random() * Math.max(10, r.width - 34);
+      const y = r.top + (r.height / 2) - 17 + (Math.random() * 14 - 7);
+      puff.style.left = x + 'px'; puff.style.top = y + 'px';
+      puff.style.setProperty('--vmdx', (Math.random() * 40 - 20) + 'px');
+      puff.style.animationDelay = (Math.random() * 0.25) + 's';
+      document.body.appendChild(puff);
+      setTimeout(() => { try{ puff.remove(); }catch(e){} }, 1300);
+    }
+    rowEl.classList.add(toAbsent ? 'vmFxOutR' : 'vmFxOutL');
+  }catch(e){ finish(); return; }
+  setTimeout(finish, 760);
+}
+function vmRefreshPresenceScreens(){
+  try{
+    otFlatCache = applyManualCardOrder(getFlatVariants().sort((a, b) => {
+      const sa = a.serial_no, sb = b.serial_no;
+      if(sa == null && sb == null) return a.name.localeCompare(b.name, 'ur');
+      if(sa == null) return 1;
+      if(sb == null) return -1;
+      return sa - sb;
+    }));
+  }catch(e){}
+  try{ if(document.getElementById('stockAdjustmentListWrap')) renderStockAdjustmentScreen(document.getElementById('stockAdjSearchInput')?.value || ''); }catch(e){}
+  try{ if(document.getElementById('productListWrap')) renderProductList(document.getElementById('productSearchInput')?.value || ''); }catch(e){}
+  try{ if(document.getElementById('otPresenceListWrap') && document.getElementById('otPresenceModal')?.classList.contains('show')) renderOtPresenceList(document.getElementById('otPresenceSearchInput')?.value || ''); }catch(e){}
+  try{ updateOtPresenceButtonLabels(); }catch(e){}
+  try{ renderOtItemsPage(); }catch(e){}
+  try{ if(document.getElementById('otAddStockListWrap')) renderOtAddStockList(document.getElementById('otAddStockSearchInput')?.value || ''); }catch(e){}
+  try{ if(document.getElementById('poBrowseList') && document.getElementById('poModal')?.classList.contains('show')) renderPoBrowseList(); }catch(e){}
+}
+// ---------- 🛡️ FM310SA283: جدول/کارڈ/موڈل — ہر جگہ کا ٹک یہیں آتا ہے ----------
+// ---------- 🛡️ FM310SA283: ٹک کی خرابی کا اصل علاج ----------
+// پہلے ٹک لگانے کے 0.75 سیکنڈ بعد تبدیلی ہوتی تھی، اور اسی دوران کلاؤڈ ملاپ (push/poll) پوری فہرست نئی بنا کر
+// بدل دیتا تھا — تبدیلی پرانی کاپی پر لگ کر ضائع ہو جاتی (سبزی دوبارہ کھڑی، بار بار ٹک)۔ اب:
+//   1) تبدیلی ٹک لگاتے ہی فوراً، اور ہمیشہ تازہ فہرست میں سے product_id کے ذریعے سبزی ڈھونڈ کر ہوتی ہے
+//   2) ہر تبدیلی "vmPresenceOverrides" میں یاد رہتی ہے اور ہر کلاؤڈ ملاپ کے بعد دوبارہ لاگو ہوتی ہے
+//   3) کلاؤڈ پر بھیجنا ایک وقت میں ایک ہی (ڈبل پش نہیں) — اور بھیجنے کے بعد دوبارہ تصدیق
+const VM_OVR_TTL = 5 * 60 * 1000;
+let vmPresenceOverrides = {}; // product_id(str) -> {dormant:bool, t:ms}
+function vmApplyPresenceOverrides(arr, remote){
+  const now = Date.now();
+  let remoteMap = null;
+  if(Array.isArray(remote)){ remoteMap = new Map(); remote.forEach(x => remoteMap.set(String(x.product_id), !!x.isDormant)); }
+  Object.keys(vmPresenceOverrides).forEach(k => {
+    const o = vmPresenceOverrides[k];
+    if(!o || now - o.t > VM_OVR_TTL){ delete vmPresenceOverrides[k]; return; }
+    if(remoteMap && remoteMap.has(k) && remoteMap.get(k) === o.dormant){ delete vmPresenceOverrides[k]; return; } // کلاؤڈ میں پہلے ہی یہی حالت ہے
+    const p = (arr || []).find(x => String(x.product_id) === k);
+    if(p) p.isDormant = o.dormant;
+  });
+  return arr;
+}
+let vmPushTimer = null, vmPushBusy = false, vmPushAgain = false;
+function vmQueuePush(){
+  clearTimeout(vmPushTimer);
+  vmPushTimer = setTimeout(vmRunPush, 600);
+}
+async function vmRunPush(){
+  if(vmPushBusy){ vmPushAgain = true; return; }
+  vmPushBusy = true;
+  const startTs = Date.now();
+  let ok = false;
+  try{ ok = await pushProductsToCloud(); }catch(e){ ok = false; }
+  try{
+    // push پوری فہرست نئی بنا کر لگاتا ہے — اگر اس دوران کوئی ٹک ضائع ہوا ہو تو دوبارہ لگائیں
+    let mismatch = false;
+    Object.keys(vmPresenceOverrides).forEach(k => {
+      const o = vmPresenceOverrides[k];
+      const p = productsData.find(x => String(x.product_id) === k);
+      if(p && !!p.isDormant !== o.dormant){ mismatch = true; }
+    });
+    if(mismatch){
+      vmApplyPresenceOverrides(productsData);
+      try{ persistAllData(); }catch(e){}
+      vmPushAgain = true;
+      vmRefreshPresenceScreens();
+    } else if(ok){
+      Object.keys(vmPresenceOverrides).forEach(k => { if(vmPresenceOverrides[k].t <= startTs) delete vmPresenceOverrides[k]; });
+    }
+  }catch(e){}
+  vmPushBusy = false;
+  if(vmPushAgain){ vmPushAgain = false; vmQueuePush(); }
+}
+// تبدیلی فوراً لاگو + یاد رکھنا + کلاؤڈ کے لیے قطار
+// ---------- 🔒 FM310SA291 (ہدایت): سبزی میں سٹاک موجود ہو تو غیر حاضر نہیں ہو سکتی — پہلے سٹاک سیل/زیرو/بک کریں ----------
+function presenceStockGuard(p){
+  if(!p) return false;
+  const tot = (p.variants || []).reduce((a, v) => a + (Number(v.stock) > 0 ? Number(v.stock) : 0), 0);
+  if(tot > 0){
+    alert(`⚠️ "${p.name}" غیر حاضر نہیں ہو سکتی — اس میں ابھی سٹاک موجود ہے (${tot}).\n\nپہلے اس کا سٹاک سیل کریں، بک کریں یا ایڈمن/آرڈر ٹیکنگ والا سٹاک زیرو کر دے، پھر غیر حاضر کریں۔`);
+    return true;
+  }
+  return false;
+}
+function vmCommitPresence(pid, toAbsent){
+  const key = String(pid);
+  const p = productsData.find(x => String(x.product_id) === key);
+  if(!p) return null;
+  if(toAbsent && presenceStockGuard(p)) return null;
+  p.isDormant = toAbsent;
+  vmPresenceOverrides[key] = { dormant: toAbsent, t: Date.now() };
+  try{ persistAllData(); }catch(e){}
+  try{ pauseCloudPolling(20000); }catch(e){} // ابھی کی تبدیلی پولنگ سے واپس نہ پلٹے
+  vmQueuePush();
+  return p;
+}
+// ---------- ایک ہی مشترکہ فنکشن: جدول/موڈل — ہر جگہ کا ٹک یہیں آتا ہے ----------
+function vmPresenceTick(productId, chkEl, opts){
+  opts = opts || {};
+  if(opts.adminOnly && AppState.currentRole !== 'admin'){ alert('صرف ایڈمن یہ تبدیل کر سکتا ہے'); if(chkEl) chkEl.checked = false; return; }
+  const key = String(productId);
+  const p = productsData.find(x => String(x.product_id) === key);
+  if(!p){ if(chkEl) chkEl.checked = false; return; }
+  if(chkEl){
+    if(chkEl.dataset.vmBusy === '1') return; // ڈبل ٹیپ — ایک ہی بار
+    chkEl.dataset.vmBusy = '1'; chkEl.disabled = true;
+  }
+  const toAbsent = !p.isDormant;
+  if(toAbsent && presenceStockGuard(p)){ if(chkEl){ chkEl.checked = false; chkEl.disabled = false; delete chkEl.dataset.vmBusy; } return; }
+  vmCommitPresence(key, toAbsent);
+  const rowEl = chkEl ? chkEl.closest('tr, .vmPresRow') : null;
+  vmPresenceFx(rowEl, toAbsent, () => { vmRefreshPresenceScreens(); });
+}
+
 // ---------- ✅ ہدایت (FM10SEPTH0530PM): جدول/شیٹ نظارے میں ہی حاضر/غیر حاضر چیک باکس — کارڈ نظارے
 // جیسا ہی سلائیڈ اثر (ہلکا سا دھندلا ہو کر قطار غائب)، پھر فہرست خودکار تازہ۔ Stock Adjustment اور Products
 // دونوں سکرینز ایک ہی productsData استعمال کرتی ہیں، اس لیے یہاں سے تبدیلی دونوں جگہ فوراً نظر آئے گی —
@@ -11596,6 +11796,7 @@ function toggleProductPresenceInSheet(productId, checkboxEl){
   setTimeout(() => {
     const p = productsData.find(x => x.product_id === productId);
     if(!p) return;
+    if(!p.isDormant && presenceStockGuard(p)){ if(tr) tr.style.opacity = ''; if(checkboxEl) checkboxEl.checked = false; return; }
     p.isDormant = !p.isDormant;
     persistAllData();
     pushProductsToCloud();
@@ -11611,6 +11812,7 @@ function toggleProductPresenceInSheet(productId, checkboxEl){
 // حاضر⟷غیر حاضر بدلتی ہے۔ <tr> کے اندر آزاد <div> اوورلے درست HTML نہیں بنتا، اس لیے یہاں پوری قطار کا
 // پس منظر رنگ (سبز/سرخ) ہی سرکاتے وقت اشارہ دیتا ہے ---------- -->
 function wireProductSwipeRows(tableId){
+  return; // ☑️ FM210FR282: سلائیڈ/سوائپ نظام مکمل ختم — اب جدول کی ہر قطار میں خالی ٹک ڈبہ ہے (vmPresenceTick)
   // ---------- 🔓 ہدایت (FM21SEPMO0M): حاضر/غیر حاضر نظام دوبارہ بحال — سوائپ گیسچر واپس فعال
   // (FM16SEPWE0518AM2 والا early-return ہٹا دیا گیا) ---------- -->
   const table = document.getElementById(tableId);
@@ -11803,8 +12005,9 @@ function renderProductSpreadsheet(filtered, wrap){
   // کا واحد راستہ اوپر والے مستقل پینل کا 🗑️ بٹن ہے (منتخب سبزی کے لیے)، جو پہلے تصدیق پھر ایڈمن پاسورڈ مانگتا
   // ہے (deleteProduct دیکھیں)۔ اس لیے کالم/فنکشن یہاں سے نکال دیا (فنکشن deleteProductRowInSheet محفوظ ہے،
   // بس اب کہیں سے نہیں بلایا جاتا) ---------- -->
-  const colWidths = [serialW, nameW, packingW, stockW, bookingW];
-  const rightOffsets = [0, colWidths[0], colWidths[0]+colWidths[1]];
+  const chkW = 40; // ☑️ FM210FR282: حاضر/غیر حاضر کا خالی ٹک ڈبہ — سب سے دائیں، منجمد
+  const colWidths = [chkW, serialW, nameW, packingW, stockW, bookingW];
+  const rightOffsets = [0, colWidths[0], colWidths[0]+colWidths[1], colWidths[0]+colWidths[1]+colWidths[2]];
   const rows = filtered.map((p, idx) => {
     const v = p.variants[0] || {};
     // ---------- 🦓 ہدایت (FM10SEPTH0530PM): زیبرا رنگ — ایک قطار گہری، ایک ہلکی؛ منتخب شدہ قطار کا
@@ -11816,28 +12019,29 @@ function renderProductSpreadsheet(filtered, wrap){
     const packingBtnStyle = "width:100%;min-width:0;box-sizing:border-box;padding:6px 2px;border:1.5px solid #d3d8de;border-radius:11px;font-size:11.5px;text-align:center;background:#fff;cursor:pointer;" + urduFont;
     const packingSelectHtml = `<button type="button" style="${packingBtnStyle}" onclick="openPackingPicker(${p.product_id}, ${v.variant_id}, '${(v.label||'').replace(/'/g,"\\'")}', '${wrap.id}')">${v.label || '❓'}</button>`;
     return `
-      <tr data-product-id="${p.product_id}" data-swipe-id="${p.product_id}" class="prodSwipeRow" style="position:relative; touch-action:pan-y;" onclick="selectVcInlineRow(${p.product_id}, ${v.variant_id}, '${wrap.id}')">
+      <tr data-product-id="${p.product_id}" data-swipe-id="${p.product_id}" class="prodSwipeRow" style="position:relative;" onclick="selectVcInlineRow(${p.product_id}, ${v.variant_id}, '${wrap.id}')">
         <!-- ---------- 🔓 ہدایت (FM21SEPMO0M): حاضر/غیر حاضر نظام دوبارہ بحال — selectVcInlineRow میں
              کوئی isDormant شرط نہیں، اس لیے ہر قطار پر ٹیپ پہلے کی طرح کام کرتا رہے گا ---------- -->
-        <td style="${tdBase}${frozenTd(0)}"><button type="button" class="serialBadgeBtn" data-serial-pid="${p.product_id}" data-serial-vid="${v.variant_id}" data-serial-val="${p.serial_no ?? ''}" data-serial-name="${(p.name||'').replace(/"/g,'&quot;')}" style="${SERIAL_BADGE_INLINE_STYLE} width:30px !important; height:30px !important; min-width:30px !important; min-height:30px !important; font-size:12px !important;">${p.serial_no ?? '?'}</button></td>
+        <td style="${tdBase}${frozenTd(0)}" onclick="event.stopPropagation()"><input type="checkbox" class="vmPresChk" ${isAdmin ? '' : 'disabled'} title="${productPresenceFilter === 'absent' ? 'ٹک لگائیں — حاضر میں بھیجیں' : 'ٹک لگائیں — غیر حاضر میں بھیجیں'}" onclick="event.stopPropagation(); vmPresenceTick(${p.product_id}, this, {adminOnly:true})"></td>
+        <td style="${tdBase}${frozenTd(1)}"><button type="button" class="serialBadgeBtn" data-serial-pid="${p.product_id}" data-serial-vid="${v.variant_id}" data-serial-val="${p.serial_no ?? ''}" data-serial-name="${(p.name||'').replace(/"/g,'&quot;')}" style="${SERIAL_BADGE_INLINE_STYLE} width:30px !important; height:30px !important; min-width:30px !important; min-height:30px !important; font-size:12px !important;">${p.serial_no ?? '?'}</button></td>
         <!-- ---------- 🔒 ہدایت (FM16SEPWE3): ✏️ بٹن مکمل ختم — اب پوری قطار پر ٹیپ کرنے سے ہی سامنے
              کا مستقل پینل اسی سبزی کی تفصیل دکھا دیتا ہے (قطار نیلی ہو کر منتخب نظر آتی ہے) ---------- -->
-        <td style="${tdBase}${frozenTd(1)}"><input type="text" style="${nameInputStyle}" value="${p.name}" onclick="event.stopPropagation(); selectVcInlineRow(${p.product_id}, ${v.variant_id}, '${wrap.id}')" onchange="updateProductName(${p.product_id}, this.value, this)"></td>
-        <td style="${tdBase}${frozenTd(2)}">${packingSelectHtml}</td>
+        <td style="${tdBase}${frozenTd(2)}"><input type="text" style="${nameInputStyle}" value="${p.name}" onclick="event.stopPropagation(); selectVcInlineRow(${p.product_id}, ${v.variant_id}, '${wrap.id}')" onchange="updateProductName(${p.product_id}, this.value, this)"></td>
+        <td style="${tdBase}${frozenTd(3)}">${packingSelectHtml}</td>
         <td style="${tdBase}${rowTd}"><input type="number" style="${inputStyle}" value="${v.stock||0}" onfocus="this.select()" onchange="updateVariantField(${p.product_id},${v.variant_id},'stock',this.value,this)"></td>
         <!-- ---------- 🔖 ہدایت (22 ستمبر): بکنگ (v.reserved) صرف دکھانے کے لیے — جان بوجھ کر input نہیں
         بنایا، تاکہ منشی کے پینڈنگ آرڈرز کا نظام غلطی سے دستی تبدیلی سے خراب نہ ہو (یہ نمبر خود بخود اپڈیٹ ہوتا ہے) ---------- -->
         <td style="${tdBase}${rowTd}"><div onclick="event.stopPropagation(); openBookingDetails(${v.variant_id}, true)" style="cursor:pointer;width:100%;box-sizing:border-box;padding:6px 2px;border-radius:11px;font-size:13px;font-weight:900;text-align:center;${numFont}background:${(v.reserved||0)>0 ? '#ffedd5' : '#f1f5f9'};color:${(v.reserved||0)>0 ? '#c2410c' : '#94a3b8'};border:1.5px solid ${(v.reserved||0)>0 ? '#fdba74' : '#e2e8f0'};">${v.reserved||0}</div></td>
       </tr>`;
   }).join('');
-  const headers = ['#','نام','پیکنگ','📦 سٹاک','🔖 بکنگ'];
+  const headers = ['☑️','#','نام','پیکنگ','📦 سٹاک','🔖 بکنگ'];
   const theadHtml = '<tr>' + headers.map((h,i) => {
-    const frozen = i < 3 ? `position:-webkit-sticky;position:sticky;right:${rightOffsets[i]}px;z-index:12;` : '';
+    const frozen = i < 4 ? `position:-webkit-sticky;position:sticky;right:${rightOffsets[i]}px;z-index:12;` : '';
     return `<th style="${thBase}width:${colWidths[i]}px;${frozen}">${h}</th>`;
   }).join('') + '</tr>';
   // ---------- 🆕 ہدایت (17 ستمبر، شام): نام والا کالم (index 1) اب فکس چوڑائی نہیں — بچی ہوئی خالی
   // جگہ خودکار اسی میں چلی جاتی ہے (جدول ہمیشہ پورے چوڑائی تک پھیلا رہے، دائیں/بائیں خالی پٹی نہ بچے) ---------- -->
-  const colgroupHtml = '<colgroup>' + colWidths.map((w,i) => i===1 ? '<col style="width:auto;">' : `<col style="width:${w}px;">`).join('') + '</colgroup>';
+  const colgroupHtml = '<colgroup>' + colWidths.map((w,i) => i===2 ? '<col style="width:auto;">' : `<col style="width:${w}px;">`).join('') + '</colgroup>';
   const totalTableW = colWidths.reduce((a,b) => a+b, 0);
   // ---------- 🧭 ہدایت (FM10SEPTH0530PM) فکس: پہلے ہر بار innerHTML بدلتے ہی سکرول واپس شروع
   // (دائیں/اوپر) پر چلا جاتا تھا — لکھتے ہوئے ایسا لگتا تھا کہ صفحہ "بھاگ کر" پہلے نمبر پر آ گیا۔ اب پرانا
@@ -12634,6 +12838,9 @@ let navBackStack = [];
 let navForwardStack = [];
 
 function goTo(screenName, _isHistoryNav){
+  // ---------- 🗄️ سیف الماری: بغیر ایڈمن PIN کے کسی راستے (مینیو، بیک بٹن، سرچ، ہوم شارٹ کٹ) سے نہیں کھلے گی ----------
+  if(screenName === 'safevault' && !window.__svUnlocked){ svAskAndOpen(); return; }
+  if(screenName !== 'safevault' && window.__svUnlocked){ window.__svUnlocked = false; }
   try{ if(screenName === 'payments' || screenName === 'mydiary'){ const _d = EXTRA_SYNC_DEFS.find(d => d.key === (screenName === 'payments' ? 'payments' : 'diary')); if(_d) setTimeout(() => extraSyncOne(_d), 300); } }catch(e){}
   // ---------- 🍇 Sabzi Mandi POS: مالک کی حتمی ہدایت پر — Admin کا Home اب ایک عام Home اسکرین ہے (بالکل
   // Salesman کی طرح)، اپنی منتخب کردہ Shortcut اسکرینوں کے آئیکن گرڈ کے ساتھ۔ Billing/پراڈکٹ گرڈ کبھی بھی
@@ -12841,6 +13048,7 @@ function goTo(screenName, _isHistoryNav){
     fetchReturnRequestsFromCloud(false);
     startReturnRequestsPolling();
   }
+  if(screenName === 'safevault'){ svRender(); svSyncRecent(); }
   if(screenName === 'recoveryList'){
     renderRecoveryListScreen();
     fetchRecoveryListFromCloud(false);
@@ -15018,7 +15226,7 @@ async function openBillPreviewBeforeComplete(){
     grand_total: grandTotal,
     previous_balance: previousBalance,
     status: 'draft',
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(), biz_date: bizCurrentDate()
   };
 
   await renderInvoiceToCanvas(draftInvoice);
@@ -15166,7 +15374,7 @@ function finalizeInvoice(){
     grand_total: grandTotal,
     previous_balance: previousBalance,
     status: 'completed',
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(), biz_date: bizCurrentDate()
   };
   // TODO: یہاں invoices + invoice_items table میں اصل INSERT ہوگا
   invoicesData.unshift(invoice);
@@ -15205,7 +15413,7 @@ function finalizeInvoice(){
     walletApplied = Math.min(customer.wallet_balance, grandTotal);
     customer.wallet_balance -= walletApplied; // ✅ Firestore Sync (قدم 1) — finalizeInvoice کے آخر میں pushCustomersToCloud() سے کلاؤڈ میں جاتا ہے
     customer.walletHistory = customer.walletHistory || [];
-    customer.walletHistory.unshift({type:'receivable_collected', amount:walletApplied, via:'wallet', date:new Date().toISOString().split('T')[0], note:`Auto-applied to ${invoice.invoice_no}`});
+    customer.walletHistory.unshift({type:'receivable_collected', amount:walletApplied, via:'wallet', date:bizDateKey(), note:`Auto-applied to ${invoice.invoice_no}`});
   }
   // ---------- بل بناتے وقت صارف نے خود جو نقد رقم درج کی ہو — یہ صرف اسی بل کے لیے نہیں بلکہ پرانے بقایہ سمیت پوری واجب الادا رقم کے خلاف لاگو ہوگی ----------
   const dueAfterWallet = Math.max(0, grandTotal - walletApplied);
@@ -15296,6 +15504,8 @@ function submitBillForApproval(customer, method, subtotal){
     sale_mode: Billing.saleMode,
     payment_method: method,
     items: JSON.parse(JSON.stringify(Billing.cart)), // snapshot
+    discount: parseFloat(document.getElementById('discountInput')?.value) || 0, // 🔧 FM310SA292: اضافی چارجز بھی محفوظ (پہلے ضائع ہو جاتے تھے)
+    discount_type: (document.getElementById('extraChargeTypeSelect')?.value || ''),
     status: 'pending',
     admin_note: '',
     submitted_at: new Date().toISOString(),
@@ -15303,6 +15513,7 @@ function submitBillForApproval(customer, method, subtotal){
   };
   // TODO: یہاں pending_bills table میں INSERT ہوگا
   pendingBillsData.unshift(pending);
+  try{ svTick(true); }catch(e){} // 🗄️ سیف الماری: بل بھیجتے ہی اسی لمحے کاپی
 
   Billing.cart = [];
   Billing.sourceAdvanceOrderId = null; // ---------- 🔒 FM22SEPTU: سیلزمین کا بل منظوری کی قطار میں گیا، حتمی فائنل نہیں ہوا — Pending Order کا ربط یہاں ختم، وہ آرڈر خود Pending میں محفوظ رہے گا ----------
@@ -15434,7 +15645,7 @@ function approvePendingPayment(){
     type: 'receivable_collected',
     amount: p.amount || 0,
     via: (p.account_type || 'bank').toLowerCase(),
-    date: new Date().toISOString().split('T')[0],
+    date: bizDateKey(),
     note: `Customer self-payment approved (${p.account_type || 'نامعلوم'}${p.account_number ? ' — ' + p.account_number : ''})`
   });
 
@@ -15488,7 +15699,7 @@ function renderPendingReview(){
     </div>
   `).join('');
 
-  const total = p.items.reduce((s,i) => s + i.qty*i.unitPrice, 0);
+  const total = p.items.reduce((s,i) => s + i.qty*i.unitPrice + i.qty*(i.laborPerUnit||0), 0) + (Number(p.discount) || 0);
   document.getElementById('reviewGrandTotal').textContent = 'Rs. ' + total.toLocaleString();
 }
 function updateReviewQty(idx, qty){
@@ -15547,9 +15758,12 @@ function approvePendingBill(){
 
   const customer = p.customer_id ? customersData.find(c => c.customer_id === p.customer_id) : null;
   const subtotal = p.items.reduce((s,i) => s + i.qty*i.unitPrice, 0);
+  // 🔧 FM310SA292: سیلزمین کے بل میں مزدوری اور اضافی چارجز پہلے جمع نہیں ہوتے تھے (ایڈمن کے اپنے بل میں ہوتے ہیں) — اب دونوں جگہ ایک جیسا حساب
+  const laborTotal = p.items.reduce((s,i) => s + i.qty*(i.laborPerUnit||0), 0);
+  const extraCharges = Number(p.discount) || 0;
   const taxPercent = AppState.settings.taxEnabled ? (AppState.settings.taxPercent || 0) : 0;
   const taxAmount = Math.round(subtotal * taxPercent / 100);
-  const grandTotal = subtotal + taxAmount;
+  const grandTotal = subtotal + laborTotal + extraCharges + taxAmount;
   const previousBalance = customer ? customer.total_receivable : 0;
 
   const invoice = {
@@ -15562,13 +15776,15 @@ function approvePendingBill(){
     sale_mode: p.sale_mode,
     payment_method: p.payment_method,
     items: JSON.parse(JSON.stringify(p.items)),
+    discount: extraCharges,
+    discount_type: p.discount_type || '',
     tax_percent: taxPercent,
     tax_amount: taxAmount,
     grand_total: grandTotal,
     previous_balance: previousBalance,
     status: 'completed',
     reviewed_by_admin: true, // بل ایڈمن کی نظر سے گزر چکا ہے (بیج کے لیے استعمال ہوگا)
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(), biz_date: bizCurrentDate()
   };
   invoicesData.unshift(invoice);
 
@@ -15593,7 +15809,7 @@ function approvePendingBill(){
         walletApplied = Math.min(customer.wallet_balance, grandTotal);
         customer.wallet_balance -= walletApplied;
         customer.walletHistory = customer.walletHistory || [];
-        customer.walletHistory.unshift({type:'receivable_collected', amount:walletApplied, via:'wallet', date:new Date().toISOString().split('T')[0], note:`Auto-applied to ${invoice.invoice_no}`});
+        customer.walletHistory.unshift({type:'receivable_collected', amount:walletApplied, via:'wallet', date:bizDateKey(), note:`Auto-applied to ${invoice.invoice_no}`});
       }
       const remainingDue = Math.max(0, grandTotal - walletApplied);
       if(remainingDue > 0) customer.total_receivable += remainingDue;
@@ -17234,6 +17450,7 @@ function toggleProductPresence(productId, makePresent){
   if(AppState.currentRole !== 'admin'){ alert('صرف ایڈمن یہ تبدیل کر سکتا ہے'); return; }
   const p = productsData.find(x => x.product_id === productId);
   if(!p) return;
+  if(!makePresent && presenceStockGuard(p)){ renderProductList(document.getElementById('productSearchInput')?.value || ''); return; }
   p.isDormant = !makePresent;
   persistAllData();
   pushProductsToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 3): حاضر/غیر حاضر کی تبدیلی فوراً کلاؤڈ میں ----------
@@ -17243,13 +17460,18 @@ function toggleProductPresence(productId, makePresent){
 // ---------- 🎬 ہدایت (FM3SEPTH10): ٹک لگاتے ہی کارڈ دائیں طرف سلائیڈ ہو کر آہستہ سے غائب ہو —
 // اس کے بعد ہی اصل فہرست تبدیل ہو، تاکہ صاف نظر آئے کہ کون سا آئٹم کہاں گیا ---------- -->
 function animateAndTogglePresence(cardId, productId){
+  // ☑️💨 FM310SA283: وہی مشترکہ محفوظ طریقہ (فوری تبدیلی + دھواں/سلائیڈ ایفیکٹ)
+  if(AppState.currentRole !== 'admin'){ alert('صرف ایڈمن یہ تبدیل کر سکتا ہے'); return; }
+  const key = String(productId);
+  const p = productsData.find(x => String(x.product_id) === key);
+  if(!p) return;
   const card = document.getElementById(cardId);
-  if(card) card.classList.add('slideOutRow');
-  setTimeout(() => {
-    const p = productsData.find(x => x.product_id === productId);
-    if(!p) return;
-    toggleProductPresence(productId, !!p.isDormant); // ---------- موجودہ حالت الٹ دیں ----------
-  }, 100);
+  if(card && card.dataset.vmBusy === '1') return;
+  if(card) card.dataset.vmBusy = '1';
+  const toAbsent = !p.isDormant;
+  if(toAbsent && presenceStockGuard(p)){ if(card) delete card.dataset.vmBusy; return; }
+  vmCommitPresence(key, toAbsent);
+  vmPresenceFx(card, toAbsent, () => { vmRefreshPresenceScreens(); });
 }
 
 // ---------- 🟩🟥 ہدایت (FM4SEPFR25): راولپنڈی/اسلام آباد ریٹ + سٹاک ہمیشہ اسی رنگ سکیم میں دکھائیں —
@@ -20074,6 +20296,373 @@ function extraSyncScheduleCheck(){
 // ایپ کھلنے کے کچھ دیر بعد ایک بار مکمل ہم آہنگی (ہر فہرست ایک ریڈ)
 setTimeout(() => { try{ extraSyncAll(); }catch(e){} }, 6000);
 
+/* =====================================================================
+   🗄️ سیف الماری (FM410SU298) — ہدایت: منشی کے بھیجے بل، آرڈر ٹیکنگ والے کے آرڈرز اور ریکوری والے کی رپورٹس
+   کی ایک مستقل، الگ، ایڈمن پن سے بند الماری۔ اصل نظام (پینڈنگ بلز، ایڈوانس آرڈرز، ریکوری لسٹ) کو ذرہ برابر نہیں چھیڑا —
+   وہ ویسے ہی چلتے رہیں گے۔ یہاں صرف ہر آنے والی چیز کی ایک "کاپی" خودکار محفوظ ہوتی ہے (svSweep)، جو اصل فہرست سے
+   غائب ہو جانے یا ڈیلیٹ ہونے پر بھی یہیں رہتی ہے۔ حذف صرف ایڈمن PIN + تین وارننگوں کے بعد۔
+   ذخیرہ: IndexedDB (localStorage کی 5MB حد سے بچنے کے لیے) + کلاؤڈ (shopData/sv_...) 6 دن کے ٹکڑوں میں
+   ===================================================================== */
+const SV_KINDS = {
+  bill:     { label: 'بل',      icon: '📄', title: 'منشی کے بھیجے گئے بل' },
+  order:    { label: 'آرڈرز',   icon: '📦', title: 'آرڈر ٹیکنگ والے کے آرڈرز' },
+  recovery: { label: 'ریکوری',  icon: '💰', title: 'ریکوری رپورٹس' }
+};
+const SV_DB_NAME = 'fmSafeVaultDB', SV_STORE = 'entries';
+let svDb = null, svReady = false, svLoadFailed = false;
+const svMem = new Map();      // vid -> entry
+const svDirty = new Set();    // IndexedDB میں لکھنے والی vids
+const svDirtyKeys = new Set();// کلاؤڈ پر بھیجنے والے ٹکڑے
+const svLastSig = {};         // اس فون نے ماخذ (اصل فہرست) کی آخری حالت کیا دیکھی
+let svLastTick = 0, svSyncTimer = null;
+const _svBusy = {};
+
+function svOpenDb(){
+  return new Promise((res, rej) => {
+    if(!window.indexedDB){ rej(new Error('IndexedDB نہیں ہے')); return; }
+    const r = indexedDB.open('SM_'+SV_DB_NAME, 1);
+    r.onupgradeneeded = () => { if(!r.result.objectStoreNames.contains(SV_STORE)) r.result.createObjectStore(SV_STORE, { keyPath: 'vid' }); };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+async function svLoad(){
+  try{
+    svDb = await svOpenDb();
+    const all = await new Promise((res, rej) => {
+      const q = svDb.transaction(SV_STORE, 'readonly').objectStore(SV_STORE).getAll();
+      q.onsuccess = () => res(q.result || []); q.onerror = () => rej(q.error);
+    });
+    all.forEach(e => { if(e && e.vid && !svMem.has(e.vid)) svMem.set(e.vid, e); });
+  }catch(e){ svLoadFailed = true; console.warn('سیف الماری: ڈیٹا بیس نہیں کھلا', e); }
+  svReady = true;
+  setTimeout(() => { try{ svTick(true); svSyncRecent(); }catch(e){} }, 1500);
+}
+function svFlush(){
+  if(!svDb || svDirty.size === 0) return;
+  const ids = Array.from(svDirty); svDirty.clear();
+  try{
+    const st = svDb.transaction(SV_STORE, 'readwrite').objectStore(SV_STORE);
+    ids.forEach(id => { const e = svMem.get(id); if(e) st.put(e); });
+  }catch(e){ ids.forEach(id => svDirty.add(id)); }
+}
+
+// ---------- کلاؤڈ ٹکڑے کا نام: sv_<قسم>_<YYYYMM>_<0..5> (ہر ٹکڑا 6 دن، تاکہ ایک دستاویز کبھی بھاری نہ ہو) ----------
+function svBucket(kind, iso){
+  const d = new Date(iso); const dt = isNaN(d) ? new Date() : d;
+  return 'sv_' + kind.charAt(0) + '_' + (dt.getFullYear() * 100 + dt.getMonth() + 1) + '_' + Math.min(5, Math.floor((dt.getDate() - 1) / 6));
+}
+function svSources(){
+  const out = [];
+  try{ (pendingBillsData || []).forEach(p => { if(!p || p.type === 'payment') return; if(p.salesman_name === 'Aslam Bhai' && p.pending_id <= 2) return; out.push(['bill', p]); }); }catch(e){}
+  try{ (advanceOrdersData || []).forEach(o => { if(o) out.push(['order', o]); }); }catch(e){}
+  try{ (recoveryListData || []).forEach(r => { if(r) out.push(['recovery', r]); }); }catch(e){}
+  return out;
+}
+function svInfo(kind, s){
+  if(kind === 'bill') return { id: s.pending_id, ts: s.submitted_at, cust: s.customer_name || '', by: s.salesman_name || '', st: s.status || 'pending',
+    amt: (s.items || []).reduce((a, i) => a + (Number(i.qty) || 0) * (Number(i.unitPrice) || 0), 0) };
+  if(kind === 'order') return { id: s.id, ts: s.createdAt, cust: s.customerName || '', by: s.employeeName || (s.placedByCustomer ? 'کسٹمر خود' : ''), st: s.isDraft ? 'draft' : (s.status || 'pending'), amt: 0 };
+  return { id: s.id, ts: s.createdAt, cust: s.customerName || '', by: s.employeeName || '', st: s.status || 'pending', amt: Number(s.amount) || 0 };
+}
+function svVid(kind, info){ return kind + '_' + info.id + '_' + (Date.parse(info.ts) || 0); }
+function svRank(st){ return st === 'draft' ? 0 : st === 'pending' ? 1 : 2; }
+
+// ---------- اصل فہرستوں کو دیکھ کر نئی چیزیں الماری میں ڈالنا — کبھی کچھ ہٹاتا نہیں ----------
+function svSweep(){
+  if(!svReady) return;
+  svSources().forEach(([kind, src]) => {
+    try{
+      const info = svInfo(kind, src);
+      if(info.id == null) return;
+      const vid = svVid(kind, info);
+      const ex = svMem.get(vid);
+      if(ex && ex.del) return; // ایڈمن نے جان بوجھ کر حذف کیا تھا — دوبارہ نہ ڈالیں
+      const snap = JSON.parse(JSON.stringify(_xHeavyStrip(src)));
+      const sig = JSON.stringify(snap);
+      const nowTs = info.ts || new Date().toISOString();
+      if(!ex){
+        svMem.set(vid, { vid, k: kind, bk: svBucket(kind, nowTs), ts: nowTs, sv: new Date().toISOString(), u: Date.now(), cust: info.cust, by: info.by, amt: info.amt, st: info.st, snap });
+        svDirty.add(vid); svDirtyKeys.add(svBucket(kind, nowTs)); svLastSig[vid] = sig; return;
+      }
+      const first = svLastSig[vid] === undefined;
+      const changed = !first && svLastSig[vid] !== sig;
+      const higher = first && svRank(info.st) > svRank(ex.st);
+      svLastSig[vid] = sig;
+      if(changed || higher){
+        ex.snap = snap; ex.st = info.st; ex.cust = info.cust; ex.by = info.by; ex.amt = info.amt; ex.u = Date.now();
+        svDirty.add(vid); svDirtyKeys.add(ex.bk);
+      }
+    }catch(e){ console.warn('سیف الماری sweep:', e); }
+  });
+}
+function svTick(force){
+  if(!svReady) return;
+  const now = Date.now();
+  if(!force && now - svLastTick < 3000) return;
+  svLastTick = now;
+  svSweep(); svFlush();
+  if(svDirtyKeys.size) svScheduleSync();
+}
+
+// ---------- کلاؤڈ ہم آہنگی: صرف جمع ہوتی ہے (union) — حذف شدہ نشان (del) سب پر غالب، باقی میں نیا u جیتتا ہے ----------
+function svMerge(local, cloud){
+  const m = new Map();
+  const put = x => {
+    if(!x || !x.vid) return;
+    const o = m.get(x.vid);
+    if(!o){ m.set(x.vid, x); return; }
+    if(o.del) return;
+    if(x.del){ m.set(x.vid, x); return; }
+    if((x.u || 0) > (o.u || 0)) m.set(x.vid, x);
+  };
+  (local || []).forEach(put); (cloud || []).forEach(put);
+  return Array.from(m.values()).sort((a, b) => a.vid < b.vid ? -1 : 1);
+}
+async function svSyncOne(key){
+  if(_svBusy[key]) return; _svBusy[key] = true;
+  try{
+    for(let a = 0; a < 3; a++){
+      const cloud = await _xReadCloud({ key });
+      if(!cloud.ok) break;
+      const local = Array.from(svMem.values()).filter(e => e.bk === key);
+      const merged = svMerge(local, cloud.list);
+      merged.forEach(x => { const cur = svMem.get(x.vid); if(!cur || JSON.stringify(cur) !== JSON.stringify(x)){ svMem.set(x.vid, x); svDirty.add(x.vid); } });
+      svFlush();
+      const body = JSON.stringify(merged);
+      const cloudSorted = JSON.stringify((cloud.list || []).slice().sort((x, y) => x.vid < y.vid ? -1 : 1));
+      if(body === cloudSorted) break;
+      if(body.length > 950000){ console.warn('سیف الماری: ٹکڑا بہت بڑا', key, body.length); break; }
+      const pre = cloud.updateTime ? `&currentDocument.updateTime=${encodeURIComponent(cloud.updateTime)}` : '';
+      const res = await authFirestoreFetch(`${smShopBase()}${key}?key=${FIREBASE_API_KEY}${pre}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: { json: { stringValue: body }, updatedAt: { integerValue: String(Date.now()) } } })
+      });
+      if(res && res.ok) break;
+      if(!(res && (res.status === 400 || res.status === 409 || res.status === 412))) break;
+    }
+  }catch(e){ /* آف لائن — اگلی بار */ }
+  _svBusy[key] = false;
+}
+function svScheduleSync(){
+  if(svSyncTimer) return;
+  svSyncTimer = setTimeout(() => {
+    svSyncTimer = null;
+    const keys = Array.from(svDirtyKeys); svDirtyKeys.clear();
+    keys.forEach(k => svSyncOne(k));
+  }, 3000);
+}
+// ---------- پچھلے ~18 دن کے ٹکڑے: ہر قسم کے موجودہ اور پچھلے دو ----------
+function svRecentKeys(){
+  const keys = new Set();
+  [0, 6, 12, 18].forEach(daysBack => {
+    const d = new Date(Date.now() - daysBack * 86400000);
+    Object.keys(SV_KINDS).forEach(k => keys.add(svBucket(k, d.toISOString())));
+  });
+  return Array.from(keys);
+}
+function svSyncRecent(){
+  try{ if(AppState.currentRole !== 'admin') return; }catch(e){ return; }
+  svRecentKeys().forEach(k => svSyncOne(k));
+}
+setInterval(() => { try{ if(svReady) svSyncRecent(); }catch(e){} }, 10 * 60 * 1000);
+svLoad();
+
+// =====================================================================
+//  سکرین — پن سے کھلتی ہے، تین خانے: بل / آرڈرز / ریکوری
+// =====================================================================
+let svTab = 'bill', svFilter = 'all', svOlderDays = 0, svFrom = '', svTo = '', svQuery = '';
+function svAskAndOpen(){
+  if(AppState.currentRole !== 'admin'){ alert('❌ سیف الماری صرف ایڈمن کھول سکتا ہے۔'); return; }
+  _askAdminPinForSerialMaster('🗄️ سیف الماری کھولنے کے لیے').then(ok => {
+    if(!ok) return;
+    window.__svUnlocked = true;
+    goTo('safevault');
+  });
+}
+function svLock(){ window.__svUnlocked = false; goTo('home'); }
+function svEsc(t){ return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function svFmtDate(iso){ const d = new Date(iso); if(isNaN(d)) return '—'; return d.toLocaleDateString('en-GB') + ' — ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); }
+function svStatusInfo(kind, st){
+  const m = {
+    bill:     { pending: ['پینڈنگ', '#b45309'], approved: ['منظور شدہ', '#15803d'], rejected: ['مسترد', '#b91c1c'] },
+    order:    { draft: ['ڈرافٹ', '#64748b'], pending: ['پینڈنگ', '#b45309'], fulfilled: ['مکمل', '#15803d'] },
+    recovery: { pending: ['ایڈمن کے پاس زیرِ التوا', '#b45309'], confirmed: ['کھاتے میں درج', '#15803d'] }
+  };
+  return (m[kind] && m[kind][st]) || [st || '—', '#475569'];
+}
+function svInRange(iso){
+  const t = Date.parse(iso); if(isNaN(t)) return svFilter === 'all';
+  const now = new Date(), d = new Date(t);
+  const sod = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  switch(svFilter){
+    case 'today': return sod(d) === sod(now);
+    case 'week': return t >= Date.now() - 7 * 86400000;
+    case 'thismonth': return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    case 'lastmonth': { const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1); return d.getFullYear() === lm.getFullYear() && d.getMonth() === lm.getMonth(); }
+    case 'lastyear': return d.getFullYear() === now.getFullYear() - 1;
+    case 'older': return t < Date.now() - svOlderDays * 86400000;
+    case 'custom': {
+      const f = svFrom ? Date.parse(svFrom + 'T00:00:00') : -Infinity, e = svTo ? Date.parse(svTo + 'T23:59:59') : Infinity;
+      return t >= f && t <= e;
+    }
+    default: return true;
+  }
+}
+function svFiltered(){
+  const q = svQuery.trim().toLowerCase();
+  return Array.from(svMem.values()).filter(e => !e.del && e.k === svTab && svInRange(e.ts) &&
+    (!q || (String(e.cust || '') + ' ' + String(e.by || '')).toLowerCase().includes(q)))
+    .sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts));
+}
+function svFilterLabel(){
+  const l = { all: 'تمام', today: 'آج', week: 'پچھلے 7 دن', thismonth: 'اس مہینے', lastmonth: 'پچھلا مہینہ', lastyear: 'پچھلا سال' };
+  if(svFilter === 'older') return `${svOlderLabel(svOlderDays)} سے پرانے`;
+  if(svFilter === 'custom') return `${svFrom || '...'} سے ${svTo || '...'} تک`;
+  return l[svFilter] || '';
+}
+function svOlderLabel(d){ return d >= 365 ? `${Math.round(d / 365)} سال` : d >= 30 ? `${Math.round(d / 30)} مہینے` : `${d} دن`; }
+function svSetTab(t){ svTab = t; svRender(); }
+function svSetFilter(f){ svFilter = f; if(f !== 'older') svOlderDays = 0; svRender(); }
+function svSetOlder(v){ const n = Number(v) || 0; if(!n){ svSetFilter('all'); return; } svOlderDays = n; svFilter = 'older'; svRender(); }
+function svSetRange(){ svFrom = document.getElementById('svFrom')?.value || ''; svTo = document.getElementById('svTo')?.value || ''; svFilter = 'custom'; svRender(); }
+function svSearchInput(v){ svQuery = v; svRenderList(); }
+
+function svRender(){
+  const root = document.getElementById('svRoot'); if(!root) return;
+  if(!window.__svUnlocked){ root.innerHTML = '<div style="text-align:center;padding:40px 10px;color:var(--muted);">🔒 سیف الماری بند ہے</div>'; return; }
+  const counts = {}; Object.keys(SV_KINDS).forEach(k => counts[k] = 0);
+  svMem.forEach(e => { if(!e.del && counts[e.k] !== undefined) counts[e.k]++; });
+  const chip = (key, label) => `<button type="button" onclick="svSetFilter('${key}')" style="padding:7px 12px;border-radius:18px;font-size:12.5px;font-weight:800;cursor:pointer;border:1.5px solid ${svFilter === key ? '#7c2d12' : '#d6d3d1'};background:${svFilter === key ? '#7c2d12' : '#fff'};color:${svFilter === key ? '#fff' : '#44403c'};">${label}</button>`;
+  const olderOpts = [[0, 'سے پرانے…'], [7, '1 ہفتہ'], [30, '1 مہینہ'], [60, '2 مہینے'], [90, '3 مہینے'], [180, '6 مہینے'], [270, '9 مہینے'], [365, '1 سال']]
+    .map(([v, l]) => `<option value="${v}" ${svFilter === 'older' && svOlderDays === v ? 'selected' : ''}>${v ? l + ' سے پرانے' : l}</option>`).join('');
+  root.innerHTML = `
+    <div style="margin-bottom:10px;">
+      <button type="button" onclick="svLock()" style="padding:9px 16px;border-radius:10px;border:1.5px solid #7c2d12;background:#fff;color:#7c2d12;font-weight:900;font-size:13.5px;cursor:pointer;">🔒 الماری بند کریں</button>
+    </div>
+    ${svLoadFailed ? '<div style="background:#fef2f2;border:1.5px solid #fca5a5;color:#b91c1c;border-radius:10px;padding:8px 10px;font-size:12.5px;font-weight:700;margin-bottom:10px;">⚠️ اس براؤزر میں مستقل ذخیرہ نہیں کھل سکا — ریکارڈ صرف کلاؤڈ اور اس سیشن میں رہے گا۔</div>' : ''}
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      ${Object.keys(SV_KINDS).map(k => `<button type="button" onclick="svSetTab('${k}')" style="flex:1;padding:10px 4px;border-radius:12px;font-weight:900;font-size:13px;cursor:pointer;border:2px solid ${svTab === k ? '#7c2d12' : '#e7e5e4'};background:${svTab === k ? '#fff7ed' : '#fff'};color:${svTab === k ? '#7c2d12' : '#57534e'};">${SV_KINDS[k].icon} ${SV_KINDS[k].label}<div style="font-size:11px;font-weight:700;">${counts[k]}</div></button>`).join('')}
+    </div>
+    <input type="search" placeholder="🔍 گاہک یا بھیجنے والے کا نام" value="${svEsc(svQuery)}" oninput="svSearchInput(this.value)" style="width:100%;padding:10px;border:1.5px solid #d6d3d1;border-radius:10px;font-size:14px;margin-bottom:8px;box-sizing:border-box;">
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+      ${chip('all', 'تمام')}${chip('today', 'آج')}${chip('week', 'پچھلے 7 دن')}${chip('thismonth', 'اس مہینے')}${chip('lastmonth', 'پچھلا مہینہ')}${chip('lastyear', 'پچھلا سال')}
+      <select onchange="svSetOlder(this.value)" style="padding:7px 8px;border-radius:18px;font-size:12.5px;font-weight:800;border:1.5px solid ${svFilter === 'older' ? '#7c2d12' : '#d6d3d1'};background:${svFilter === 'older' ? '#7c2d12' : '#fff'};color:${svFilter === 'older' ? '#fff' : '#44403c'};">${olderOpts}</select>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;font-size:12px;color:var(--muted);">
+      📅 <input type="date" id="svFrom" value="${svEsc(svFrom)}" style="flex:1;padding:7px;border:1.5px solid #d6d3d1;border-radius:9px;min-width:0;"> سے
+      <input type="date" id="svTo" value="${svEsc(svTo)}" style="flex:1;padding:7px;border:1.5px solid #d6d3d1;border-radius:9px;min-width:0;"> تک
+      <button type="button" onclick="svSetRange()" style="padding:8px 12px;border-radius:9px;border:none;background:#7c2d12;color:#fff;font-weight:800;cursor:pointer;">دیکھیں</button>
+    </div>
+    <div id="svListWrap"></div>`;
+  svRenderList();
+}
+function svRenderList(){
+  const wrap = document.getElementById('svListWrap'); if(!wrap) return;
+  const list = svFiltered();
+  const total = list.reduce((a, e) => a + (e.amt || 0), 0);
+  const live = new Set(svSources().map(([k, s]) => { const i = svInfo(k, s); return svVid(k, i); }));
+  const shown = list.slice(0, 150);
+  wrap.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;background:#f5f5f4;border-radius:10px;padding:9px 12px;margin-bottom:8px;font-size:13px;font-weight:800;">
+      <span>${SV_KINDS[svTab].icon} ${list.length} ریکارڈ (${svFilterLabel()})</span>
+      ${svTab !== 'order' ? `<span style="color:#15803d;">Rs. ${total.toLocaleString()}</span>` : ''}
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <button type="button" onclick="svExport()" ${list.length ? '' : 'disabled'} style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #0f766e;background:#f0fdfa;color:#0f766e;font-weight:900;font-size:13px;cursor:pointer;">💾 کاپی ڈاؤن لوڈ</button>
+      <button type="button" onclick="svDeleteFiltered()" ${list.length ? '' : 'disabled'} style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #fca5a5;background:#fef2f2;color:#b91c1c;font-weight:900;font-size:13px;cursor:pointer;">🗑️ یہ ${list.length} حذف کریں</button>
+    </div>
+    ${list.length === 0 ? '<div style="text-align:center;color:var(--muted);padding:30px 10px;">اس فلٹر میں کوئی ریکارڈ نہیں</div>' : ''}
+    ${shown.map(e => svCardHtml(e, live)).join('')}
+    ${list.length > shown.length ? `<div style="text-align:center;color:var(--muted);font-size:12px;padding:8px;">پہلے ${shown.length} دکھائے گئے — باقی دیکھنے کے لیے فلٹر چھوٹا کریں</div>` : ''}`;
+}
+function svItemsHtml(e){
+  const s = e.snap || {};
+  if(e.k === 'recovery'){
+    let how = ''; try{ how = recoverySplitLabel(s); }catch(x){}
+    return `<div style="font-size:13.5px;margin-top:8px;background:#f0fdf4;border-radius:9px;padding:7px 10px;">💳 ${svEsc(how)}</div>${s.note ? `<div style="font-size:13.5px;color:#78350f;background:#fffbeb;border-radius:9px;padding:7px 10px;margin-top:6px;">📝 ${svEsc(s.note)}</div>` : ''}`;
+  }
+  const items = s.items || [];
+  if(!items.length) return '';
+  const isBill = e.k === 'bill';
+  const cols = isBill ? '28px 1fr 52px 62px 78px' : '28px 1fr 64px';
+  const cell = 'padding:9px 6px;font-size:14px;';
+  const head = `<div style="display:grid;grid-template-columns:${cols};background:#7c2d12;color:#fff;font-weight:900;font-size:12.5px;border-radius:9px 9px 0 0;">
+      <div style="padding:8px 6px;text-align:center;">#</div><div style="padding:8px 6px;">آئٹم</div><div style="padding:8px 6px;text-align:center;">تعداد</div>${isBill ? '<div style="padding:8px 6px;text-align:center;">ریٹ</div><div style="padding:8px 6px;text-align:center;">رقم</div>' : ''}</div>`;
+  const rows = items.map((i, n) => {
+    const q = Number(i.qty) || 0, r = Number(i.unitPrice) || 0;
+    return `<div style="display:grid;grid-template-columns:${cols};align-items:center;background:${n % 2 ? '#fafaf9' : '#fff'};border-bottom:1px solid #f0efed;">
+      <div style="${cell}text-align:center;color:#a8a29e;font-size:12px;">${n + 1}</div>
+      <div style="${cell}font-weight:800;line-height:1.5;">${svEsc(i.name)}${i.label ? `<div style="font-size:11.5px;font-weight:700;color:#78716c;">${svEsc(i.label)}</div>` : ''}</div>
+      <div style="${cell}text-align:center;font-weight:900;color:#7c2d12;">${svEsc(i.qty)}</div>
+      ${isBill ? `<div style="${cell}text-align:center;">${r.toLocaleString()}</div><div style="${cell}text-align:center;font-weight:900;color:#15803d;">${(q * r).toLocaleString()}</div>` : ''}</div>`;
+  }).join('');
+  return `<details style="margin-top:8px;"><summary style="cursor:pointer;list-style:none;font-size:13.5px;font-weight:900;color:#7c2d12;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:9px 12px;">👁️ ${items.length} آئٹمز دیکھیں ▾</summary>
+    <div style="margin-top:6px;border:1.5px solid #e7e5e4;border-radius:10px;overflow:hidden;">${head}${rows}</div></details>`;
+}
+function svCardHtml(e, live){
+  const [stLabel, stColor] = svStatusInfo(e.k, e.st);
+  const missing = e.st === 'pending' && !live.has(e.vid);
+  return `<div style="background:#fff;border:1.5px solid ${missing ? '#f59e0b' : '#e7e5e4'};border-radius:12px;padding:11px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05);">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+      <span style="font-weight:900;font-size:15px;">🧑 ${svEsc(e.cust || '—')}</span>
+      <span style="font-size:10.5px;color:#fff;background:${stColor};border-radius:7px;padding:2px 8px;font-weight:800;white-space:nowrap;">${svEsc(stLabel)}</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-top:3px;">🕐 ${svFmtDate(e.ts)}${e.by ? ' — 👤 ' + svEsc(e.by) : ''}</div>
+    ${e.k !== 'order' ? `<div style="font-size:14px;color:#15803d;font-weight:900;margin-top:3px;">Rs. ${(e.amt || 0).toLocaleString()}</div>` : ''}
+    ${missing ? '<div style="font-size:12px;font-weight:800;color:#b45309;background:#fffbeb;border-radius:7px;padding:4px 8px;margin-top:5px;">⚠️ یہ ایڈمن کی عام فہرست میں نظر نہیں آ رہا — الماری میں محفوظ ہے</div>' : ''}
+    ${svItemsHtml(e)}
+    <div style="display:flex;gap:6px;margin-top:8px;">
+      ${missing && e.k === 'bill' ? `<button type="button" onclick="svRestoreBill('${e.vid}')" style="flex:1;padding:8px;border-radius:9px;border:none;background:#15803d;color:#fff;font-weight:800;font-size:12.5px;cursor:pointer;">↩️ ایڈمن کی فہرست میں واپس ڈالیں</button>` : ''}
+      <button type="button" onclick="svDeleteOne('${e.vid}')" style="padding:8px 14px;border-radius:9px;border:1px solid #fca5a5;background:#fef2f2;color:#b91c1c;font-weight:800;font-size:12.5px;cursor:pointer;">🗑️</button>
+    </div>
+  </div>`;
+}
+
+// ---------- گم شدہ بل کو ایڈمن کی پینڈنگ فہرست میں واپس لانا (صرف بل، صرف جو وہاں نہیں ہے) ----------
+function svRestoreBill(vid){
+  const e = svMem.get(vid); if(!e || e.k !== 'bill') return;
+  if(!confirm(`↩️ ${e.cust} کا یہ بل ایڈمن کی "بلز منظوری" فہرست میں واپس ڈالنا ہے؟`)) return;
+  const s = JSON.parse(JSON.stringify(e.snap)); s.status = 'pending';
+  if(pendingBillsData.some(p => p.pending_id === s.pending_id && p.submitted_at === s.submitted_at)){ alert('یہ بل پہلے سے فہرست میں موجود ہے۔'); return; }
+  if(pendingBillsData.some(p => p.pending_id === s.pending_id)) s.pending_id = nextPendingId++;
+  pendingBillsData.unshift(s);
+  persistAllData(); pushPendingBillsToCloud();
+  alert('✅ بل واپس ایڈمن کی فہرست میں آ گیا۔'); svRender();
+}
+
+// ---------- ڈاؤن لوڈ ----------
+function svExport(){
+  const list = svFiltered(); if(!list.length) return;
+  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), kind: svTab, filter: svFilterLabel(), count: list.length, entries: list }, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `SafeAlmari_${svTab}_${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+// ---------- حذف: تین وارننگیں + ایڈمن PIN ----------
+function svDeleteOne(vid){ const e = svMem.get(vid); if(e) svDeleteFlow([e], `${e.cust || ''} کا ایک ریکارڈ`); }
+function svDeleteFiltered(){ const l = svFiltered(); if(l.length) svDeleteFlow(l, `${SV_KINDS[svTab].label} کے ${l.length} ریکارڈ (${svFilterLabel()})`); }
+async function svDeleteFlow(list, what){
+  if(AppState.currentRole !== 'admin'){ alert('❌ صرف ایڈمن حذف کر سکتا ہے۔'); return; }
+  if(!confirm(`🗑️ وارننگ 1/3\n\nآپ سیف الماری سے ${what} حذف کرنے جا رہے ہیں۔\n\nیہ ریکارڈ الماری سے ہمیشہ کے لیے مٹ جائیں گے۔ (ایڈمن کی عام فہرست متاثر نہیں ہوگی۔) جاری رکھیں؟`)) return;
+  if(!confirm(`⚠️ وارننگ 2/3\n\n${list.length} ریکارڈ مٹنے والے ہیں اور واپس نہیں آئیں گے۔\n\nکیا آپ نے پہلے "💾 کاپی ڈاؤن لوڈ" کر لی ہے؟ اگر نہیں، تو Cancel دبا کر پہلے کاپی لے لیں۔`)) return;
+  const word = prompt(`🛑 آخری وارننگ 3/3\n\n${list.length} ریکارڈ حذف ہونے لگے ہیں۔ تصدیق کے لیے نیچے لفظ  حذف  لکھیں:`);
+  if(word === null) return;
+  if(word.trim() !== 'حذف'){ alert('❌ لفظ درست نہیں لکھا — کچھ حذف نہیں ہوا۔'); return; }
+  if(!(await _askAdminPinForSerialMaster(`سیف الماری سے ${list.length} ریکارڈ حذف کرنے کے لیے`))) return;
+  const now = Date.now();
+  list.forEach(e => {
+    svMem.set(e.vid, { vid: e.vid, k: e.k, bk: e.bk, ts: e.ts, del: 1, u: now }); // چھوٹا "حذف شدہ" نشان — تاکہ sweep یا دوسرا فون اسے دوبارہ نہ ڈال دے
+    svDirty.add(e.vid); svDirtyKeys.add(e.bk);
+  });
+  svFlush(); svScheduleSync();
+  alert(`✅ ${list.length} ریکارڈ سیف الماری سے حذف ہو گئے۔`);
+  svRender();
+}
+
 
 /* =====================================================================
    👆 28 ستمبر: ایڈمن (مالک) کے لیے فنگر پرنٹ / فون کے ٹچ سے لاگ اِن — صرف ایڈمن، ملازمین کے لیے نہیں۔
@@ -21712,7 +22301,7 @@ function getAllExpiringItems(){
   const today = new Date();
   today.setHours(0,0,0,0);
   const items = [];
-  productsData.forEach(p => p.variants.forEach(v => {
+  productsData.filter(p => !p.isDormant).forEach(p => p.variants.forEach(v => {
     if(v.batches && v.batches.length){
       v.batches.forEach(b => {
         if(!b.expiryDate || b.qty <= 0) return;
@@ -21764,7 +22353,7 @@ function renderDashDate(){
 function renderHealthBand(){
   // کل اسٹاک ویلیو = تمام variants کی (purchase price × stock) کا مجموعہ
   let stockValue = 0;
-  productsData.forEach(p => p.variants.forEach(v => stockValue += variantStockValue(v))); // 🧾 ہر چالان اپنے ریٹ سے
+  productsData.filter(p => !p.isDormant).forEach(p => p.variants.forEach(v => stockValue += variantStockValue(v))); // 🧾 ہر چالان اپنے ریٹ سے
 
   // ---------- Receivable/Payable اب لائیو حساب ہیں — کسٹمرز اور سپلائرز کے اصل موجودہ ریکارڈ سے، پرانی جامد (static) قیمت سے نہیں ----------
   const totalReceivable = customersData.reduce((sum, c) => sum + (c.total_receivable || 0), 0);
@@ -21813,7 +22402,7 @@ function renderKpiCards(){
   // ---------- Today's Sales اب لائیو حساب ہے — آج کے مکمل شدہ invoices کا مجموعہ (پرانی جامد قیمت کی بجائے) ----------
   const todayStr = new Date().toISOString().split('T')[0];
   const todaySales = invoicesData
-    .filter(inv => inv.status === 'completed' && (inv.created_at || '').split('T')[0] === todayStr)
+    .filter(inv => inv.status === 'completed' && invDay(inv) === todayStr)
     .reduce((sum, inv) => sum + inv.grand_total, 0);
 
   const stats = [
@@ -21845,7 +22434,7 @@ function scrollToAlertsSection(){
 // --- Helpers: صرف گنتی نکالنے کے لیے (KPI بیج میں استعمال ہوتی ہیں) ---
 function countLowStockItems(){
   let count = 0;
-  productsData.forEach(p => p.variants.forEach(v => { if(v.stock <= v.lowStockAt) count++; }));
+  productsData.filter(p => !p.isDormant).forEach(p => p.variants.forEach(v => { if(v.stock <= v.lowStockAt) count++; }));
   return count;
 }
 // ---------- ایکسپائری الرٹ ونڈو — صارف اپنی مرضی کے دنوں کی تعداد منتخب کر سکتا ہے (7/15/30/60/90/کوئی بھی عدد) ----------
@@ -21881,7 +22470,7 @@ function renderLowStockAlerts(){
   const grid = document.getElementById('lowStockGrid');
   const badge = document.getElementById('lowStockCount');
   const lowItems = [];
-  productsData.forEach(p => p.variants.forEach(v => {
+  productsData.filter(p => !p.isDormant).forEach(p => p.variants.forEach(v => {
     if(v.stock <= v.lowStockAt) lowItems.push({product_id: p.product_id, name: `${p.name} ${v.label}`, stock: v.stock, threshold: v.lowStockAt});
   }));
 
@@ -23036,7 +23625,7 @@ function renderStockAdjustmentScreen(query){
     <div class="productCard ${openProductCards.has(p.product_id) ? 'open' : ''}" id="sa-pcard-${p.product_id}" data-pid="${p.product_id}">
       <div class="productHead" onclick="toggleProductCard(${p.product_id}, 'sa-pcard-${p.product_id}')" dir="rtl">
         <label class="pPresenceCheck" title="${p.isDormant ? 'ٹک لگائیں — واپس حاضر کریں' : 'ٹک لگائیں — غیر حاضر کریں'}" style="${isAdmin ? 'cursor:pointer;' : 'cursor:default;'}" onclick="event.stopPropagation();">
-          <input type="checkbox" ${p.isDormant ? 'checked' : ''} ${isAdmin ? '' : 'disabled'} onclick="animateAndTogglePresence('sa-pcard-${p.product_id}', ${p.product_id})" style="width:20px; height:20px; margin:0;">
+          <input type="checkbox" ${isAdmin ? '' : 'disabled'} onclick="animateAndTogglePresence('sa-pcard-${p.product_id}', ${p.product_id})" style="width:20px; height:20px; margin:0;">
         </label>
         <!-- ---------- 🔢 ہدایت (FM10SEPTH0844AM): سیریل بیج کو pNameWrap سے نکال کر اپنا مخصوص، ہمیشہ
              46px والا الگ کالم دیا — اب کسی صورت میں سکڑ/کٹ نہیں سکتا ---------- -->
@@ -23367,7 +23956,7 @@ async function renderStockValueReportToCanvas(canvasEl){
 
   // ---------- ڈیٹا تیار کریں: ہر variant کی الگ لائن — خرید، راولپنڈی (منافع سمیت)، اسلام آباد (منافع سمیت) ---------- -->
   const rows = [];
-  productsData.forEach(p => {
+  productsData.filter(p => !p.isDormant).forEach(p => {
     p.variants.forEach(v => {
       const qty = v.stock || 0;
       if(qty === 0) return; // ---------- جس چیز کا سٹاک صفر ہے اسے رپورٹ میں شامل کرنے کا کوئی فائدہ نہیں ----------
@@ -23665,7 +24254,7 @@ function buildVegListRows(){
   productsData
     // ---------- 🔓 ہدایت (FM21SEPMO0M): حاضر/غیر حاضر فلٹر دوبارہ بحال (FM16SEPWE0518AM2 والا ہائیڈ واپس
     // لیا گیا) — present=صرف حاضر، absent=صرف غیر حاضر، both=دونوں ---------- -->
-    .filter(p => vegListMode === 'both' ? true : (vegListMode === 'present' ? !p.isDormant : !!p.isDormant))
+    .filter(p => vegListMode === 'absent' ? !!p.isDormant : !p.isDormant) // FM310SA291: غیر حاضر رپورٹ/پرنٹ سے غائب (صرف خاص "غیر حاضر" فہرست الگ)
     .sort((a,b) => (a.serial_no||0) - (b.serial_no||0))
     .forEach(p => {
       (p.variants || []).forEach(v => {
@@ -24165,7 +24754,7 @@ function buildCustomerLedgerTimeline(customerId){
   invoicesData.filter(inv => inv.customer_id === customerId && inv.status !== 'voided').forEach(inv => {
     const due = getInvoiceAmountDue(inv);
     if(due > 0){
-      events.push({ date: (inv.created_at || '').split('T')[0] || todayDateKey(), type:'sale', amount: due, label: 'بل ' + (inv.invoice_no || '') });
+      events.push({ date: invDay(inv) || todayDateKey(), type:'sale', amount: due, label: 'بل ' + (inv.invoice_no || '') });
     }
   });
   (c.walletHistory || []).filter(h => h.type === 'receivable_collected').forEach(h => {
@@ -24715,7 +25304,7 @@ function saveCustomerFilterState(){ saveToStorage('customerFilterState', custome
 
 function customerBoughtToday(customerId){
   const todayStr = todayDateKey();
-  return invoicesData.some(inv => inv.customer_id === customerId && (inv.created_at || '').split('T')[0] === todayStr);
+  return invoicesData.some(inv => inv.customer_id === customerId && invDay(inv) === todayStr);
 }
 
 const RATE_AREA_LABELS = { retail: '🏷️ اسلام آباد', wholesale: '📦 راولپنڈی', suburbs: '🌿 مضافات' };
@@ -25484,7 +26073,7 @@ function renderPurchaseOrdersScreen(){
   const supplierSelect = document.getElementById('poSupplierFilterSelect');
   const currentSupplierVal = supplierSelect.value || 'all';
   const uniqueSuppliers = [...new Map(allOrders.map(po => [po.supplier_id, po.supplier_name])).entries()];
-  supplierSelect.innerHTML = `<option value="all">🏭 تمام سپلائرز</option>` +
+  supplierSelect.innerHTML = `<option value="all">🏭 تمام بیوپاری</option>` +
     uniqueSuppliers.map(([id, name]) => `<option value="${id}">${name}</option>`).join('');
   supplierSelect.value = uniqueSuppliers.some(([id]) => String(id) === currentSupplierVal) ? currentSupplierVal : 'all';
 
@@ -25502,7 +26091,7 @@ function renderPurchaseOrdersScreen(){
 
   // ---------- خلاصہ پٹی ----------
   const totalAmount = filtered.reduce((s,po) => s + po.total, 0);
-  document.getElementById('poSummaryBar').innerHTML = `<span>پرچیز آرڈرز</span><span>${filtered.length} آرڈر • Rs. ${totalAmount.toLocaleString()}</span>`;
+  document.getElementById('poSummaryBar').innerHTML = `<span>📦 بیوپاری خریداری</span><span>${filtered.length} آرڈر • Rs. ${totalAmount.toLocaleString()}</span>`;
 
   const wrap = document.getElementById('poListWrap');
   if(filtered.length === 0){
@@ -25513,25 +26102,44 @@ function renderPurchaseOrdersScreen(){
   wrap.innerHTML = filtered.map(po => {
     const isPending = po.status !== 'received';
     const daysPending = daysSince(po.date);
+    const sup = suppliersData.find(x => x.supplier_id === po.supplier_id) || {};
+    const bal = Number(sup.total_payable) || 0, wal = Number(sup.wallet_balance) || 0;
     const statusTag = isPending
       ? `<span class="pendingStatusTag pending">⏳ زیرِ التوا • ${daysPending} دن</span>`
-      : `<span class="pendingStatusTag approved">✅ موصول ہو چکا</span>`;
+      : `<span class="pendingStatusTag approved">✅ موصول</span>`;
+    const balHtml = bal > 0
+      ? `<span style="color:#b91c1c;">📤 بقایا (ہم نے دینا): Rs. ${bal.toLocaleString()}</span>`
+      : (wal > 0 ? `<span style="color:#15803d;">💳 ایڈوانس اس کے پاس: Rs. ${wal.toLocaleString()}</span>` : `<span style="color:#15803d;">✅ کھاتہ صاف</span>`);
     return `
-      <div class="billCard" dir="rtl" style="font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','PDMSMultan','Noto Nastaliq Urdu',serif;">
-        <div>
-          <div class="bNo">🏭 ${po.supplier_name} ${statusTag}</div>
-          <div class="bMeta">${po.date} | ${po.items.length} آئٹم | Rs. ${po.total.toLocaleString()}</div>
-        </div>
-        <div class="billActions">
-          <button class="btnPrint" onclick="openPoPreview(${po.supplier_id}, ${po.po_idx})" ${isPending ? '' : 'style="min-width:130px; padding:12px 18px; font-size:15px; font-weight:900;"'}>🖨️ پرنٹ</button>
+      <div class="poCard" dir="rtl">
+        <div class="poTop"><span class="poName">🏭 ${po.supplier_name}</span>${statusTag}</div>
+        <div class="poMeta">${po.date} | ${po.items.length} آئٹم | Rs. ${po.total.toLocaleString()}</div>
+        <div class="poBal">${balHtml}</div>
+        <div class="poActs">
+          <button style="background:#eef2ff; color:var(--primary-dark);" onclick="openPoPreview(${po.supplier_id}, ${po.po_idx})">🖨️ پرنٹ</button>
+          <button style="background:#dcfce7; color:#166534;" onclick="poPaySupplier(${po.supplier_id})">💵 پیمنٹ</button>
           ${isPending
-            ? `<button class="btnReceiveShipment" onclick="openReceiveShipmentModal(${po.supplier_id}, ${po.po_idx})">🚚 مال وصول کریں</button>
-               <button class="btnPrint" onclick="openPoReminderModal(${po.supplier_id}, ${po.po_idx})">📢 یاد دہانی</button>
-               <button class="btnPrint" style="background:#fee2e2; color:#b91c1c;" onclick="deletePendingPurchaseOrder(${po.supplier_id}, ${po.po_idx}); renderPurchaseOrdersScreen();">🗑️ حذف کریں</button>`
-            : ''}<!-- 🧾 FM210FR280: "مال واپس کریں" بٹن ہٹا دیا (ہدایت — واپسی کا کام نہیں ہوتا) -->
+            ? `<button style="background:var(--primary); color:#fff;" onclick="openReceiveShipmentModal(${po.supplier_id}, ${po.po_idx})">🚚 مال وصول</button>
+               <button style="background:#eef2ff; color:var(--primary-dark);" onclick="openPoReminderModal(${po.supplier_id}, ${po.po_idx})">📢 یاد دہانی</button>
+               <button style="background:#fee2e2; color:#b91c1c;" onclick="deletePendingPurchaseOrder(${po.supplier_id}, ${po.po_idx}); renderPurchaseOrdersScreen();">🗑️ حذف</button>`
+            : ''}
         </div>
       </div>`;
   }).join('');
+}
+
+// ---------- 💵 FM410SU301: بیوپاری خریداری سکرین سے ہی بیوپاری کو پیمنٹ — وہی موجودہ ادائیگی کا نظام (بقایا/والٹ/کیش/رسید)،
+// بس ادائیگی کے بعد پروفائل کھلنے کی بجائے یہی سکرین تازہ ہوتی ہے۔ رسید پر پچھلا اور نیا بقایا آتا ہے،
+// اور اسی دن کی خریداری کا 🖨️ پرنٹ کھولیں تو اس میں بھی ادائیگی اور آخری بقایا درج ہوتا ہے ----------
+function poPaySupplier(supplierId){
+  openPaySupplierModal(supplierId, 'pay');
+  window.__payFromPo = true;
+}
+function poPayFromTop(){
+  const sel = document.getElementById('poSupplierFilterSelect');
+  const v = sel ? sel.value : 'all';
+  if(!v || v === 'all'){ alert('پہلے اوپر والی فہرست سے بیوپاری منتخب کریں، پھر پیمنٹ کا بٹن دبائیں۔\n\n(یا کسی بھی آرڈر کے نیچے 💵 پیمنٹ دبائیں)'); return; }
+  poPaySupplier(Number(v));
 }
 
 // ---------- کسٹمر کو بقایہ رقم کا ریمائنڈر بھیجیں — انفرادی بلوں کی فہرست + میرے پیمنٹ اکاؤنٹس کے ساتھ ----------
@@ -25614,8 +26222,8 @@ function openSupplierProfile(supplierId){
 
   // --- بائیں طرف چھوٹے 3D آئیکن بٹنوں کا کالم؛ Transactions سب سے نیچے ---
   document.getElementById('profileQuickActions').innerHTML = `
-    <!-- ---------- 🔄 ہدایت (FM3SEPTH10): "نیا پرچیز آرڈر" بٹن دوبارہ فعال — یہیں سے openPoModal کھلتا ہے ---------- -->
-    <button style="background:linear-gradient(155deg,#0ea5e9,#0369a1);" onclick="openPoModal(${s.supplier_id});"><span class="sideIcon">📦</span><span class="sideLabel">نیا آرڈر</span></button>
+    <!-- ---------- 🛒 FM310SA285 (ہدایت): "نیا آرڈر" کی جگہ "خریداری" — بیوپاری خریداری کا پورا نظام (openPoModal) اسی بیوپاری کے اندر؛ ہوم کا الگ "بیوپاری خریداری" بٹن ختم ---------- -->
+    <button style="background:linear-gradient(155deg,#0ea5e9,#0369a1);" onclick="openPoModal(${s.supplier_id});"><span class="sideIcon">📦</span><span class="sideLabel">خریداری</span></button>
     <button style="background:linear-gradient(155deg,#f59e0b,#b45309);" onclick="document.getElementById('profileModal').classList.remove('show'); openSupplierSlipReport(${s.supplier_id});"><span class="sideIcon">🧾</span><span class="sideLabel">چٹ</span></button>
     <button style="background:linear-gradient(155deg,#ef4444,#b91c1c);" onclick="openPaySupplierModal(${s.supplier_id}, 'pay');"><span class="sideIcon">💵</span><span class="sideLabel">ادائیگی</span></button>
     <button style="background:linear-gradient(155deg,#10b981,#047857);" onclick="openPaySupplierModal(${s.supplier_id}, 'receive');"><span class="sideIcon">📥</span><span class="sideLabel">ادھار لیا</span></button>
@@ -26024,6 +26632,7 @@ function normalizeSupplierBalance(s, reasonNote){
 }
 
 function openPaySupplierModal(supplierId, onlyMode){
+  window.__payFromPo = false; // 💵 FM410SU301: پیمنٹ بٹن (poPaySupplier) خود اسے اس کے بعد true کرتا ہے
   if(onlyMode === 'receive'){ openSupLoanModal(supplierId); return; } // 📥 FM29SEP: نیا ٹیبل والا فارم
   const s = suppliersData.find(x => x.supplier_id === supplierId);
   if(!s) return;
@@ -26137,6 +26746,7 @@ function confirmPaySupplier(){
   const s = suppliersData.find(x => x.supplier_id === activePaySupplierId);
   if(!s) return;
 
+  const _fromPo = !!window.__payFromPo; // 💵 FM410SU301
   const sp = calcSupplierSplit(s, amount, discount, mode);
   // ---------- 💳 ہدایت (FM28SEP شام): زیادہ ادائیگی یا وصولی پر تصدیقی پیغام میں پورا حساب لکھا آئے ----------
   if(sp.toWallet > 0 || mode === 'receive'){
@@ -26197,7 +26807,9 @@ function confirmPaySupplier(){
   pushSuppliersToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 2): ادائیگی کے بعد بقایا فوراً کلاؤڈ میں ----------
   pushFinanceToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 7): Cash in Hand کی تبدیلی فوراً کلاؤڈ میں ----------
   renderPartyList(document.getElementById('partySearchInput') ? document.getElementById('partySearchInput').value : '');
-  openSupplierProfile(s.supplier_id); // پروفائل فوراً تازہ ترین حالت (بقایا + والٹ خانہ) میں دوبارہ کھلے
+  window.__payFromPo = false;
+  if(_fromPo){ try{ renderPurchaseOrdersScreen(); }catch(e){} } // 💵 FM410SU301: خریداری سکرین پر ہی رہیں
+  else openSupplierProfile(s.supplier_id); // پروفائل فوراً تازہ ترین حالت (بقایا + والٹ خانہ) میں دوبارہ کھلے
   if(savedPayment) sharePaymentReceiptImage(savedPayment.payment_id);
 }
 
@@ -26214,6 +26826,7 @@ let cashPurchasesData = loadFromStorage('cashPurchases', []); // 🆕 نقد خ�
 let activePoCategory = 'all';
 
 function openPoModal(supplierId){
+  poFeedMode = false; // 🛡️ FM310SA283: پچھلی بار کا فیڈ موڈ نہ رہ جائے (openStockFeedModal اس کے بعد خود لگاتا ہے)
   let s = null;
   if(supplierId){
     s = suppliersData.find(x => x.supplier_id === supplierId);
@@ -26291,12 +26904,31 @@ function refreshOtAfterStockChange(){
 }
 
 let poFeedMode = false;
+// ---------- ☑️ FM310SA283: چالان فیڈ سکرین کا حاضر/غیر حاضر موڈ ----------
+let poPresenceMode = 'present';
+function setPoPresenceMode(m){ poPresenceMode = m; renderPoBrowseList(); }
+function poUpdatePresenceButtons(){
+  const row = document.getElementById('poPresenceBtnRow');
+  if(!row) return;
+  row.style.display = poFeedMode ? 'flex' : 'none';
+  if(!poFeedMode) return;
+  const pc = productsData.filter(p => !p.isDormant).length, ac = productsData.filter(p => !!p.isDormant).length;
+  const pb = document.getElementById('poPresenceBtnPresent'), ab = document.getElementById('poPresenceBtnAbsent');
+  const isP = poPresenceMode === 'present';
+  if(pb && ab){
+    pb.textContent = `🟢 حاضر سبزیاں (${pc})`; ab.textContent = `🔴 غیر حاضر سبزیاں (${ac})`;
+    pb.style.background = isP ? '#134e2c' : '#f1f5f9'; pb.style.color = isP ? '#fff' : 'var(--text)';
+    ab.style.background = !isP ? '#78350f' : '#f1f5f9'; ab.style.color = !isP ? '#fff' : 'var(--text)';
+  }
+}
 function openStockFeedModal(){
   openPoModal(null);
   poCashMode = false;
   poFeedMode = true;
+  poPresenceMode = 'present';
   document.getElementById('poModalTitle').textContent = '📥 مال آیا — چالان فیڈ کریں';
   const b = document.getElementById('poSaveBtn'); if(b) b.textContent = '✅ محفوظ کریں (نیا چالان — سٹاک میں فوراً شامل)';
+  renderPoBrowseList(); // 🛡️ FM310SA283: فیڈ موڈ لگنے کے بعد فہرست دوبارہ (ٹک ڈبے کے ساتھ)
   renderPoCart();
 }
 function openCashPurchaseModal(){
@@ -26360,7 +26992,9 @@ function renderPoBrowseList(){
   const wrap = document.getElementById('poBrowseList');
   if(!wrap) return;
 
-  let list = productsData.filter(p => !p.isDormant);
+  poUpdatePresenceButtons();
+  const _poAbsentView = poFeedMode && poPresenceMode === 'absent';
+  let list = productsData.filter(p => poFeedMode ? (!!p.isDormant === _poAbsentView) : !p.isDormant);
   if(activePoCategory !== 'all'){
     list = list.filter(p => (p.category && p.category.trim() ? p.category.trim() : 'Uncategorized') === activePoCategory);
   }
@@ -26369,7 +27003,7 @@ function renderPoBrowseList(){
   applyManualCardOrder(list);
 
   if(list.length === 0){
-    wrap.innerHTML = `<div class="placeholder">اس کیٹیگری میں کوئی آئٹم نہیں</div>`;
+    wrap.innerHTML = `<div class="placeholder">${_poAbsentView ? '✅ فی الحال کوئی سبزی غیر حاضر نہیں' : 'اس کیٹیگری میں کوئی آئٹم نہیں'}</div>`;
     return;
   }
 
@@ -26387,8 +27021,11 @@ function renderPoBrowseList(){
   const stockW = 40;
   const qtyW = 124;
 
-  const colWidths = [serialW, nameW, packingW, stockW, qtyW];
-  const rightOffsets = [0, colWidths[0], colWidths[0]+colWidths[1]];
+  // ☑️ FM310SA283: چالان فیڈ موڈ میں سب سے دائیں (سیریل کے ساتھ) خالی ٹک ڈبے کا کالم
+  const _off = poFeedMode ? 1 : 0;
+  const chkW = 34;
+  const colWidths = poFeedMode ? [chkW, serialW, nameW, packingW, stockW, qtyW] : [serialW, nameW, packingW, stockW, qtyW];
+  const rightOffsets = [0, colWidths[0], colWidths[0]+colWidths[1], colWidths[0]+colWidths[1]+colWidths[2]];
 
   const rows = list.map((p, idx) => {
     const isSingle = p.variants.length === 1;
@@ -26428,6 +27065,7 @@ function renderPoBrowseList(){
 
     return `
       <tr style="background:${rowBg};">
+        ${poFeedMode ? `<td style="${tdBase}${frozenTd(0)}"><input type="checkbox" class="vmPresChk" title="${_poAbsentView ? 'ٹک لگائیں — حاضر میں بھیجیں' : 'ٹک لگائیں — غیر حاضر میں بھیجیں'}" onclick="vmPresenceTick(${p.product_id}, this)"></td>` : ''}
         <td style="${tdBase}${frozenTd(0)}"><span style="${SERIAL_BADGE_INLINE_STYLE} width:28px !important;height:28px !important;min-width:28px !important;min-height:28px !important;font-size:11px !important;cursor:default !important;pointer-events:none !important;">${p.serial_no ?? '?'}</span></td>
         <td style="${tdBase}${frozenTd(1)}${urduFont}font-size:12.5px;font-weight:800;white-space:normal;word-break:break-word;line-height:1.35;text-align:right;padding-inline-end:4px;">${p.name}</td>
         <td style="${tdBase}${frozenTd(2)}">${packingCellHtml}</td>
@@ -26436,13 +27074,13 @@ function renderPoBrowseList(){
       </tr>`;
   }).join('');
 
-  const headers = ['#','نام','پیکنگ','📦 سٹاک','مقدار'];
+  const headers = poFeedMode ? ['☑️','#','نام','پیکنگ','📦 سٹاک','مقدار'] : ['#','نام','پیکنگ','📦 سٹاک','مقدار'];
   const theadHtml = '<tr>' + headers.map((h,i) => {
-    const frozen = i < 3 ? `position:-webkit-sticky;position:sticky;right:${rightOffsets[i]}px;z-index:12;` : '';
+    const frozen = i < 3 + _off ? `position:-webkit-sticky;position:sticky;right:${rightOffsets[i]}px;z-index:12;` : '';
     return `<th style="${thBase}width:${colWidths[i]}px;${frozen}">${h}</th>`;
   }).join('') + '</tr>';
 
-  const colgroupHtml = '<colgroup>' + colWidths.map((w,i) => i===1 ? '<col style="width:auto;">' : `<col style="width:${w}px;">`).join('') + '</colgroup>';
+  const colgroupHtml = '<colgroup>' + colWidths.map((w,i) => i===1+_off ? '<col style="width:auto;">' : `<col style="width:${w}px;">`).join('') + '</colgroup>';
   const totalTableW = colWidths.reduce((a,b)=>a+b,0);
 
   const oldScrollEl = document.getElementById('poBrowseScrollWrap');
@@ -27534,7 +28172,7 @@ function updateOtPresenceButtonLabels(){
 function openOtPresenceModal(mode){
   otPresenceFilterMode = mode;
   const title = document.getElementById('otPresenceModalTitle');
-  if(title) title.textContent = mode === 'present' ? '🟢 حاضر سبزیاں — سرکا کر غیر حاضر کریں' : '🔴 غیر حاضر سبزیاں — سرکا کر واپس حاضر کریں';
+  if(title) title.textContent = mode === 'present' ? '🟢 حاضر سبزیاں — ٹک لگا کر غیر حاضر کریں' : '🔴 غیر حاضر سبزیاں — ٹک لگا کر واپس حاضر کریں';
   const searchEl = document.getElementById('otPresenceSearchInput');
   if(searchEl) searchEl.value = '';
   renderOtPresenceList('');
@@ -27556,83 +28194,19 @@ function renderOtPresenceList(query){
     return;
   }
   wrap.innerHTML = list.map(p => `
-    <div class="otPresenceSwipeRow" data-swipe-pid="${p.product_id}" style="display:flex; align-items:center; gap:8px; background:#fff; border:1.5px solid #e5e9f0; border-radius:10px; padding:11px 10px; margin-bottom:7px; touch-action:pan-y; user-select:none; -webkit-user-select:none;" dir="rtl">
+    <div class="vmPresRow" data-swipe-pid="${p.product_id}" style="display:flex; align-items:center; gap:8px; background:#fff; border:1.5px solid #e5e9f0; border-radius:10px; padding:11px 10px; margin-bottom:7px; user-select:none; -webkit-user-select:none;" dir="rtl">
       ${p.serial_no ? `<span style="${SERIAL_BADGE_INLINE_STYLE} width:30px !important; height:30px !important; min-width:30px !important; min-height:30px !important; font-size:12px !important; margin:0; cursor:default; pointer-events:none;">${p.serial_no}</span>` : ''}
       <div style="flex:1; min-width:0; text-align:right; font-weight:800; font-size:14px; pointer-events:none;">${p.name}</div>
-      <div style="font-size:16px; pointer-events:none;">${otPresenceFilterMode === 'present' ? '⬅️' : '➡️'}</div>
+      <input type="checkbox" class="vmPresChk" title="${otPresenceFilterMode === 'present' ? 'ٹک لگائیں — غیر حاضر میں بھیجیں' : 'ٹک لگائیں — حاضر میں بھیجیں'}" onclick="vmPresenceTick(${p.product_id}, this)">
     </div>`).join('');
-  wireOtPresenceSwipeRows();
 }
 // ---------- سادہ سوائپ گیسچر — ایڈمن والے prodSwipeRow جیسا ہی احساس، مگر یہاں سادہ flex قطاریں ہیں
 // (sticky کالم منجمد کرنے کی ضرورت نہیں) ---------- -->
-function wireOtPresenceSwipeRows(){
-  const wrap = document.getElementById('otPresenceListWrap');
-  if(!wrap || wrap.dataset.swipeWired) return;
-  wrap.dataset.swipeWired = '1';
-  let activeRow = null, startX = 0, startY = 0, dx = 0, dragging = false, lockedHorizontal = false, pointerDownTime = 0;
-  const easyThreshold = 70; // ---------- غیر حاضر → حاضر: تیز/آسان ---------- -->
-  const hardThreshold = 170; // ---------- حاضر → غیر حاضر: جان بوجھ کر مشکل — غلطی سے نہ ہو ---------- -->
-  const hardMinHoldMs = 450;
-  const getX = e => (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
-  const getY = e => (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
-  const resetRow = () => {
-    if(activeRow){
-      activeRow.style.transition = 'transform .15s, background .15s';
-      activeRow.style.transform = '';
-      activeRow.style.background = '#fff';
-    }
-    dragging = false; activeRow = null; dx = 0; lockedHorizontal = false;
-  };
-  const onStart = e => {
-    const row = e.target.closest('.otPresenceSwipeRow');
-    if(!row || !wrap.contains(row)) return;
-    activeRow = row; startX = getX(e); startY = getY(e); dx = 0; dragging = true; lockedHorizontal = false;
-    pointerDownTime = Date.now();
-    row.style.transition = '';
-  };
-  const onMove = e => {
-    if(!dragging || !activeRow) return;
-    const x = getX(e), y = getY(e);
-    dx = x - startX; const dy = y - startY;
-    if(!lockedHorizontal){
-      if(Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-      if(Math.abs(dy) > Math.abs(dx)){ resetRow(); return; }
-      lockedHorizontal = true;
-    }
-    if(e.cancelable) e.preventDefault();
-    activeRow.style.transform = `translateX(${dx}px)`;
-    const willBeAbsent = otPresenceFilterMode === 'present';
-    activeRow.style.background = willBeAbsent ? '#fecaca' : '#bbf7d0';
-  };
-  const onEnd = () => {
-    if(!dragging || !activeRow){ resetRow(); return; }
-    const row = activeRow;
-    const productId = parseInt(row.dataset.swipePid, 10);
-    const willBeAbsent = otPresenceFilterMode === 'present';
-    const heldMs = Date.now() - pointerDownTime;
-    const commitOk = lockedHorizontal && (willBeAbsent
-      ? (Math.abs(dx) > hardThreshold && heldMs >= hardMinHoldMs)
-      : (Math.abs(dx) > easyThreshold));
-    if(commitOk){
-      row.style.transition = 'opacity .15s';
-      row.style.opacity = '0.15';
-      setTimeout(() => { otTogglePresence(productId); }, 110);
-      dragging = false; activeRow = null; dx = 0; lockedHorizontal = false;
-    } else {
-      resetRow();
-    }
-  };
-  wrap.addEventListener('touchstart', onStart, {passive:true});
-  wrap.addEventListener('touchmove', onMove, {passive:false});
-  wrap.addEventListener('touchend', onEnd);
-  wrap.addEventListener('touchcancel', resetRow);
-  wrap.addEventListener('pointerdown', onStart);
-  wrap.addEventListener('pointermove', onMove);
-  wrap.addEventListener('pointerup', onEnd);
-}
+function wireOtPresenceSwipeRows(){ /* ☑️ FM210FR282: سلائیڈ نظام ختم — اب ٹک ڈبہ (vmPresenceTick) */ }
 function otTogglePresence(productId){
   const p = productsData.find(x => x.product_id === productId);
   if(!p) return;
+  if(!p.isDormant && presenceStockGuard(p)) return;
   p.isDormant = !p.isDormant;
   persistAllData();
   pushProductsToCloud();
@@ -27649,21 +28223,38 @@ function otTogglePresence(productId){
   try{ renderOtItemsPage(); }catch(e){}
   try{ renderOtAddStockList(document.getElementById('otAddStockSearchInput')?.value || ''); }catch(e){}
 }
+// ---------- ☑️ FM210FR282: چالان فیڈ کرنے والی فہرست کا حاضر/غیر حاضر موڈ ----------
+let otAddStockPresenceMode = 'present';
+function setOtAddStockPresenceMode(mode){
+  otAddStockPresenceMode = mode;
+  renderOtAddStockList(document.getElementById('otAddStockSearchInput')?.value || '');
+}
 function renderOtAddStockList(query){
   const wrap = document.getElementById('otAddStockListWrap');
   if(!wrap) return;
   const q = (query || '').trim().toLowerCase();
+  // حاضر/غیر حاضر بٹن — تعداد اور نمایاں حالت
+  const _pc = productsData.filter(p => !p.isDormant).length, _ac = productsData.filter(p => !!p.isDormant).length;
+  const _pb = document.getElementById('otAddStockBtnPresent'), _ab = document.getElementById('otAddStockBtnAbsent');
+  const _isP = otAddStockPresenceMode === 'present';
+  if(_pb && _ab){
+    _pb.textContent = `🟢 حاضر سبزیاں (${_pc})`; _ab.textContent = `🔴 غیر حاضر سبزیاں (${_ac})`;
+    _pb.style.background = _isP ? '#134e2c' : '#f1f5f9'; _pb.style.color = _isP ? '#fff' : 'var(--text)';
+    _ab.style.background = !_isP ? '#78350f' : '#f1f5f9'; _ab.style.color = !_isP ? '#fff' : 'var(--text)';
+  }
   const rows = [];
   productsData.slice().sort((a,b) => (a.serial_no||0) - (b.serial_no||0)).forEach(p => {
+    if(!!p.isDormant !== !_isP) return;
     if(q && !p.name.toLowerCase().includes(q) && String(p.serial_no ?? '').indexOf(q) === -1) return;
     (p.variants || []).forEach(v => rows.push({p, v}));
   });
   if(rows.length === 0){
-    wrap.innerHTML = `<div class="placeholder" style="text-align:center; padding:16px 0; color:var(--muted);">کوئی سبزی نہیں ملی</div>`;
+    wrap.innerHTML = `<div class="placeholder" style="text-align:center; padding:16px 0; color:var(--muted);">${_isP ? 'کوئی سبزی نہیں ملی' : '✅ فی الحال کوئی سبزی غیر حاضر نہیں'}</div>`;
     return;
   }
   wrap.innerHTML = rows.map(({p, v}) => `
-    <div style="display:flex; align-items:center; gap:6px; background:#fff; border:1.5px solid #e5e9f0; border-radius:10px; padding:8px; margin-bottom:7px;" dir="rtl">
+    <div class="vmPresRow" style="display:flex; align-items:center; gap:6px; background:#fff; border:1.5px solid #e5e9f0; border-radius:10px; padding:8px; margin-bottom:7px;" dir="rtl">
+      <input type="checkbox" class="vmPresChk" title="${_isP ? 'ٹک لگائیں — غیر حاضر میں بھیجیں' : 'ٹک لگائیں — حاضر میں بھیجیں'}" onclick="vmPresenceTick(${p.product_id}, this)">
       ${p.serial_no ? `<span class="serialBadgeBtn" style="${SERIAL_BADGE_INLINE_STYLE} width:30px !important; height:30px !important; min-width:30px !important; min-height:30px !important; font-size:12px !important; margin:0; cursor:default;">${p.serial_no}</span>` : ''}
       <div style="flex:1; min-width:0; text-align:right;">
         <div style="font-weight:800; font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.name}</div>
@@ -28321,75 +28912,7 @@ function renderOtItemsTable(wrap){
 // قطار سیدھی سرک سکتی ہے۔ منشی (کوئی بھی رول) یہاں سے یہ کر سکتا ہے — یہی otTogglePresence فنکشن استعمال ہوتا
 // ہے جو 🔴 غیر حاضر سبزیاں والے موڈل میں بھی استعمال ہوتا ہے، اس لیے دونوں جگہ سے تبدیلی ہمیشہ ہم آہنگ رہتی ہے۔
 // واپس "حاضر" کرنے کے لیے اوپر 🔴 غیر حاضر سبزیاں بٹن سے موڈل کھول کر وہاں سے سرکا کر واپس لایا جا سکتا ہے ---------- -->
-function wireOtTableSwipeRows(wrap){
-  return; // 🔒 26 ستمبر: آرڈر بکنگ میں قطاریں لاک — سلائیڈ نہیں ہوگی
-  if(!wrap || wrap.dataset.otTableSwipeWired) return;
-  wrap.dataset.otTableSwipeWired = '1';
-  let activeRow = null, startX = 0, startY = 0, dx = 0, dragging = false, lockedHorizontal = false, pointerDownTime = 0;
-  const dormantThreshold = 170; // ---------- جان بوجھ کر لمبا سرکانا — غلطی سے سبزی غیر حاضر نہ ہو جائے ----------
-  const dormantMinHoldMs = 450;
-  const getX = e => (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
-  const getY = e => (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
-  const resetRow = () => {
-    if(activeRow){
-      activeRow.style.transition = 'transform .15s, opacity .15s, background .15s';
-      activeRow.style.transform = '';
-      activeRow.style.opacity = '';
-      activeRow.style.background = '';
-      activeRow.querySelectorAll('td').forEach(td => { td.style.background = ''; });
-    }
-    dragging = false; activeRow = null; dx = 0; lockedHorizontal = false;
-  };
-  const onStart = e => {
-    if(e.target.closest('button,a')) return;
-    if(AppState.currentRole !== 'admin') return; // 🔒 26 ستمبر: منشی سبزی غیر حاضر نہیں کر سکتا
-    const row = e.target.closest('.otTableSwipeRow');
-    if(!row || !wrap.contains(row)) return;
-    activeRow = row; startX = getX(e); startY = getY(e); dx = 0; dragging = true; lockedHorizontal = false;
-    pointerDownTime = Date.now();
-    row.style.transition = '';
-  };
-  const onMove = e => {
-    if(!dragging || !activeRow) return;
-    const x = getX(e), y = getY(e);
-    dx = x - startX; const dy = y - startY;
-    if(!lockedHorizontal){
-      if(Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-      if(Math.abs(dy) > Math.abs(dx)){ resetRow(); return; }
-      lockedHorizontal = true;
-    }
-    if(e.cancelable) e.preventDefault();
-    activeRow.style.position = 'relative';
-    activeRow.style.zIndex = '4';
-    activeRow.style.transform = `translateX(${dx}px)`;
-    const tint = Math.abs(dx) > dormantThreshold ? '#fca5a5' : '#fecaca';
-    activeRow.querySelectorAll('td').forEach(td => { td.style.background = tint; });
-  };
-  const onEnd = () => {
-    if(!dragging || !activeRow){ resetRow(); return; }
-    const row = activeRow;
-    const productId = parseInt(row.dataset.swipePid, 10);
-    const heldMs = Date.now() - pointerDownTime;
-    const commitOk = lockedHorizontal && Math.abs(dx) > dormantThreshold && heldMs >= dormantMinHoldMs;
-    if(commitOk){
-      row.style.transition = 'transform .12s, opacity .12s';
-      row.style.transform = `translateX(${dx > 0 ? '120%' : '-120%'})`;
-      row.style.opacity = '0';
-      dragging = false; activeRow = null; dx = 0; lockedHorizontal = false;
-      setTimeout(() => { otTogglePresence(productId); }, 130);
-    } else {
-      resetRow();
-    }
-  };
-  wrap.addEventListener('touchstart', onStart, {passive:true});
-  wrap.addEventListener('touchmove', onMove, {passive:false});
-  wrap.addEventListener('touchend', onEnd);
-  wrap.addEventListener('touchcancel', resetRow);
-  wrap.addEventListener('pointerdown', e => { if(e.pointerType === 'touch') return; onStart(e); });
-  wrap.addEventListener('pointermove', e => { if(e.pointerType === 'touch') return; onMove(e); });
-  wrap.addEventListener('pointerup', e => { if(e.pointerType === 'touch') return; onEnd(); });
-  wrap.addEventListener('pointercancel', e => { if(e.pointerType === 'touch') return; resetRow(); });
-}
+function wireOtTableSwipeRows(wrap){ /* ☑️ FM210FR282: آرڈر ٹیکنگ سے سلائیڈ نظام مکمل ختم */ }
 // ---------- 🐞 ہدایت (FM18SEPFR): اصل خرابی — یہ فنکشن اور نیچے موجود ویل والا setOtQtyDirect(...)
 // دونوں کا نام ایک جیسا "setOtQtyDirect" تھا۔ جاوا اسکرپٹ میں ایک ہی نام کے دو function ہوں تو بعد والا
 // (ویل والا) پہلے والے کو مکمل ختم/اووررائٹ کر دیتا ہے — اس لیے جدول (Table View) میں مقدار ہاتھ سے ٹائپ کرنے پر
@@ -28764,6 +29287,7 @@ async function openOtReview(){
   }
   persistAllData();
   pushAdvanceOrdersToCloud(); // ---------- ⚡ فوراً کلاؤڈ پر بھیجیں (بیک گراؤنڈ میں) — ایڈمن کے فون پر اگلے 12 سیکنڈ میں خودکار نظر آ جائے گا ----------
+  try{ svTick(true); }catch(e){} // 🗄️ سیف الماری
 
   document.getElementById('otStepItems').style.display = 'none';
   document.getElementById('otStepReview').style.display = '';
@@ -29248,7 +29772,7 @@ let rlMethodMap = {};
 // ---------- اس کسٹمر کی آج کی (اسی تاریخ کی) وصولی انٹریاں — کچی یا پکی دونوں ----------
 function rlTodayEntriesFor(customerId){
   const t = todayDateKey();
-  return recoveryListData.filter(r => r.customer_id === customerId && (r.createdAt || '').split('T')[0] === t);
+  return recoveryListData.filter(r => r.customer_id === customerId && recDay(r) === t);
 }
 // ---------- اس کسٹمر کی تمام کچی (ایڈمن نے ابھی کھاتے میں درج نہیں کیں) وصولیاں — باقی بقایا انہی کو منہا کر کے دکھایا جاتا ہے ----------
 function rlPendingSumFor(customerId){
@@ -29315,7 +29839,7 @@ function renderRecoveryListEmployeeView(){
   }
   const drAll = computeDailyRecoveryRows();
   // ---------- 📊 FM299TU#261: ملازم کو بھی اوپر آج کی اپنی کل وصولی ----------
-  const _myToday = recoveryListData.filter(e => e.employeeName === (AppState.currentUser?.name) && (e.createdAt || '').split('T')[0] === todayDateKey());
+  const _myToday = recoveryListData.filter(e => e.employeeName === (AppState.currentUser?.name) && recDay(e) === todayDateKey());
   const _myTotal = _myToday.reduce((a, e) => a + (Number(e.amount) || 0), 0);
   const _sumHtml = `<div dir="rtl" style="grid-column:1/-1; background:linear-gradient(135deg,#15803d,#065f46); color:#fff; border-radius:12px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
       <span style="font-weight:800;">📥 آج کی میری کل وصولی (${_myToday.length} گاہک) <button type="button" onclick="runCloudHealthCheck()" style="margin-right:6px; border:none; border-radius:999px; background:rgba(255,255,255,.2); color:#fff; font-size:11px; padding:2px 8px; cursor:pointer; font-family:inherit;">🩺 کلاؤڈ چیک</button></span>
@@ -29470,6 +29994,7 @@ function buildRecoveryEntryFromSplit(c){
     noteUpdatedAt: Date.now(),
     employeeName: AppState.currentUser?.name || 'Unknown',
     status: 'pending', // ---------- ایڈمن Confirm کرنے تک اصل کھاتے میں کوئی تبدیلی نہیں ----------
+    bizDate: bizDateKey(),
     createdAt: new Date().toISOString(),
     confirmedAt: null
   };
@@ -29482,6 +30007,7 @@ function submitSingleRecovery(customerId){
   recoveryListData.unshift(entry);
   if(entry.note) saveDailyRecoveryNote(customerId, entry.note);
   persistAllData();
+  try{ svTick(true); }catch(e){} // 🗄️ سیف الماری
   pushRecoveryListToCloud(); // ---------- ⚡ فوراً کلاؤڈ پر ----------
   delete rlSplitMap[customerId]; delete rlNoteMap[customerId];
   rlReopenIds = rlReopenIds.filter(x => x !== customerId);
@@ -29519,6 +30045,7 @@ function submitRecoveryList(){
     delete rlSplitMap[id]; delete rlNoteMap[id];
   });
   persistAllData();
+  try{ svTick(true); }catch(e){} // 🗄️ سیف الماری
   pushRecoveryListToCloud();
   alert('آج کی وصولی جمع ہو گئی — ایڈمن اصل کھاتے میں اندراج کے بعد تصدیق کریں گے۔');
   goTo('home');
@@ -29572,34 +30099,156 @@ function renderRecoveryListAdminView(){
 // =========================================================================
 let dailyRecoveryNotes = loadFromStorage('dailyRecoveryNotes', {}); // ---------- key: "YYYY-MM-DD_customerId" ----------
 
-function todayDateKey(){ return new Date().toISOString().split('T')[0]; }
+function todayDateKey(){ return bizDateKey(); } // ---------- FM310SA287: اب اصل تاریخ نہیں، ایڈمن کی مقرر کردہ "کاروباری تاریخ" ----------
 
 // ---------- ہر کسٹمر کی آج کی سرگرمی نکالیں — "آج کا مال" میں صرف وہ حصہ شامل ہے جو ادھار (کریڈٹ) گیا ہو،
 // نقد فروخت اس رپورٹ میں کہیں شامل نہیں ہوتی (ہدایت: یہ لیجر نہیں، صرف ریکوری کی فہرست ہے) ----------
-function computeDailyRecoveryRows(){
-  const todayStr = todayDateKey();
-  return customersData.map(c => {
-    const todayInvoices = invoicesData.filter(inv => inv.customer_id === c.customer_id && (inv.created_at || '').split('T')[0] === todayStr);
-    // ---------- invoice.amount_due = اسی بل میں سے جتنا حصہ نقد ادا نہیں ہوا (یعنی ادھار گیا) — یہی اصل "آج کا مال" ہے ----------
-    const todayGoods = todayInvoices.reduce((s, inv) => s + (inv.amount_due || 0), 0)
-      + (c.walletHistory || []).filter(h => h.type === 'cash_given' && h.date === todayStr).reduce((s, h) => s + (h.amount || 0), 0); // 💸 آج کا نقد ادھار بھی
 
-    const todayRecoveryEntries = (c.walletHistory || []).filter(h => h.type === 'receivable_collected' && h.date === todayStr);
-    const confirmedRecovery = todayRecoveryEntries.reduce((s, h) => s + (h.amount || 0), 0);
-    // ---------- 🧾 FM299TU#261 (ہدایت): ریکوری والے لڑکے کی آج کی وصولی جو ابھی ایڈمن نے کھاتے میں درج نہیں کی
-    // (کچی) وہ بھی "آج کی ریکوری" میں — تاکہ آج کی اصل ریکوری پوری نظر آئے ----------
-    const pendingRecovery = recoveryListData.filter(e => e.customer_id === c.customer_id && e.status === 'pending' && (e.createdAt || '').split('T')[0] === todayStr)
+// =========================================================================
+// 📅 FM310SA287 (ہدایت): کاروباری تاریخ (Business Day) — تاریخ خود بخود (رات 12 بجے) نہیں بدلتی،
+// صرف ایڈمن \"ڈیٹ اینڈ کریں\" دبا کر (دو بار تصدیق کے بعد) بدلتا ہے۔ سبزی، وصولی، کم وصولی — سب اسی کاروباری تاریخ میں۔
+// پچھلی (لاک) تاریخ میں اینٹری کے لیے ایڈمن PIN، پھر دوبارہ لاک (دو بار تصدیق)۔ حالت کلاؤڈ (shopData/businessDay) پر سب فونز میں۔
+// =========================================================================
+var bizDayState = loadFromStorage('bizDayState', null) || { cur: null, closed: {}, updatedAt: 0 };
+var bizOverride = null;   // ---------- صرف اسی فون پر، صرف میموری میں (ری لوڈ پر خودبخود ختم — غلطی سے پرانی تاریخ میں اینٹری نہ ہو) ----------
+var drViewDate = null;    // ---------- رپورٹ میں دیکھنے کی تاریخ (None = موجودہ) ----------
+function localDateKey(d){ d = d || new Date(); const p = n => String(n).padStart(2,'0'); return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()); }
+function bizCurrentDate(){ return (bizDayState && bizDayState.cur) ? bizDayState.cur : localDateKey(); }
+function bizDateKey(){ return bizOverride || bizCurrentDate(); }
+function recDay(e){ return (e && e.bizDate) || ((e && e.createdAt) || '').split('T')[0]; }
+function invDay(inv){ return (inv && inv.biz_date) || ((inv && inv.created_at) || '').split('T')[0]; }
+function bizFmt(d){ const a = (d || '').split('-'); return a.length === 3 ? a[2] + '/' + a[1] + '/' + a[0] : d; }
+function bizNextDate(D){ const dt = new Date(D + 'T12:00:00'); dt.setDate(dt.getDate() + 1); const n = localDateKey(dt), t = localDateKey(); return n > t ? n : t; }
+function bizIsAdmin(){ return AppState.currentRole === 'admin'; }
+
+const BIZDAY_DOC_PATH = smShopBase() + 'businessDay';
+async function pushBizDay(){
+  try{
+    const res = await authFirestoreFetch(`${BIZDAY_DOC_PATH}?key=${FIREBASE_API_KEY}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: { json: { stringValue: JSON.stringify(bizDayState) }, updatedAt: { integerValue: String(bizDayState.updatedAt || Date.now()) } } })
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+async function fetchBizDay(){
+  try{
+    const res = await authFirestoreFetch(`${BIZDAY_DOC_PATH}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' });
+    if(!res.ok) return;
+    const doc = await res.json();
+    const cloud = JSON.parse(doc.fields?.json?.stringValue || 'null');
+    if(!cloud || (cloud.updatedAt || 0) <= (bizDayState.updatedAt || 0)) return;
+    bizDayState = cloud; saveToStorage('bizDayState', bizDayState);
+    try{ if(document.getElementById('screen-dailyRecovery')?.classList.contains('active')) renderDailyRecoveryScreen(); }catch(e){}
+  }catch(e){}
+}
+setTimeout(() => { try{ fetchBizDay(); }catch(e){} }, 4000);
+setInterval(() => { try{ if(!document.hidden) fetchBizDay(); }catch(e){} }, 15000);
+
+async function endBizDay(){
+  if(!bizIsAdmin()){ alert('صرف ایڈمن تاریخ اینڈ کر سکتا ہے'); return; }
+  if(bizOverride){ alert('پہلے پچھلی تاریخ کی اینٹری کو دوبارہ لاک کریں'); return; }
+  await fetchBizDay();
+  const D = bizCurrentDate(), N = bizNextDate(D);
+  const pend = recoveryListData.filter(e => e.status === 'pending' && recDay(e) === D).length;
+  if(!confirm(`📅 تاریخ: ${bizFmt(D)}\n\nکیا اس تاریخ کی تمام سبزی اور تمام ریکوری/وصولی کا حساب مکمل ہو گیا ہے؟` + (pend ? `\n\n⚠️ ${pend} کچی وصولیاں ابھی کھاتے میں درج نہیں ہوئیں۔` : ''))) return;
+  if(!confirm(`🔒 آخری تصدیق\n\nکیا آپ پکا ${bizFmt(D)} کی تاریخ کو لاک کرنا چاہتے ہیں؟\n\nOK دبانے پر یہ تاریخ لاک ہو جائے گی اور نیا دن ${bizFmt(N)} شروع ہو جائے گا۔ اس کے بعد ہر نئی اینٹری ${bizFmt(N)} میں جائے گی۔\n(پچھلی تاریخ میں اینٹری صرف ایڈمن PIN سے کھول کر ہو سکے گی)`)) return;
+  bizDayState.closed = bizDayState.closed || {};
+  bizDayState.closed[D] = { at: Date.now(), by: AppState.currentUser?.name || 'admin' };
+  bizDayState.cur = N; bizDayState.updatedAt = Date.now();
+  saveToStorage('bizDayState', bizDayState);
+  drViewDate = null;
+  const ok = await pushBizDay();
+  alert(`✅ ${bizFmt(D)} لاک ہو گئی۔ نیا دن: ${bizFmt(N)}` + (ok ? '' : '\n⚠️ کلاؤڈ پر نہیں جا سکی (نیٹ؟) — نیٹ آتے ہی دوبارہ اینڈ کی تصدیق دیکھ لیں'));
+  renderDailyRecoveryScreen(); refreshBizBanner();
+}
+
+function closeBizUnlockDialog(){ document.getElementById('bizUnlockDlg')?.remove(); }
+function openBizUnlockDialog(){
+  if(!bizIsAdmin()){ alert('صرف ایڈمن'); return; }
+  if(bizOverride){ alert('پہلے سے ' + bizFmt(bizOverride) + ' کھلی ہے'); return; }
+  const closed = Object.keys(bizDayState.closed || {}).sort().reverse();
+  if(!closed.length){ alert('ابھی کوئی لاک شدہ پچھلی تاریخ موجود نہیں'); return; }
+  closeBizUnlockDialog();
+  const d = document.createElement('div'); d.id = 'bizUnlockDlg'; d.dir = 'rtl';
+  d.style.cssText = 'position:fixed;inset:0;z-index:999990;background:rgba(15,23,42,.6);display:flex;align-items:center;justify-content:center;padding:16px;';
+  d.innerHTML = `<div style="background:#fff;border-radius:14px;padding:16px;width:100%;max-width:340px;font-family:inherit;">
+    <div style="font-weight:900;font-size:16px;margin-bottom:10px;">🔓 پچھلی تاریخ میں اینٹری</div>
+    <div style="font-size:12.5px;margin-bottom:4px;">تاریخ منتخب کریں:</div>
+    <select id="bizUnSel" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;margin-bottom:10px;font-size:14px;">${closed.map(x => `<option value="${x}">${bizFmt(x)}</option>`).join('')}</select>
+    <div style="font-size:12.5px;margin-bottom:4px;">ایڈمن پن (PIN):</div>
+    <input id="bizUnPin" type="password" inputmode="numeric" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;margin-bottom:12px;font-size:16px;box-sizing:border-box;">
+    <div style="display:flex;gap:8px;"><button onclick="confirmBizUnlock()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#b45309;color:#fff;font-weight:800;">🔓 کھولیں</button>
+    <button onclick="closeBizUnlockDialog()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#e2e8f0;font-weight:800;">بند</button></div></div>`;
+  document.body.appendChild(d);
+}
+async function confirmBizUnlock(){
+  const pin = (document.getElementById('bizUnPin')?.value || '').trim();
+  const dt = document.getElementById('bizUnSel')?.value;
+  if(!pin){ alert('❌ PIN درج کریں'); return; }
+  const h = await hashPin(pin);
+  if(!usersData.some(u => u.pin === h && u.role === 'admin' && u.is_active)){ alert('❌ غلط PIN — تاریخ نہیں کھلی'); return; }
+  bizOverride = dt; drViewDate = null;
+  closeBizUnlockDialog(); refreshBizBanner(); renderDailyRecoveryScreen();
+  alert(`🔓 ${bizFmt(dt)} کھل گئی۔\n\nاب جو بھی وصولی درج ہوگی (کسٹمر منتخب کر کے) وہ ${bizFmt(dt)} میں جائے گی۔ کام ختم ہونے پر اوپر نارنجی پٹی سے "دوبارہ لاک" کریں۔`);
+}
+function relockBizDate(){
+  if(!bizOverride) return;
+  const D = bizOverride;
+  if(!confirm(`📅 ${bizFmt(D)}\n\nکیا اس تاریخ میں اینٹری اور حساب کتاب مکمل ہو گیا ہے؟`)) return;
+  if(!confirm(`🔒 آخری تصدیق\n\nکیا آپ پکا ${bizFmt(D)} کو دوبارہ لاک کرنا چاہتے ہیں؟\nOK کے بعد نئی اینٹری موجودہ دن ${bizFmt(bizCurrentDate())} میں جائے گی۔`)) return;
+  if(bizDayState.closed && bizDayState.closed[D]){ bizDayState.closed[D].relockedAt = Date.now(); bizDayState.closed[D].relockedBy = AppState.currentUser?.name || 'admin'; bizDayState.updatedAt = Date.now(); saveToStorage('bizDayState', bizDayState); pushBizDay(); }
+  bizOverride = null; drViewDate = null;
+  persistAllData(); refreshBizBanner(); renderDailyRecoveryScreen();
+  alert('🔒 ' + bizFmt(D) + ' دوبارہ لاک ہو گئی');
+}
+function refreshBizBanner(){
+  let b = document.getElementById('bizOverrideBanner');
+  if(!bizOverride){ if(b) b.style.display = 'none'; return; }
+  if(!b){ b = document.createElement('div'); b.id = 'bizOverrideBanner'; b.dir = 'rtl'; document.body.appendChild(b); }
+  b.style.cssText = 'display:flex;position:fixed;top:0;left:0;right:0;z-index:999980;background:linear-gradient(180deg,#ea580c,#9a3412);color:#fff;gap:6px;align-items:center;justify-content:center;padding:6px 8px;font-weight:800;font-size:12px;flex-wrap:wrap;';
+  b.innerHTML = `<span>🔓 اینٹری ${bizFmt(bizOverride)} میں ہو رہی ہے</span>
+    <button onclick="openRecordPaymentModal()" style="padding:4px 10px;border:none;border-radius:6px;background:#fff;color:#9a3412;font-weight:900;font-size:11.5px;">➕ وصولی</button>
+    <button onclick="relockBizDate()" style="padding:4px 10px;border:none;border-radius:6px;background:#fff;color:#9a3412;font-weight:900;font-size:11.5px;">🔒 دوبارہ لاک</button>`;
+}
+function drEffDate(){ return drViewDate || todayDateKey(); }
+function setDrViewDate(v){ drViewDate = (v && v !== todayDateKey()) ? v : null; renderDailyRecoveryScreen(); }
+function renderBizDayBar(){
+  const el = document.getElementById('drDayBar'); if(!el) return;
+  const cur = todayDateKey(), eff = drEffDate();
+  const closed = Object.keys(bizDayState.closed || {}).sort().reverse();
+  const opts = [cur].concat(closed.filter(x => x !== cur)).map(x => `<option value="${x}" ${x === eff ? 'selected' : ''}>${bizFmt(x)}${x === cur ? (bizOverride ? ' 🔓' : ' • جاری') : ' 🔒'}</option>`).join('');
+  const bs = 'padding:5px 7px;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;color:#fff;';
+  const isPast = eff !== cur;
+  el.style.paddingRight = '0'; el.style.marginRight = '-3px';
+  el.innerHTML = `<select onchange="setDrViewDate(this.value)" class="drGreenSel ${isPast ? 'drPast' : ''}" style="padding:6px 4px;border-radius:8px;font-size:12px;min-width:100px;height:34px;flex:0 0 auto;">${opts}</select>
+    ${bizIsAdmin() ? `<button type="button" onclick="endBizDay()" style="${bs}background:#b91c1c;flex:0 0 auto;height:34px;">🔒 ڈیٹ اینڈ</button><button type="button" onclick="openBizUnlockDialog()" style="${bs}background:#b45309;flex:0 0 auto;height:34px;">🔓 پچھلی ڈیٹ</button>` : ''}
+    <button type="button" onclick="printDailyRecoveryReport()" style="${bs}background:var(--primary-dark);flex:0 0 auto;height:34px;">🖨️ PDF</button>
+    <button type="button" onclick="shareDailyRecoveryImage()" style="${bs}background:#25D366;flex:0 0 auto;height:34px;">📤</button>
+    ${isPast ? '<span style="font-size:10.5px;color:#b45309;font-weight:800;white-space:nowrap;">صرف دیکھنے کے لیے</span>' : ''}`;
+}
+
+function computeDailyRecoveryRows(dateStr){
+  const D = dateStr || todayDateKey();
+  return customersData.map(c => {
+    const hist = c.walletHistory || [];
+    const invs = invoicesData.filter(inv => inv.customer_id === c.customer_id);
+    const goodsOf = (pred) => invs.filter(inv => pred(invDay(inv))).reduce((s, inv) => s + (inv.amount_due || 0), 0)
+      + hist.filter(h => h.type === 'cash_given' && pred(h.date)).reduce((s, h) => s + (h.amount || 0), 0);
+    const recOf = (pred) => hist.filter(h => h.type === 'receivable_collected' && pred(h.date)).reduce((s, h) => s + (h.amount || 0), 0);
+    const todayGoods = goodsOf(d => d === D);
+    const goodsAfter = goodsOf(d => d > D);
+    const confirmedRecovery = recOf(d => d === D);
+    const recAfter = recOf(d => d > D);
+    const pendingRecovery = recoveryListData.filter(e => e.customer_id === c.customer_id && e.status === 'pending' && recDay(e) === D)
       .reduce((s, e) => s + (Number(e.amount) || 0), 0);
     const todayRecovery = confirmedRecovery + pendingRecovery;
-
-    // ---------- سابقہ بقایہ = آج کی ادھار سرگرمی سے پیچھے کا حساب (کھاتہ + آج درج شدہ ریکوری − آج کا ادھار مال) ----------
-    const openingBalance = (c.total_receivable || 0) + confirmedRecovery - todayGoods;
+    const endBal = (c.total_receivable || 0) + recAfter - goodsAfter; // ---------- اس تاریخ کے اختتام پر بقایہ (کھاتے کے مطابق) ----------
+    const openingBalance = endBal + confirmedRecovery - todayGoods;
     const totalBalance = openingBalance + todayGoods;
     const finalBalance = totalBalance - todayRecovery;
-    // ---------- ⚠️ کم وصولی: آج کی خریداری میں سے جتنا کم دیا — صرف دیکھنے کے لیے، کسی جمع/تفریق میں شامل نہیں ----------
     const shortfall = todayGoods > 0 ? Math.max(0, todayGoods - todayRecovery) : 0;
     const hasToday = todayGoods > 0 || todayRecovery > 0;
-
     return { c, openingBalance, todayGoods, totalBalance, todayRecovery, confirmedRecovery, pendingRecovery, finalBalance, shortfall, hasToday };
   });
 }
@@ -29647,8 +30296,9 @@ function renderDailyRecoveryScreen(){
   const table = document.getElementById('drTable');
   if(table) table.style.fontSize = baseFs.toFixed(1) + 'px';
 
-  const todayStr = todayDateKey();
-  let rows = computeDailyRecoveryRows();
+  const todayStr = drEffDate();
+  let rows = computeDailyRecoveryRows(todayStr);
+  renderBizDayBar();
 
   const byName = (a, b) => (a.c.name || '').localeCompare(b.c.name || '', 'ur');
   const byCreated = (a, b) => new Date(a.c.createdAt || 0) - new Date(b.c.createdAt || 0);
@@ -29666,22 +30316,21 @@ function renderDailyRecoveryScreen(){
   }
 
   // ---------- 📊 FM299TU#261: آج کا خلاصہ ----------
-  const allRows = computeDailyRecoveryRows();
+  const allRows = computeDailyRecoveryRows(todayStr);
   const sumConf = allRows.reduce((a, r) => a + r.confirmedRecovery, 0);
   const sumPend = allRows.reduce((a, r) => a + r.pendingRecovery, 0);
   const sumGoods = allRows.reduce((a, r) => a + r.todayGoods, 0);
   const shortRows = allRows.filter(r => r.shortfall > 0);
   const sumShort = shortRows.reduce((a, r) => a + r.shortfall, 0);
   const numF = "font-family:'Arial Black',Arial,sans-serif; font-weight:900;";
-  const sumBox = (bg, bd, fg, label, val, sub) => `<div style="flex:1; min-width:120px; background:${bg}; border:1.5px solid ${bd}; border-radius:12px; padding:8px 10px; text-align:center;">
-      <div style="font-size:12px; font-weight:800; color:${fg};">${label}</div>
-      <div style="${numF} font-size:19px; color:${fg}; direction:ltr;">Rs. ${Math.round(val).toLocaleString()}</div>
-      ${sub ? `<div style="font-size:10.5px; color:${fg}; opacity:.85;">${sub}</div>` : ''}</div>`;
+  const sumBox = (bg, bd, fg, label, val) => `<div style="flex:1; min-width:0; background:${bg}; border:1px solid ${bd}; border-radius:8px; padding:2px 3px; text-align:center; line-height:1.15;">
+      <div style="font-size:10.5px; font-weight:800; color:${fg}; white-space:nowrap;">${label}</div>
+      <div style="${numF} font-size:clamp(14px,4.7vw,21px); color:${fg}; direction:ltr; white-space:nowrap;">${Math.round(val).toLocaleString('en-US')}</div></div>`;
   const sumEl = document.getElementById('drSummary');
-  if(sumEl) sumEl.innerHTML = `<div style="display:flex; gap:8px; flex-wrap:wrap;">
-      ${sumBox('#f0fdf4','#86efac','#15803d','📥 آج کی کل ریکوری', sumConf + sumPend, `✅ کھاتے میں ${sumConf.toLocaleString()} • ⏳ کچی ${sumPend.toLocaleString()}`)}
-      ${sumBox('#fff7ed','#fdba74','#c2410c','🛒 آج کا ادھار مال', sumGoods, '')}
-      ${sumBox('#fef2f2','#fca5a5','#b91c1c','⚠️ آج کی کم وصولی', sumShort, `${shortRows.length} گاہک — صرف دیکھنے کے لیے`)}
+  if(sumEl) sumEl.innerHTML = `<div style="display:flex; gap:4px; flex-wrap:nowrap;">
+      ${sumBox('#fff7ed','#fdba74','#c2410c','🛒 آج کا ادھار مال', sumGoods)}
+      ${sumBox('#f0fdf4','#86efac','#15803d','📥 آج کی ریکوری', sumConf + sumPend)}
+      ${sumBox('#fef2f2','#fca5a5','#b91c1c','⚠️ کم وصولی', sumShort)}
     </div>`;
 
   const waNum = (ph) => { const d = (ph || '').replace(/[^0-9]/g, ''); return d ? (d.startsWith('92') ? d : d.startsWith('0') ? '92' + d.slice(1) : d) : ''; };
@@ -29690,7 +30339,7 @@ function renderDailyRecoveryScreen(){
   tbody.innerHTML = rows.map((r, idx) => {
     const shade = ['#e8f7ee','#e6f0fd','#fdf3dc','#f5e9fb'][idx % 4]; // FM110TH272: چار نرم رنگ باری باری
     const noteKey = todayStr + '_' + r.c.customer_id;
-    const noteVal = recoveryListData.filter(e => e.customer_id === r.c.customer_id && (e.createdAt || '').split('T')[0] === todayStr && e.note).map(e => e.note).join(' — ') || dailyRecoveryNotes[noteKey] || '';
+    const noteVal = recoveryListData.filter(e => e.customer_id === r.c.customer_id && recDay(e) === todayStr && e.note).map(e => e.note).join(' — ') || dailyRecoveryNotes[noteKey] || '';
     const fmtCell = (n, color) => `<span style="color:${color || 'inherit'}; font-weight:700;">${n < 0 ? '('+Math.abs(n).toLocaleString()+')' : n.toLocaleString()}</span>`;
     // ---------- نمبر کالمز کی سیدھ منتخب کردہ الائنمنٹ کے مطابق — نام ہمیشہ رائٹ (کبھی نہیں بدلتی) ----------
     const num = (n, color) => `<span class="drNum" style="color:${color || 'inherit'};">${n < 0 ? '(' + Math.abs(Math.round(n)).toLocaleString() + ')' : Math.round(n).toLocaleString()}</span>`;
@@ -29704,7 +30353,7 @@ function renderDailyRecoveryScreen(){
         <td>${r.todayRecovery > 0 ? num(r.todayRecovery, '#15803d') + (r.pendingRecovery > 0 ? '<div style="font-size:.68em; color:#b45309;">⏳ ' + r.pendingRecovery.toLocaleString() + '</div>' : '') : '—'}</td>
         <td class="drShort">${r.shortfall > 0 ? num(r.shortfall) : '—'}</td>
         <td>${num(r.finalBalance, 'var(--primary-dark)')}</td>
-        <td class="drNoPrint"><div style="display:flex; flex-direction:column; align-items:center; gap:4px;">${r.c.phone ? contactBtn('tel:' + r.c.phone, '#1565c0', '📞') + contactBtn('https://wa.me/' + waNum(r.c.phone) + '?text=' + encodeURIComponent(`السلام علیکم ${r.c.name}،\nآج کی خریداری: Rs. ${r.todayGoods.toLocaleString()}\nآج کی وصولی: Rs. ${r.todayRecovery.toLocaleString()}` + (r.shortfall > 0 ? `\n⚠️ کم وصولی: Rs. ${r.shortfall.toLocaleString()}` : '') + `\nکل بقایا: Rs. ${r.finalBalance.toLocaleString()}\n— ${AppState.settings.businessName || ''}`), '#25D366', '💬', 'target="_blank"') : '<span style="color:#cbd5e1; font-size:.7em;">—</span>'}</div></td>
+        <td class="drNoPrint"><div style="display:flex; flex-direction:row; align-items:center; justify-content:center; gap:5px;">${r.c.phone ? contactBtn('tel:' + r.c.phone, '#1565c0', '📞') + contactBtn('https://wa.me/' + waNum(r.c.phone) + '?text=' + encodeURIComponent(`السلام علیکم ${r.c.name}،\nآج کی خریداری: Rs. ${r.todayGoods.toLocaleString()}\nآج کی وصولی: Rs. ${r.todayRecovery.toLocaleString()}` + (r.shortfall > 0 ? `\n⚠️ کم وصولی: Rs. ${r.shortfall.toLocaleString()}` : '') + `\nکل بقایا: Rs. ${r.finalBalance.toLocaleString()}\n— ${AppState.settings.businessName || ''}`), '#25D366', '💬', 'target="_blank"') : contactBtn('javascript:void(0)', '#94a3b8', '📞', 'onclick="alert(\'اس کسٹمر کا فون نمبر محفوظ نہیں — کسٹمر پروفائل میں نمبر لکھیں\'); return false;"') + contactBtn('javascript:void(0)', '#94a3b8', '💬', 'onclick="alert(\'اس کسٹمر کا فون نمبر محفوظ نہیں — کسٹمر پروفائل میں نمبر لکھیں\'); return false;"')}</div></td>
         <td><div class="drNote">${noteVal ? noteVal.replace(/</g,'&lt;') : ''}</div></td>
       </tr>`;
   }).join('');
@@ -29724,7 +30373,7 @@ function printDailyRecoveryReport(){
 // ---------- 📤 واٹس ایپ شیئر — پوری لسٹ کو ایک تصویر (PNG) کی شکل میں بناتے ہیں، خالص متن کے طور پر نہیں ----------
 async function shareDailyRecoveryImage(){
   try{
-    const rows = computeDailyRecoveryRows();
+    const rows = computeDailyRecoveryRows(drEffDate());
     const sortMode = document.getElementById('drSortSelect')?.value || 'todayFirst';
     const byName = (a, b) => (a.c.name || '').localeCompare(b.c.name || '', 'ur');
     let sorted = rows.slice();
@@ -29746,7 +30395,7 @@ async function shareDailyRecoveryImage(){
     ctx.textBaseline = 'middle';
 
     // ---------- 📊 FM299TU#261: اوپر آج کا خلاصہ ----------
-    const _all = computeDailyRecoveryRows();
+    const _all = computeDailyRecoveryRows(drEffDate());
     const _rec = _all.reduce((a, r) => a + r.todayRecovery, 0), _short = _all.reduce((a, r) => a + r.shortfall, 0);
     ctx.fillStyle = '#f0fdf4'; ctx.fillRect(0, 0, w, sumH);
     ctx.textAlign = 'center'; ctx.font = 'bold 18px sans-serif';
@@ -29786,7 +30435,7 @@ async function shareDailyRecoveryImage(){
       ctx.strokeStyle = '#e5e9f0'; ctx.beginPath(); ctx.moveTo(0, y+rowH); ctx.lineTo(w, y+rowH); ctx.stroke();
     });
     ctx.fillStyle = '#6B7280'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('' + smBiz() + ' — ' + todayDateKey(), w/2, h-sumH-18);
+    ctx.fillText('' + smBiz() + ' — ' + bizFmt(drEffDate()), w/2, h-sumH-18);
 
     canvas.toBlob(async (blob) => {
       const file = new File([blob], 'daily-recovery-list.png', {type:'image/png'});
@@ -29812,6 +30461,7 @@ async function shareDailyRecoveryImage(){
 function confirmRecoveryEntry(entryId){
   const entry = recoveryListData.find(r => r.id === entryId);
   if(!entry) return;
+  if(entry.status === 'confirmed'){ alert('✅ یہ وصولی پہلے ہی کھاتے میں درج ہو چکی ہے — دوبارہ درج نہیں ہو سکتی۔'); return; } // 🔧 FM310SA292: دوہرا اندراج روکنے کے لیے
   const c = customersData.find(x => x.customer_id === entry.customer_id);
   if(!c){ alert('یہ کسٹمر اب موجود نہیں'); return; }
   if(!confirm(`تصدیق کریں: ${entry.customerName} — Rs. ${entry.amount.toLocaleString()} اصل کھاتے میں درج ہو چکی ہے؟`)) return;
@@ -29828,7 +30478,7 @@ function confirmRecoveryEntry(entryId){
     amount: entry.amount - excess,
     via: entry.method,
     methods: getRecoverySplit(entry),
-    date: new Date().toISOString().split('T')[0],
+    date: entry.bizDate || bizDateKey(),
     note: `Recovery List — ${recoverySplitLabel(entry)} — ${entry.employeeName}${entry.note ? ' — 📝 ' + entry.note : ''}`
   });
   if(excess > 0){
@@ -29836,7 +30486,7 @@ function confirmRecoveryEntry(entryId){
       type: 'deposit',
       amount: excess,
       via: entry.method,
-      date: new Date().toISOString().split('T')[0],
+      date: entry.bizDate || bizDateKey(),
       note: `اضافی رقم (Overpayment) — Wallet میں محفوظ — ${entry.employeeName}`
     });
   }
@@ -30153,7 +30803,7 @@ async function generateTodayRecoveryReport(){
   const isAdmin = AppState.currentRole === 'admin';
   const dayOf = (t) => (t || '').split('T')[0];
   const todayEntries = recoveryListData.filter(r => {
-    const sentToday = dayOf(r.createdAt) === todayStr;
+    const sentToday = recDay(r) === todayStr;
     if(isAdmin) return sentToday || (r.status === 'confirmed' && dayOf(r.confirmedAt) === todayStr);
     return r.employeeName === AppState.currentUser?.name && sentToday;
   }).sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
@@ -30275,7 +30925,7 @@ async function generateTodayRecoveryReport(){
 // کرتے ہیں (ہدایت FM3SEPTH34): سیٹنگ بدلتے ہی صرف یہی دوبارہ چلتا ہے، باقی صفحہ ویسا ہی رہتا ہے ---------- -->
 async function renderRecoveryReceiptCanvas(c, entry, printMode){
   const todayGoods = invoicesData
-    .filter(inv => inv.customer_id === c.customer_id && (inv.created_at || '').split('T')[0] === todayDateKey())
+    .filter(inv => inv.customer_id === c.customer_id && invDay(inv) === todayDateKey())
     .reduce((s, inv) => s + (inv.amount_due || 0), 0);
   const totalBefore = entry.totalReceivableAtTime || (c.total_receivable + entry.amount);
   const openingBalance = totalBefore - todayGoods;
@@ -32244,6 +32894,7 @@ function confirmBatchReturn(invoiceId){
   }
 
   // ---------- اب اسٹاک، والٹ/کیش، اور بل کی مجموعی رقم اپڈیٹ کریں ----------
+  let _returnOffsetNote = '';
   let totalRefund = 0;
   const returnedNames = [];
   picks.forEach(({idx, item, qty, amount}) => {
@@ -32274,7 +32925,21 @@ function confirmBatchReturn(invoiceId){
     pushCustomersToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 1) ----------
   } else {
     // ---------- کیش ریفنڈ — کیش ان ہینڈ سے رقم منہا کریں ----------
-    financeDummy.cashInHand -= totalRefund; // TODO: نقدی لیجر (cash ledger) میں INSERT
+    // 🔧 FM310SA292: اگر یہ ادھار بل ہے اور کسٹمر پر اس بل کا بقایا باقی ہے تو واپسی کی رقم پہلے اسی بقایا میں سے کٹے
+    // (کسٹمر نے وہ رقم دی ہی نہیں تھی، اس لیے کیش سے نہیں نکلنی چاہیے) — صرف بچی ہوئی رقم کیش سے جائے
+    let _cashRefund = totalRefund;
+    const _retCust = inv.customer_id ? customersData.find(c => c.customer_id === inv.customer_id) : null;
+    const _retDue = (typeof getInvoiceAmountDue === 'function') ? getInvoiceAmountDue(inv) : 0;
+    if(_retCust && _retDue > 0 && inv.status !== 'voided'){
+      const _offset = Math.min(totalRefund, _retDue);
+      inv.amount_due = _retDue - _offset;
+      _retCust.total_receivable = Math.max(0, (Number(_retCust.total_receivable) || 0) - _offset);
+      _cashRefund = totalRefund - _offset;
+      _returnOffsetNote = `\n📒 Rs. ${_offset.toLocaleString()} customer's pending balance reduced` + (_cashRefund > 0 ? '' : ' (no cash paid out)');
+      persistAllData();
+      pushCustomersToCloud();
+    }
+    financeDummy.cashInHand -= _cashRefund; // TODO: نقدی لیجر (cash ledger) میں INSERT
     pushFinanceToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 7): کیش ریفنڈ سے Cash in Hand کم ہونا فوراً کلاؤڈ میں ----------
   }
 
@@ -32291,7 +32956,7 @@ function confirmBatchReturn(invoiceId){
   document.getElementById('billSearchInput') && renderBillHistory();
   if(typeof renderDashboard === 'function') renderDashboard();
   const methodLabel = method === 'wallet' ? "customer's wallet" : 'cash (deducted from cash in hand)';
-  alert(`✅ Returned: ${returnedNames.join(', ')}.\nRs. ${totalRefund.toLocaleString()} refunded via ${methodLabel}. Stock updated and today's sales adjusted.`);
+  alert(`✅ Returned: ${returnedNames.join(', ')}.\nRs. ${totalRefund.toLocaleString()} refunded via ${methodLabel}. Stock updated and today's sales adjusted.` + _returnOffsetNote);
 
   // ---------- واپسی کی الگ رسید (Return Receipt) بنا کر واٹس ایپ/شیئر کے لیے تیار کر دیں ----------
   renderReturnReceiptToCanvas(inv, picks, totalRefund, method).then(canvas => {
@@ -32995,7 +33660,7 @@ function saveCollectReceivable(){
   }
   // ---------- نوٹ: totalReceivable اب Dashboard پر لائیو حساب ہوتا ہے (customersData سے براہ راست)، اس لیے یہاں الگ سے اپڈیٹ کرنے کی ضرورت نہیں ----------
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = bizDateKey();
   if(sp.toDue > 0){
     c.walletHistory.unshift({ type: 'receivable_collected', amount: sp.toDue, via: activeCollectMode, date: today });
   }
@@ -33111,7 +33776,7 @@ function saveCustLoan(){
   const sp = calcCustLoan(c, amount, recovery);
   const memo = document.getElementById('custLoanNote').value.trim();
   const now = new Date();
-  const today = now.toISOString().split('T')[0];
+  const today = bizDateKey();
   const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
   const balanceBefore = c.total_receivable || 0;
   c.walletHistory = c.walletHistory || [];
@@ -33728,11 +34393,11 @@ function saveRecordPaymentModal(){
     const rpExcessC = Math.max(0, amount - Math.max(0, c.total_receivable || 0));
     c.total_receivable = Math.max(0, (c.total_receivable || 0) - amount);
     c.wallet_balance = (c.wallet_balance || 0) + rpExcessC;
-    if(rpExcessC > 0){ (c.walletHistory = c.walletHistory || []).unshift({type:'deposit', amount: rpExcessC, via:'cash', date:new Date().toISOString().split('T')[0], note:'اضافی وصولی — والٹ میں جمع'}); }
+    if(rpExcessC > 0){ (c.walletHistory = c.walletHistory || []).unshift({type:'deposit', amount: rpExcessC, via:'cash', date:bizDateKey(), note:'اضافی وصولی — والٹ میں جمع'}); }
     balanceAfter = c.total_receivable;
-    financeDummy.cashInHand += amount;
+    if(method === 'Cash') financeDummy.cashInHand += amount; // 🔧 FM310SA292: بینک/والٹ ٹرانسفر سے کیش ان ہینڈ نہ بڑھے
     c.walletHistory = c.walletHistory || [];
-    c.walletHistory.unshift({type:'receivable_collected', amount, via:method==='Cash'?'cash':'bank', date:new Date().toISOString().split('T')[0]});
+    c.walletHistory.unshift({type:'receivable_collected', amount, via:method==='Cash'?'cash':'bank', date:bizDateKey()});
   } else {
     const s = suppliersData.find(x => x.supplier_id === partyId);
     if(!s) return;
@@ -33741,7 +34406,7 @@ function saveRecordPaymentModal(){
     s.total_payable = (s.total_payable || 0) - amount;
     normalizeSupplierBalance(s); // 💳 FM28SEP: زیادہ ادائیگی والٹ (ایڈوانس) میں
     balanceAfter = s.total_payable;
-    financeDummy.cashInHand -= amount;
+    if(method === 'Cash') financeDummy.cashInHand -= amount; // 🔧 FM310SA292: بینک/والٹ ادائیگی سے کیش ان ہینڈ نہ گھٹے
     s.ledgerHistory = s.ledgerHistory || [];
     s.ledgerHistory.unshift({type:'payment', amount, date:new Date().toISOString().split('T')[0], note});
   }
@@ -35536,6 +36201,9 @@ function _invCfg(){
 
 // ---------- اصل ملاپ: base = آخری معلوم کلاؤڈ حالت، local = یہ فون، remote = ابھی کا کلاؤڈ ---------- -->
 function mergeProductsThreeWay(base, local, remote){
+  return vmApplyPresenceOverrides(_mergeProductsThreeWayCore(base, local, remote), remote); // 🛡️ FM310SA283
+}
+function _mergeProductsThreeWayCore(base, local, remote){
   if(!Array.isArray(base)){
     // ---------- پہلی بار (base نہیں): کلاؤڈ بنیاد، صرف مقامی نئے آئٹم شامل (پرانا محفوظ رویہ) ---------- -->
     const ids = new Set(remote.map(p => p.product_id));
@@ -37218,7 +37886,9 @@ function adminVoidBill(invoiceId){
   inv.items.forEach(item => {
     productsData.forEach(p => {
       const v = p.variants.find(x => x.variant_id === item.variant_id);
-      if(v) restoreVariantStock(v, item.qty, item.chalanAlloc); // TODO: DB میں product_variants.current_stock += qty
+      // 🔧 FM310SA292: جو مقدار پہلے ہی ریٹرن میں سٹاک واپس آ چکی، وہ Void پر دوبارہ شامل نہ ہو (ورنہ سٹاک بڑھ جاتا تھا)
+      const _restQty = (Number(item.qty) || 0) - (item.returned ? (Number(item.returnQty) || 0) : 0);
+      if(v && _restQty > 0) restoreVariantStock(v, _restQty, item.chalanAlloc);
     });
   });
 
@@ -37342,13 +38012,26 @@ function getBillSummaryRows(invoice){
   let laterRecovery = 0;
   try{
     if(invoice.customer_id && invoice.invoice_id !== 'DRAFT' && hasOldCredit){
-      const mine = invoicesData.filter(x => x.customer_id === invoice.customer_id);
-      const latest = mine.reduce((m, x) => (!m || (x.created_at || '') > (m.created_at || '')) ? x : m, null);
-      if(latest && latest.invoice_id === invoice.invoice_id){
+      // 🔧 FM410SU297 (ہدایت): جو وصولی کسی بل کے بعد، اگلا بل بننے سے پہلے آئی وہ اسی بل کی ہے — اگلا بل بننے کے بعد بھی
+      // دوبارہ پرنٹ/شیئر پر وہی رہے گی، کبھی صفر نہیں ہوگی۔ اگلے بل کی اپنی صورتحال اس کے اپنے وقت سے شروع ہوتی ہے۔
+      // (پچھلے ورژن میں صرف "آخری بل" کو وصولی ملتی تھی، اس لیے نیا بل بنتے ہی پرانے بل پر صفر آ جاتا تھا)
+      const _ts = (v) => new Date(v || 0).getTime() || 0;
+      const mine = invoicesData.filter(x => x.customer_id === invoice.customer_id && x.status !== 'voided');
+      const billTs = _ts(invoice.created_at);
+      const laterBills = mine.filter(x => x.invoice_id !== invoice.invoice_id && _ts(x.created_at) > billTs).sort((a, b) => _ts(a.created_at) - _ts(b.created_at));
+      const recEntries = recoveryListData.filter(r => r.customer_id === invoice.customer_id && (r.status === 'pending' || r.status === 'confirmed'));
+      if(laterBills.length === 0){
+        // ---------- یہی اس کسٹمر کا آخری بل ہے: کچی وصولی + تصدیق شدہ وصولی (بقایہ کے فرق یا ریکوری لسٹ کی انٹری، جو بڑی ہو) ----------
         const cu = customersData.find(c => c.customer_id === invoice.customer_id);
-        const pend = recoveryListData.filter(r => r.customer_id === invoice.customer_id && r.status === 'pending').reduce((a, r) => a + (Number(r.amount) || 0), 0);
+        const pend = recEntries.filter(r => r.status === 'pending').reduce((a, r) => a + (Number(r.amount) || 0), 0);
         const confirmedLater = cu ? Math.max(0, (Number(invoice.new_balance) || 0) - (Number(cu.total_receivable) || 0)) : 0;
-        laterRecovery = pend + confirmedLater;
+        const confirmedFromList = recEntries.filter(r => r.status === 'confirmed' && _ts(r.createdAt || r.confirmedAt) >= billTs).reduce((a, r) => a + (Number(r.amount) || 0), 0);
+        laterRecovery = pend + Math.max(confirmedLater, confirmedFromList);
+      } else {
+        // ---------- اس کے بعد اور بل بن چکے ہیں: صرف وہ وصولیاں جو اس بل کے وقت سے اگلے بل کے وقت تک کی ہیں ----------
+        const nextTs = _ts(laterBills[0].created_at);
+        laterRecovery = recEntries.filter(r => { const t = _ts(r.createdAt || r.confirmedAt); return t >= billTs && t < nextTs; })
+          .reduce((a, r) => a + (Number(r.amount) || 0), 0);
       }
     }
   }catch(e){}
@@ -42251,7 +42934,7 @@ let currentReportCategories = [];
 // ---------- کیٹگری کے حساب سے فلیٹ کی گئی پراڈکٹ/ویرینٹ فہرست — ہر ویرینٹ ایک لائن، لو سٹاک لمٹ سمیت ----------
 function getReportFlatItems(){
   const flat = [];
-  productsData.forEach(p => {
+  productsData.filter(p => !p.isDormant).forEach(p => {
     const cat = p.category && p.category.trim() ? p.category.trim() : 'Uncategorized';
     (p.variants || []).forEach(v => {
       flat.push({
@@ -44014,7 +44697,11 @@ function getPurchaseChalanReportData(){
         if(sold && !c.ratePending){
           profit = Math.round(sold.revenue - sold.qty * ((Number(c.rate) || 0) + (Number(v.labor) || 0)));
         }
-        chalanRows.push({...base, source: chalanSourceLabel(c).replace(/^\S+\s/, ''), inQty: pq, soldQty: sold ? Math.round(sold.qty * 100) / 100 : 0, left: Number(c.qty) || 0,
+        // 🆕 FM410SU293 (ہدایت): "سیل ہوا" کی جگہ اسلام آباد کی قیمت فروخت — چالان کی اپنی، نہ ہو تو (پرانے چالان) ورائنٹ کی
+        let sellIsb = Number(c.retail);
+        if(!(sellIsb > 0) && (isLegacyChalan(c) || !chalanNeedsAccounting(c))) sellIsb = Number(v.retail);
+        if(!(sellIsb > 0)) sellIsb = null;
+        chalanRows.push({...base, source: chalanSourceLabel(c).replace(/^\S+\s/, ''), inQty: pq, soldQty: sold ? Math.round(sold.qty * 100) / 100 : 0, sellIsb, left: Number(c.qty) || 0,
           rate: c.ratePending ? null : Number(c.rate) || 0, profit});
       }
     });
@@ -44078,11 +44765,12 @@ async function renderPurchaseChalanReportToCanvas(){
   ]);
   const chalanCols = layoutCols([
     {key:'name', label:'سبزی / چالان'},
-    {key:'inQty', label:'آمد', frac:0.1, num:true},
-    {key:'soldQty', label:'بکا', frac:0.1, num:true},
-    {key:'left', label:'باقی', frac:0.1, num:true},
-    {key:'rate', label:'ریٹ', frac:0.13, num:true},
-    {key:'profit', label:'منافع', frac:0.16, num:true},
+    // 🧾 FM310SA286 (ہدایت): کیپشن اور ترتیب (دائیں سے بائیں): حاضر سٹاک، ریٹ، سیل ہوا، باقی سٹاک، منافع — ڈیٹا ہر کالم کے ساتھ ہی شفٹ
+    {key:'inQty', label:'حاضر سٹاک', frac:0.125, num:true},
+    {key:'rate', label:'خرید ریٹ', frac:0.12, num:true},
+    {key:'sellIsb', label:'فروخت ریٹ', frac:0.12, num:true},
+    {key:'left', label:'باقی سٹاک', frac:0.125, num:true},
+    {key:'profit', label:'منافع', frac:0.14, num:true},
   ]);
 
   // ---------- خاکہ (blocks) — پہلے اونچائی ناپیں، پھر بنائیں ---------- -->
@@ -44111,17 +44799,17 @@ async function renderPurchaseChalanReportToCanvas(){
   blocks.push({t:'gap'});
   blocks.push({t:'summary', text:`نقد: ${cashTotal.toLocaleString()}   |   بیوپاری: ${supTotal.toLocaleString()}   |   کل خرید: ${(cashTotal + supTotal).toLocaleString()}`});
   blocks.push({t:'gap'});
-  blocks.push({t:'section', text:'🧾 چالان وار — آمد، فروخت، باقی، منافع', color:'#134e2c'});
+  blocks.push({t:'section', text:'🧾 چالان وار — حاضر سٹاک، خرید ریٹ، فروخت ریٹ، باقی سٹاک، منافع', color:'#134e2c'});
   blocks.push({t:'head', cols: chalanCols});
   let profitTotal = 0;
   if(data.chalanRows.length === 0) blocks.push({t:'empty', text:'کوئی چالان نہیں'});
   data.chalanRows.forEach((r, i) => {
     if(r.profit) profitTotal += r.profit;
-    blocks.push({t:'row', cols: chalanCols, idx:i, cells:{name: r.name, sub: `#${r.chalanNo} — ${r.source}${r.label ? ' — ' + r.label : ''}`, serial: r.serial, inQty: r.inQty, soldQty: r.soldQty, left: r.left, rate: fmt(r.rate), profit: r.soldQty ? fmt(r.profit) : '—'}, profitColor: r.profit});
+    blocks.push({t:'row', cols: chalanCols, idx:i, cells:{name: r.name, trader: r.source, sub3: `#${r.chalanNo}${r.label ? ' — ' + r.label : ''}`, serial: r.serial, inQty: r.inQty, sellIsb: fmt(r.sellIsb), left: r.left, rate: fmt(r.rate), profit: r.soldQty ? fmt(r.profit) : '—'}, profitColor: r.profit});
   });
   if(data.chalanRows.length) blocks.push({t:'total', cols: chalanCols, cells:{name:'کل منافع', profit: profitTotal.toLocaleString()}});
 
-  const hOf = (b) => b.t === 'section' ? sectionH : b.t === 'sub' ? Math.round(fsItem * 2.3) : b.t === 'head' ? headerRowH : b.t === 'gap' ? gapH : b.t === 'summary' ? Math.round(fsSection * 2.4) : rowH;
+  const hOf = (b) => b.t === 'section' ? sectionH : b.t === 'sub' ? Math.round(fsItem * 2.3) : b.t === 'head' ? headerRowH : b.t === 'gap' ? gapH : b.t === 'summary' ? Math.round(fsSection * 2.4) : (b.t === 'row' && b.cols === chalanCols) ? Math.round(rowH * 1.55) : rowH;
 
   // ---------- سرخی ---------- -->
   const fitFont = (text, maxW, px, weight, fam) => {
@@ -44215,6 +44903,24 @@ async function renderPurchaseChalanReportToCanvas(){
           const hasBadge = b.cells.serial !== null && b.cells.serial !== undefined;
           const tx = cellX(c) - (hasBadge ? badgeD + 4 : 0);
           ctx.textAlign = 'right';
+          if(b.cells.trader){
+            // 🆕 FM410SU293: چالان وار قطار — اوپر سبزی، بیچ میں بیوپاری کا نام موٹا اور صاف، نیچے چالان نمبر/پیکنگ
+            const wAvail = c.width - 8 - (hasBadge ? badgeD + 4 : 0);
+            const q1 = fitFont(v, wAvail, fsItem, 'bold');
+            const l1 = y + h * 0.32;
+            ctx.fillText(v, tx, l1);
+            ctx.fillStyle = '#1e3a8a';
+            fitFont(b.cells.trader, wAvail, fsItem, 'bold');
+            ctx.fillText(b.cells.trader, tx, y + h * 0.62);
+            if(b.cells.sub3){
+              ctx.fillStyle = '#475569';
+              fitFont(b.cells.sub3, wAvail, Math.round(q1 * 0.78));
+              ctx.fillText(b.cells.sub3, tx, y + h * 0.90);
+            }
+            ctx.restore();
+            if(hasBadge){ try{ drawSerialBadge(ctx, cellX(c) - badgeD/2, l1 - Math.round(q1 * 0.3), badgeD/2, b.cells.serial); }catch(e){} }
+            return;
+          }
           const p1 = fitFont(v, c.width - 8 - (hasBadge ? badgeD + 4 : 0), fsItem, 'bold');
           ctx.fillText(v, tx, y + h/2 - 2);
           if(b.cells.sub){
@@ -44230,6 +44936,11 @@ async function renderPurchaseChalanReportToCanvas(){
         ctx.textAlign = c.num ? 'center' : 'right';
         if(c.key === 'profit' && typeof b.profitColor === 'number') ctx.fillStyle = b.profitColor < 0 ? '#b91c1c' : '#15803d';
         if(String(v).includes('⏳')) ctx.fillStyle = '#b45309';
+        // 🆕 FM410SU294 (ہدایت): چالان وار قطار میں "باقی سٹاک" صفر سے زیادہ ہو تو اس خانے کا بیک گراؤنڈ سرخ اور لکھائی سفید؛ صفر یا ڈیش ہو تو عام رنگ
+        if(c.key === 'left' && b.t === 'row' && b.cols === chalanCols && Number(v) > 0){
+          ctx.fillStyle = '#dc2626'; ctx.fillRect(c.x + 1, y + 1, c.width - 1, h - 1);
+          ctx.fillStyle = '#ffffff';
+        }
         const weight = (b.t === 'total' || c.key === 'amount' || c.key === 'profit') ? '900' : '';
         fitFont(String(v), c.width - 6, fsItem, weight, isNumTxt ? numFontFam : fontFam);
         ctx.fillText(String(v), cellX(c), y + h/2 + fsItem * 0.32);
