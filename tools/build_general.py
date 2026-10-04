@@ -871,6 +871,18 @@ rep("  const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) 
     }
   }catch(e){}
   const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) ? currentUser.screens : [];""")
+# ---------- ☁️ SM410SU045: CSV سے امپورٹ کی گئی سبزیاں کلاؤڈ پر نہیں جاتی تھیں — اس لیے ملازم کے فون پر نظر نہیں آتی تھیں ----------
+rep("  backfillMissingProductSerials(); // ---------- امپورٹ کی گئی نئی سبزیوں کو بھی سیریل نمبر مل جائے ---------- -->\n",
+    "  backfillMissingProductSerials(); // ---------- امپورٹ کی گئی نئی سبزیوں کو بھی سیریل نمبر مل جائے ---------- -->\n"
+    "  // ☁️ SM410SU045: امپورٹ فوراً فون میں محفوظ + کلاؤڈ پر، تاکہ ملازمین کے فون پر بھی سبزیاں آئیں\n"
+    "  try{ persistAllData(); }catch(e){}\n"
+    "  try{ AppState.settings.productsPendingSync = true; pushProductsToCloud(); }catch(e){}\n")
+_fp = s.index('async function fetchProductsFromCloud(silent){')
+_404 = "    if(res.status === 404) return false; // ---------- ابھی تک کبھی کلاؤڈ پر محفوظ نہیں ہوا ----------"
+_k4 = s.index(_404, _fp)
+assert _k4 - _fp < 3000
+s = s[:_k4] + ("    // ☁️ SM410SU045: نئی دکان — کلاؤڈ پر سبزیوں کی فہرست ابھی بنی ہی نہیں؛ مالک کے فون پر سبزیاں ہوں تو اسی وقت بھیج دیں\n"
+               "    if(res.status === 404){ try{ if(AppState.currentRole === 'admin' && Array.isArray(productsData) && productsData.length){ AppState.settings.productsPendingSync = true; setTimeout(() => { try{ pushProductsToCloud(); }catch(e){} }, 400); } }catch(e){} return false; }") + s[_k4+len(_404):]
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
