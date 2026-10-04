@@ -855,6 +855,22 @@ s=s[:_k3]+_join_fix+s[_k3:]
 _m = re.search(r'<div class="csvImportBar" style="display:none;">(\s*<button class="csvTemplateBtn" onclick="downloadProductCsvTemplate\(\)">)', s)
 assert _m, 'product csv bar not found'
 s = s[:_m.start()] + '<div class="csvImportBar" style="display:flex;"><!-- 📥 SM410SU043: سبزی منڈی میں سبزیوں کا CSV امپورٹ کھلا -->' + _m.group(1) + s[_m.end():]
+# ---------- 📦 SM410SU044: سبزی منڈی میں "مال کی فہرست" کا ہوم آئیکن (FM15SEPTU3 میں چھپایا گیا تھا — FM میں چھپا ہی رہے) ----------
+# مالک کے ہوم پر ایک بار خود لگ جاتا ہے؛ ✏️ سے ہٹائے تو دوبارہ خود نہیں لگتا۔ ملازم کو صرف 🖥️ Screens سے ملے۔
+rep("    if(key === 'products') return null;\n", "    // 📦 SM410SU044: سبزی منڈی میں مال کی فہرست کا آئیکن دکھائیں (CSV امپورٹ وغیرہ اسی سکرین میں)\n")
+rep("  const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) ? currentUser.screens : [];",
+    """  // 📦 SM410SU044: مالک کے ہوم پر "مال کی فہرست" صرف ایک بار خود لگے
+  try{
+    if(currentUser && currentUser.role === 'admin' && AppState.currentRole === 'admin' && !AppState.settings.smProdTileOnce){
+      if(!Array.isArray(currentUser.screens)) currentUser.screens = [];
+      if(!currentUser.screens.includes('products')) currentUser.screens.push('products');
+      AppState.settings.smProdTileOnce = true;
+      saveToStorage('settings', AppState.settings);
+      saveToStorage('users', usersData);
+      try{ if(typeof pushUsersToCloud === 'function') pushUsersToCloud(); }catch(e){}
+    }
+  }catch(e){}
+  const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) ? currentUser.screens : [];""")
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
