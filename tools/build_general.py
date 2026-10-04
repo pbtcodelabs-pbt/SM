@@ -879,50 +879,101 @@ _k4 = s.index(_404, _fp)
 assert _k4 - _fp < 3000
 s = s[:_k4] + ("    // ☁️ SM410SU045: نئی دکان — کلاؤڈ پر سبزیوں کی فہرست ابھی بنی ہی نہیں؛ مالک کے فون پر سبزیاں ہوں تو اسی وقت بھیج دیں\n"
                "    if(res.status === 404){ try{ if(AppState.currentRole === 'admin' && Array.isArray(productsData) && productsData.length){ AppState.settings.productsPendingSync = true; setTimeout(() => { try{ pushProductsToCloud(); }catch(e){} }, 400); } }catch(e){} return false; }") + s[_k4+len(_404):]
-# ---------- 📦 SM410SU046: پہلے والی CSV امپورٹ سے بنی "ایک سبزی کے کئی ویرینٹ" (پیاز لال: شاپر + فی کلو) کو
-# صدام کی ایپ (ماسٹر) کی طرح الگ الگ سبزیوں میں بانٹ دیں — مالک کے فون پر صرف ایک بار، پھر کلاؤڈ پر ----------
+# ---------- 📦 SM410SU047: کئی پیکنگ والی سبزیوں کو صدام کی ایپ (ماسٹر) کی طرح الگ الگ سبزیوں میں بانٹنا —
+# 046 میں یہ صرف فون پر ہوتا تھا اور ملاپ (merge) کلاؤڈ کی پرانی حالت واپس لا سکتا تھا۔ اب سیدھا کلاؤڈ کی
+# فہرست پر: پڑھو → بانٹو → اسی وقت لکھو (updateTime شرط)۔ مالک کا فون، جب تک کوئی کئی-پیکنگ سبزی باقی ہو ----------
 _split_fix = r"""<script>
 /* SM_SPLIT_VARIANTS_BEGIN */
-function smSplitMultiVariantProducts(){
-  if(typeof AppState === 'undefined' || AppState.currentRole !== 'admin') return false;
-  if(AppState.settings.smSplitV046) return false;
-  if(!Array.isArray(productsData) || !productsData.length) return false;
+function _smSplitList(list, nextPid){
   let made = 0;
   const extra = [];
-  productsData.forEach(p => {
+  let maxSerial = list.reduce((m, p) => Math.max(m, Number(p && p.serial_no) || 0), 0);
+  list.forEach(p => {
     if(!p || !Array.isArray(p.variants) || p.variants.length < 2) return;
     const rest = p.variants.slice(1);
     p.variants = [p.variants[0]];
     rest.forEach(v => {
       const np = JSON.parse(JSON.stringify(Object.assign({}, p, { variants: [] })));
-      delete np.serial_no;
-      np.product_id = nextProductId++;
+      np.product_id = nextPid++;
+      np.serial_no = ++maxSerial;
       np.variants = [v];
       extra.push(np);
       made++;
     });
   });
-  AppState.settings.smSplitV046 = true;
-  if(made){
-    extra.forEach(np => productsData.push(np));
-    try{ backfillMissingProductSerials(); }catch(e){}
-    try{ persistAllData(); }catch(e){}
-    AppState.settings.productsPendingSync = true;
-    try{ pushProductsToCloud(); }catch(e){}
-    try{ refreshAllScreens(); }catch(e){}
-    console.log('📦 SM410SU046: ' + made + ' پیکنگ الگ سبزیوں میں بدلی گئیں');
-  }
-  try{ saveToStorage('settings', AppState.settings); }catch(e){}
-  return made;
+  extra.forEach(np => list.push(np));
+  return { list, made, nextPid };
+}
+let _smSplitBusy = false, _smSplitLastTry = 0;
+async function smSplitMultiVariantProducts(force){
+  if(typeof AppState === 'undefined' || AppState.currentRole !== 'admin') return false;
+  if(_smSplitBusy) return false;
+  if(!force && Date.now() - _smSplitLastTry < 20000) return false;
+  _smSplitBusy = true; _smSplitLastTry = Date.now();
+  try{
+    for(let attempt = 0; attempt < 3; attempt++){
+      const res = await authFirestoreFetch(`${PRODUCTS_DOC_PATH}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' });
+      if(!res || !res.ok) return false;
+      const doc = await res.json();
+      const str = doc.fields?.json?.stringValue;
+      if(!str) return false;
+      const remote = JSON.parse(str);
+      if(!Array.isArray(remote)) return false;
+      const maxId = remote.reduce((m, p) => Math.max(m, Number(p && p.product_id) || 0), 0);
+      const rn = parseInt(doc.fields?.nextProductId?.integerValue || '0') || 0;
+      let nextPid = Math.max(nextProductId || 0, rn, maxId + 1);
+      const out = _smSplitList(remote, nextPid);
+      if(!out.made){
+        // کلاؤڈ ٹھیک ہے — فون پر پرانی جڑی حالت ہو تو کلاؤڈ والی لے لیں
+        if((productsData || []).some(p => p && Array.isArray(p.variants) && p.variants.length > 1)){
+          productsData = _reattachLocalImages(remote, productsData);
+          _syncSetBase(remote);
+          saveProductsLight();
+          try{ refreshAllScreens(); }catch(e){}
+        }
+        return true;
+      }
+      const rv = parseInt(doc.fields?.nextVariantId?.integerValue || '0') || 0;
+      const nv = Math.max(nextVariantId || 0, rv);
+      const fields = {
+        json: { stringValue: JSON.stringify(stripImagesForSync(out.list)) },
+        nextProductId: { integerValue: String(out.nextPid) },
+        nextVariantId: { integerValue: String(nv) },
+        updatedAt: { integerValue: String(Date.now()) }
+      };
+      if(doc.fields?.manualOrder) fields.manualOrder = doc.fields.manualOrder;
+      if(doc.fields?.serialLocked) fields.serialLocked = doc.fields.serialLocked;
+      const pre = doc.updateTime ? `&currentDocument.updateTime=${encodeURIComponent(doc.updateTime)}` : '';
+      const w = await authFirestoreFetch(`${PRODUCTS_DOC_PATH}?key=${FIREBASE_API_KEY}${pre}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields })
+      });
+      if(w && w.ok){
+        nextProductId = out.nextPid; nextVariantId = nv;
+        productsData = _reattachLocalImages(out.list, productsData);
+        _syncSetBase(out.list);
+        AppState.settings.productsPendingSync = false;
+        saveProductsLight();
+        try{ persistAllData(); }catch(e){}
+        try{ refreshAllScreens(); }catch(e){}
+        console.log('📦 SM410SU047: ' + out.made + ' پیکنگ الگ سبزیوں میں بدلی گئیں (کلاؤڈ پر)');
+        return true;
+      }
+      if(!(w && (w.status === 400 || w.status === 409 || w.status === 412))) return false;
+    }
+    return false;
+  }catch(e){ return false; }
+  finally{ _smSplitBusy = false; }
 }
 setInterval(function(){
   try{
-    if(typeof AppState !== 'undefined' && AppState.currentRole === 'admin' && !AppState.settings.smSplitV046
-       && document.getElementById('app') && document.getElementById('app').style.display !== 'none'){
-      smSplitMultiVariantProducts();
+    if(typeof AppState === 'undefined' || AppState.currentRole !== 'admin' || !navigator.onLine) return;
+    const app = document.getElementById('app');
+    if(!app || getComputedStyle(app).display === 'none') return;
+    if(!window._smSplitCheckedOnce || (productsData || []).some(p => p && Array.isArray(p.variants) && p.variants.length > 1)){
+      smSplitMultiVariantProducts().then(ok => { if(ok) window._smSplitCheckedOnce = true; });
     }
   }catch(e){}
-}, 6000);
+}, 5000);
 /* SM_SPLIT_VARIANTS_END */
 </script>
 """
