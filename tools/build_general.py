@@ -851,6 +851,10 @@ function smLooksLikeJoinText(raw){
 """
 _k3=s.rindex('</body>')
 s=s[:_k3]+_join_fix+s[_k3:]
+# ---------- 📥 SM410SU043: سبزیوں کا CSV امپورٹ بٹن "مزید آپشنز" میں دوبارہ نظر آئے (FM میں چھپا ہی رہے) ----------
+_m = re.search(r'<div class="csvImportBar" style="display:none;">(\s*<button class="csvTemplateBtn" onclick="downloadProductCsvTemplate\(\)">)', s)
+assert _m, 'product csv bar not found'
+s = s[:_m.start()] + '<div class="csvImportBar" style="display:flex;"><!-- 📥 SM410SU043: سبزی منڈی میں سبزیوں کا CSV امپورٹ کھلا -->' + _m.group(1) + s[_m.end():]
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------

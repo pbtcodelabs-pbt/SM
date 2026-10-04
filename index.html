@@ -4361,7 +4361,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
           <div id="prodOptionsPanel" style="display:none;">
             <button onclick="openNewProductModal()" style="width:100%; margin-bottom:8px; padding:10px; background:var(--primary); color:#fff; border:none; border-radius:10px; font-weight:800; cursor:pointer;">+ New Product</button>
             <button onclick="openVegListReport()" style="width:100%; margin-bottom:10px; padding:11px; background:#eef2ff; color:var(--primary-dark); border:1.5px solid var(--primary); border-radius:10px; font-weight:800; cursor:pointer;">🖨️ سبزیوں کی پرنٹ رپورٹ</button>
-            <div class="csvImportBar" style="display:none;">
+            <div class="csvImportBar" style="display:flex;"><!-- 📥 SM410SU043: سبزی منڈی میں سبزیوں کا CSV امپورٹ کھلا -->
               <button class="csvTemplateBtn" onclick="downloadProductCsvTemplate()">📄 Download Excel/CSV Template</button>
               <button class="csvImportBtn" onclick="document.getElementById('productCsvInput').click()">📥 Import Products</button>
               <input type="file" id="productCsvInput" accept=".csv,.xlsx,.xls,text/csv" style="display:none;" onchange="handleProductCsvFileSelect(event)">
@@ -9114,7 +9114,7 @@ function getDeveloperContact(){
 // 🆕 FM410SU295: چالان وار جدول کے کالم کے نام — "ریٹ" کی جگہ "خرید ریٹ" اور "قیمتیں فروخت" کی جگہ "فروخت ریٹ"
 // 🆕 FM410SU294: چالان وار "باقی سٹاک" خانہ — صفر سے زیادہ ہو تو سرخ بیک گراؤنڈ
 // 🆕 FM410SU293: خرید اور چالان رپورٹ — "سیل ہوا" کالم کی جگہ "قیمتیں فروخت" (اسلام آباد ریٹ)، اور چالان وار خانے میں سبزی کے نیچے بیوپاری کا نام موٹا اور صاف
-const APP_BUILD_VERSION = 'SM410SU042'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM410SU043'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
