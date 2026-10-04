@@ -670,10 +670,26 @@ function smRegSave(){
   setTimeout(() => location.reload(), 300); // دکان کا کلاؤڈ راستہ (موبائل نمبر) نئے سرے سے بنے
 }
 // ---------- 📲 ملازم کا فون: پہلے سے رجسٹر دکان سے جڑیں (مالک کا موبائل نمبر) ----------
-async function smJoinAsStaff(){
-  const raw = prompt('📋 مالک کا بھیجا ہوا پیغام (موبائل نمبر + کوڈ) کاپی کر کے یہاں پیسٹ کر دیں۔\n\n(واٹس ایپ میں پیغام پر دبا کر رکھیں ← Copy)');
+async function smJoinAsStaff(pasted){
+  // 🧑‍💼 SM410SU042: ایکٹیویشن کوڈ والے خانے میں پیسٹ کیا گیا "دکان سے جڑیں" پیغام بھی یہیں آتا ہے
+  const raw = (typeof pasted === 'string' && pasted.trim()) ? pasted : prompt('📋 مالک کا بھیجا ہوا پیغام (موبائل نمبر + کوڈ) کاپی کر کے یہاں پیسٹ کر دیں۔\n\n(واٹس ایپ میں پیغام پر دبا کر رکھیں ← Copy)');
   if(raw === null) return;
   let { mobile: m, code: c } = smParseJoinText(raw);
+  // 🧑‍💼 SM410SU042: مالک اپنے ہی فون پر اپنی دکان کا پیغام نہ ڈالے
+  if(m && AppState.settings.smRegistered && !AppState.settings.smJoinedAsStaff && m === smShopMobile()){
+    alert('⚠️ یہ آپ کی اپنی دکان کا نمبر اور کوڈ ہے۔\n\nیہ پیغام ملازم کے فون پر ڈالا جاتا ہے، مالک کے فون پر نہیں۔'); return;
+  }
+  // 🧑‍💼 SM410SU042: جو فون پہلے سے اپنی الگ دکان کے طور پر رجسٹر ہے — خالی ہو تو تصدیق کے بعد جڑ جائے، ڈیٹا ہو تو روک دیں
+  if(AppState.settings.smRegistered && !AppState.settings.smJoinedAsStaff){
+    let _n = 0;
+    try{ _n += (customersData || []).length; }catch(e){}
+    try{ _n += (suppliersData || []).length; }catch(e){}
+    try{ _n += (invoicesData || []).length; }catch(e){}
+    if(_n > 0){
+      alert('⚠️ یہ فون پہلے سے ایک الگ دکان کے طور پر رجسٹر ہے اور اس میں کسٹمر/بیوپاری/بل موجود ہیں۔\n\nاس لیے اسے دوسری دکان سے نہیں جوڑا جا سکتا۔ ملازم کے لیے نیا/خالی فون استعمال کریں۔'); return;
+    }
+    if(!confirm('📲 یہ فون ابھی ایک الگ (خالی) دکان کے طور پر رجسٹر ہے۔\n\nکیا اسے مالک کی دکان سے ملازم کے طور پر جوڑ دیں؟\n(اس فون کی الگ خالی دکان ختم ہو جائے گی)')) return;
+  }
   if(!m){ m = (prompt('📲 مالک کا موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, ''); }
   if(!/^03\d{9}$/.test(m)){ if(m) alert('درست موبائل نمبر نہیں ملا — مالک کا پورا پیغام کاپی کر کے پیسٹ کریں'); return; }
   if(!c || c.length !== 8){ c = (prompt('🔐 ملازم کا کوڈ لکھیں (مثلاً K7M2-9QXP):') || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
@@ -681,6 +697,7 @@ async function smJoinAsStaff(){
   const prev = { p: AppState.settings.businessPhone, c: AppState.settings.smShopCode, r: AppState.settings.smRegistered, j: AppState.settings.smJoinedAsStaff, pl: AppState.settings.smPlan };
   AppState.settings.businessPhone = m; AppState.settings.smShopCode = c; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = true;
   AppState.settings.smPlan = 'P1+1';
+  try{ Object.keys(AppState.settings).forEach(k => { if(/PendingSync$/.test(k)) AppState.settings[k] = false; }); }catch(e){} // 🧑‍💼 SM410SU042: نئی دکان کے راستے پر پرانا ڈیٹا نہ جائے
   saveToStorage('settings', AppState.settings);
   const ok = await smPullLicenseMirror();
   if(!ok){
@@ -692,6 +709,11 @@ async function smJoinAsStaff(){
   try{ localStorage.removeItem('fm_phoneOwner'); }catch(e){}
   try{ localStorage.removeItem('fm_bioCred'); }catch(e){}
   try{ saveToStorage('rememberedSession', null); }catch(e){}
+  // 🧑‍💼 SM410SU042: اس فون کی پرانی (خالی/نمونہ) فہرستیں مالک کے کلاؤڈ پر کبھی نہ چڑھیں — جڑتے وقت سب "زیر التوا سنک" نشان صاف
+  try{
+    Object.keys(AppState.settings).forEach(k => { if(/PendingSync$/.test(k)) AppState.settings[k] = false; });
+    saveToStorage('settings', AppState.settings);
+  }catch(e){}
   location.reload();
 }
 // ---------- 🔁 لائسنس آئینہ: مالک کا فون پیکج/مدت دکان کے کلاؤڈ میں رکھتا ہے، ملازم کا فون وہیں سے لیتا ہے ----------
@@ -796,6 +818,39 @@ rep("""function _migratePhoneOwner(){
     const users = (usersData || []).filter(u => u.is_active);
     const adminSign = !!(AppState.settings && (AppState.settings.lastGDriveBackupAt || AppState.settings.gdriveAccountEmail)) && !(AppState.settings && AppState.settings.smJoinedAsStaff);
     if(adminSign){""")
+# ---------- 🧑‍💼 SM410SU042: "دکان سے جڑیں" والا پیغام اگر ایکٹیویشن کوڈ کے خانے میں پیسٹ ہو جائے تو "Invalid code" کی بجائے خود جوڑنے کا عمل چلے ----------
+_join_fix = r"""<script>
+/* SM_JOIN_FROM_ACTIVATION_BEGIN */
+function smLooksLikeJoinText(raw){
+  raw = String(raw || '');
+  if(!/03\d{9}/.test(raw.replace(/[\s\-]/g, ''))) return false;
+  return /دکان|موبائل|کوڈ/.test(raw);
+}
+(function(){
+  function wrap(fnName, inputId, msgId){
+    const orig = window[fnName];
+    if(typeof orig !== 'function') return;
+    window[fnName] = async function(){
+      const inp = document.getElementById(inputId);
+      const val = inp ? inp.value : '';
+      if(smLooksLikeJoinText(val)){
+        const msg = document.getElementById(msgId);
+        if(msg){ msg.style.color = 'var(--muted)'; msg.textContent = '📲 یہ سبسکرپشن کوڈ نہیں، دکان سے جڑنے کا پیغام ہے — جوڑا جا رہا ہے…'; }
+        try{ await smJoinAsStaff(val); }catch(e){}
+        if(msg){ msg.textContent = ''; }
+        return;
+      }
+      return orig.apply(this, arguments);
+    };
+  }
+  wrap('activateFromLoginScreen', 'loginActivationCodeInput', 'loginActivationMsg');
+  wrap('submitActivationCode', 'subGateCodeInput', 'subGateMsg');
+})();
+/* SM_JOIN_FROM_ACTIVATION_END */
+</script>
+"""
+_k3=s.rindex('</body>')
+s=s[:_k3]+_join_fix+s[_k3:]
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
