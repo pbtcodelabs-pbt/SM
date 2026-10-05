@@ -979,6 +979,8 @@ setInterval(function(){
 """
 _k5=s.rindex('</body>')
 s=s[:_k5]+_split_fix+s[_k5:]
+# ---------- ⛔ SM510MO050: غلط ریپو پہرہ — یہ فائل سبزی منڈی کی ہے ----------
+rep("var __APP_KIND = 'FM';", "var __APP_KIND = 'SM';")
 open(f'{OUT}/index.html','w',encoding='utf-8').write(s)
 
 # ---------- 8) sw.js ----------
