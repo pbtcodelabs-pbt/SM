@@ -779,11 +779,13 @@ s=s[:_k]+'<script>\n/* SM_BACKUP_V2_BEGIN */\n'+_js+'\n/* SM_BACKUP_V2_END */\n<
 if 'const LEGACY_DEMO_CUSTOMERS' not in s:
     rep("function isLegacyDemoCustomer(c){\n  return !!c && LEGACY_DEMO_CUSTOMERS.some(", "const LEGACY_DEMO_CUSTOMERS = [];\nfunction isLegacyDemoCustomer(c){\n  return !!c && LEGACY_DEMO_CUSTOMERS.some(")
 # ---------- SM110TH026: کسٹمر پروفائل میں Delete بٹن (tools/sm_customer_delete.js) ----------
-rep("<span class=\"sideIcon\">📜</span><span class=\"sideLabel\">Transactions</span></button>\n  `;\n\n  renderCustomerMainContent(c.customer_id);",
-    "<span class=\"sideIcon\">📜</span><span class=\"sideLabel\">Transactions</span></button>\n    ${AppState.currentRole === 'admin' ? `<button style=\"background:linear-gradient(155deg,#dc2626,#7f1d1d);\" onclick=\"deleteCustomerFromProfile(${c.customer_id})\"><span class=\"sideIcon\">🗑️</span><span class=\"sideLabel\">Delete</span></button>` : ''}\n  `;\n\n  renderCustomerMainContent(c.customer_id);")
-_js2=open(_p.join(ROOT,'tools','sm_customer_delete.js'),encoding='utf-8').read()
-_k2=s.rindex('</body>')
-s=s[:_k2]+'<script>\n/* SM_CUSTOMER_DELETE_BEGIN */\n'+_js2+'\n/* SM_CUSTOMER_DELETE_END */\n</script>\n'+s[_k2:]
+# 🗑️ FM610TU320: اب FM میں ہی ایک ایک کر کے حذف (تنبیہ + بقایا تنبیہ + PIN) موجود ہے — یہ پرانا SM والا صرف تب لگے جب FM میں نہ ہو
+if 'async function deleteCustomerFromProfile' not in s:
+    rep("<span class=\"sideIcon\">📜</span><span class=\"sideLabel\">Transactions</span></button>\n  `;\n\n  renderCustomerMainContent(c.customer_id);",
+        "<span class=\"sideIcon\">📜</span><span class=\"sideLabel\">Transactions</span></button>\n    ${AppState.currentRole === 'admin' ? `<button style=\"background:linear-gradient(155deg,#dc2626,#7f1d1d);\" onclick=\"deleteCustomerFromProfile(${c.customer_id})\"><span class=\"sideIcon\">🗑️</span><span class=\"sideLabel\">Delete</span></button>` : ''}\n  `;\n\n  renderCustomerMainContent(c.customer_id);")
+    _js2=open(_p.join(ROOT,'tools','sm_customer_delete.js'),encoding='utf-8').read()
+    _k2=s.rindex('</body>')
+    s=s[:_k2]+'<script>\n/* SM_CUSTOMER_DELETE_BEGIN */\n'+_js2+'\n/* SM_CUSTOMER_DELETE_END */\n</script>\n'+s[_k2:]
 # ---------- 🧑‍💼 SM210FR036: ملازم کے طور پر جڑے فون پر لاگ ان میں صرف ملازم کا خانہ (ایڈمن کا نہیں) ----------
 rep("function applyLoginDeviceLock(){", r"""function applyLoginDeviceLock(){
   _origApplyLoginDeviceLock();
