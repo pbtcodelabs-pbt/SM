@@ -279,11 +279,94 @@ async function smPushRegistry(){
       deviceUID: { stringValue: st.deviceUID || '' }, lastSeen: { integerValue: String(Date.now()) },
       registeredAt: { stringValue: st.smRegisteredAt || '' }
     };
+    try{ const rj = await smBuildRejoinMap(mobile); if(rj) f.rj = { stringValue: rj }; }catch(e){} // 🔄 SM810TH091: ملازم کی واپسی
     await authFirestoreFetch(`registry/${mobile}?key=${FIREBASE_API_KEY}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: f }) });
   }catch(e){}
 }
 setTimeout(() => { try{ smPushRegistry(); }catch(e){} }, 12000);
 setInterval(() => { try{ smPushRegistry(); }catch(e){} }, 20 * 60 * 1000);
+
+// =====================================================================
+// 🔄 SM810TH091: "پہلے سے جڑے تھے؟ واپس آئیں" — فون کی میموری صاف ہو جائے تو ملازم مالک سے دوبارہ کوڈ منگوائے بغیر
+// صرف (مالک کا موبائل نمبر + اپنا PIN) لکھ کر واپس دکان سے جڑ جائے۔
+// مالک کا فون رجسٹری میں ہر ملازم کے لیے ایک خفیہ ڈبہ رکھتا ہے جس میں دکان کا کوڈ ہے؛ یہ ڈبہ اسی ملازم کے
+// PIN سے تالا لگا ہے (PBKDF2 + AES-GCM) — PIN کے بغیر کوئی اسے نہیں کھول سکتا۔ آسان PIN (1234) والوں کا ڈبہ بنتا ہی نہیں۔
+// =====================================================================
+const SM_RJ_ITER = 250000;
+const _smRjCache = {};
+function _smHex(buf){ return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+function _smB64(buf){ let t = ''; new Uint8Array(buf).forEach(b => t += String.fromCharCode(b)); return btoa(t); }
+function _smUnB64(str){ const t = atob(str); const a = new Uint8Array(t.length); for(let i = 0; i < t.length; i++) a[i] = t.charCodeAt(i); return a; }
+async function _smRjId(mobile, pinHash){
+  return _smHex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('smrj-id|' + mobile + '|' + pinHash))).slice(0, 24);
+}
+async function _smRjKey(mobile, pinHash){
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pinHash), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode('smrj-salt|' + mobile), iterations: SM_RJ_ITER },
+    base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function smBuildRejoinMap(mobile){
+  const st = AppState.settings;
+  if(!crypto || !crypto.subtle || !smIsCloudPlan() || st.smJoinedAsStaff) return '';
+  const code = smShopCode(); if(!code) return '';
+  const weak = new Set();
+  try{ for(const p of ['1234', '0000', '1111', '12345', '123456']) weak.add(await hashPin(p)); }catch(e){}
+  const out = {};
+  for(const u of (usersData || [])){
+    if(u.role !== 'salesman' || u.is_active === false || !u.pin || weak.has(u.pin)) continue;
+    const ck = mobile + '|' + u.pin + '|' + code + '|' + smPlan();
+    if(!_smRjCache[ck]){
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const key = await _smRjKey(mobile, u.pin);
+      const body = new TextEncoder().encode(JSON.stringify({ c: code, p: smPlan(), n: u.name || '' }));
+      const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, body);
+      _smRjCache[ck] = { id: await _smRjId(mobile, u.pin), v: _smB64(iv) + '.' + _smB64(ct) };
+    }
+    out[_smRjCache[ck].id] = _smRjCache[ck].v;
+  }
+  return Object.keys(out).length ? JSON.stringify(out) : '';
+}
+async function smRejoinShop(){
+  if(!crypto || !crypto.subtle){ alert('⚠️ یہ براؤزر خفیہ تالا نہیں کھول سکتا — مالک کا بھیجا پیغام "ملازم ہیں؟ دکان سے جڑیں" میں پیسٹ کریں۔'); return; }
+  const m = (prompt('🔄 پہلے سے جڑے تھے؟\n\nدکان کے مالک کا موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, '');
+  if(!m) return;
+  if(!/^03\d{9}$/.test(m)){ alert('درست موبائل نمبر لکھیں (03XXXXXXXXX)'); return; }
+  const pin = (prompt('🔑 اپنا وہی PIN لکھیں جس سے آپ اس دکان میں لاگ ان کرتے تھے:') || '').trim();
+  if(!pin) return;
+  const bar = document.createElement('div');
+  bar.style.cssText = 'position:fixed; inset:0; z-index:2147483647; background:rgba(2,44,34,.85); color:#fff; display:flex; align-items:center; justify-content:center; font:800 20px/1.9 Tahoma,Arial,sans-serif; text-align:center; padding:20px;';
+  bar.textContent = '⏳ دکان تلاش ہو رہی ہے… براہ کرم انتظار کریں';
+  document.body.appendChild(bar);
+  const done = () => { try{ bar.remove(); }catch(e){} };
+  try{
+    const res = await authFirestoreFetch(`registry/${m}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' });
+    if(!res || !res.ok){ done(); alert(res && res.status === 404 ? '❌ اس نمبر سے کوئی دکان نہیں ملی۔ مالک کا نمبر دوبارہ چیک کریں۔' : '⚠️ کلاؤڈ سے رابطہ نہیں ہو سکا (' + (res ? res.status : 'نیٹ') + ')۔ انٹرنیٹ چیک کر کے دوبارہ کوشش کریں، یا مالک کا بھیجا پیغام "ملازم ہیں؟ دکان سے جڑیں" میں پیسٹ کریں۔'); return; }
+    const doc = await res.json();
+    const raw = doc.fields && doc.fields.rj && doc.fields.rj.stringValue;
+    let map = {}; try{ map = raw ? JSON.parse(raw) : {}; }catch(e){}
+    const ph = await hashPin(pin);
+    const blob = map[await _smRjId(m, ph)];
+    if(!blob){ done(); alert('❌ نمبر یا PIN درست نہیں۔\n\n(یاد رہے: یہ سہولت صرف ملازمین کے لیے ہے، اور مالک کی ایپ نے پچھلے 20 منٹ میں ایک بار آن لائن ہو کر آپ کا ریکارڈ اپڈیٹ کیا ہو)'); return; }
+    const [ivB, ctB] = blob.split('.');
+    const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: _smUnB64(ivB) }, await _smRjKey(m, ph), _smUnB64(ctB));
+    const info = JSON.parse(new TextDecoder().decode(plain));
+    if(!info || !info.c){ done(); alert('❌ ریکارڈ پڑھا نہیں جا سکا'); return; }
+    if(!confirm(`✅ دکان مل گئی: ${(doc.fields.shop && doc.fields.shop.stringValue) || ''}\nملازم: ${info.n || ''}\n\nکیا یہ فون دوبارہ اسی دکان سے جوڑ دیں؟`)){ done(); return; }
+    AppState.settings.businessPhone = m; AppState.settings.smShopCode = info.c; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = true;
+    AppState.settings.smPlan = smNormPlan(info.p) || 'P1+1';
+    try{ Object.keys(AppState.settings).forEach(k => { if(/PendingSync$/.test(k)) AppState.settings[k] = false; }); }catch(e){}
+    saveToStorage('settings', AppState.settings);
+    try{ await smPullLicenseMirror(); }catch(e){}
+    try{ localStorage.removeItem('fm_phoneOwner'); }catch(e){}
+    try{ localStorage.removeItem('fm_bioCred'); }catch(e){}
+    try{ saveToStorage('rememberedSession', null); }catch(e){}
+    bar.textContent = '✅ دوبارہ جڑ گئے — ایپ کھل رہی ہے…';
+    setTimeout(() => location.reload(), 900);
+  }catch(e){
+    done();
+    alert('❌ نمبر یا PIN درست نہیں، یا انٹرنیٹ میں مسئلہ ہے۔ دوبارہ کوشش کریں۔');
+  }
+}
 function smBiz(){ try{ return (AppState.settings.businessName || '').trim() || 'سبزی منڈی'; }catch(e){ return 'سبزی منڈی'; } }
 function smPhone(){ try{ return AppState.settings.businessPhone || ''; }catch(e){ return ''; } }
 function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catch(e){ return 'مالک'; } }
@@ -9307,7 +9390,7 @@ function getDeveloperContact(){
 // 🆕 FM410SU295: چالان وار جدول کے کالم کے نام — "ریٹ" کی جگہ "خرید ریٹ" اور "قیمتیں فروخت" کی جگہ "فروخت ریٹ"
 // 🆕 FM410SU294: چالان وار "باقی سٹاک" خانہ — صفر سے زیادہ ہو تو سرخ بیک گراؤنڈ
 // 🆕 FM410SU293: خرید اور چالان رپورٹ — "سیل ہوا" کالم کی جگہ "قیمتیں فروخت" (اسلام آباد ریٹ)، اور چالان وار خانے میں سبزی کے نیچے بیوپاری کا نام موٹا اور صاف
-const APP_BUILD_VERSION = 'SM810TH090'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM810TH091'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -49164,6 +49247,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <button type="button" onclick="smRegSave()" style="width:100%; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ رجسٹر کریں</button>
       <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; flex-wrap:wrap;">
         <span style="font-size:12px; color:#64748b;">ابتدائی پن: <b dir="ltr">1234</b></span>
+        <button type="button" onclick="smRejoinShop()" style="width:100%; margin:2px 0 4px; padding:9px; border:2px solid #0f766e; border-radius:12px; background:#ecfdf5; color:#065f46; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer;">🔄 پہلے سے جڑے تھے؟ واپس آئیں (مالک کا نمبر + اپنا PIN)</button>
         <a href="javascript:void(0)" onclick="smJoinAsStaff()" style="font-size:12.5px; color:#1d4ed8; font-weight:800;">📲 ملازم ہیں؟ دکان سے جڑیں</a>
         <span id="smRegVersion" dir="ltr" style="display:inline-block; background:#15803d; color:#fff; font-family:Arial,sans-serif; font-size:12px; font-weight:700; letter-spacing:.4px; padding:3px 12px; border-radius:999px;"></span>
       </div>
