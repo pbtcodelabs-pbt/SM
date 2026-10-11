@@ -2,7 +2,7 @@
 // یہ نمبر HTML فائل کے APP_BUILD_VERSION جیسا نہیں ہوتا (وہ اردو میں ہے، یہ ہمیشہ انگریزی/ASCII میں رہے گا) —
 // صرف کیش کا نام بدلنے کے لیے استعمال ہوتا ہے تاکہ پرانی فائلیں خودکار صاف ہو کر نئی لوڈ ہو جائیں۔
 // ہر نئی ڈیلیوری پر یہ نمبر لازمی بدلیں (فائل کے نام جیسا ہی رکھیں) ----------
-const CACHE_VERSION = 'SM1010SA100';
+const CACHE_VERSION = 'SM1110SU101';
 const CACHE_NAME = 'sabzi-mandi-general-' + CACHE_VERSION;
 
 // ---------- 🔒🆕 ہدایت (FM21SEPMO03): آف لائن نہ چلنے کی اصل جڑ یہاں ملی — پہلے تمام فائلیں
@@ -25,9 +25,6 @@ const OPTIONAL_URLS = [
   './fonts/JameelNooriNastaleeq-Regular.ttf',
   './fonts/JameelNooriNastaleeq-Kasheeda.ttf',
   // ---------- 🆕 ہدایت (FM8SEPTU4): 3 نئے فونٹ — fonts/ فولڈر میں ---------- -->
-  './fonts/PTSimpleBoldRuled.ttf',
-  './fonts/ThuluthAlsmt.ttf',
-  './fonts/JameelKhushkhati.ttf',
   // ---------- 🗑️ ہدایت (FM13SEPSU): 4 فونٹ (Gandhara Suls, Akram Unicode, AlQalam Khawar, AlFars Aban)
   // فہرست سے ہٹا دیے گئے، اس لیے یہ precache انٹریز بھی ہٹا دی گئیں ---------- -->
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'

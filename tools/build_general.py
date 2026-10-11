@@ -860,7 +860,7 @@ s = s[:_m.start()] + '<div class="csvImportBar" style="display:flex;"><!-- 📥 
 # ---------- 📦 SM410SU044: سبزی منڈی میں "مال کی فہرست" کا ہوم آئیکن (FM15SEPTU3 میں چھپایا گیا تھا — FM میں چھپا ہی رہے) ----------
 # مالک کے ہوم پر ایک بار خود لگ جاتا ہے؛ ✏️ سے ہٹائے تو دوبارہ خود نہیں لگتا۔ ملازم کو صرف 🖥️ Screens سے ملے۔
 rep("    if(key === 'products') return null;\n", "    // 📦 SM410SU044: سبزی منڈی میں مال کی فہرست کا آئیکن دکھائیں (CSV امپورٹ وغیرہ اسی سکرین میں)\n")
-rep("  const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) ? currentUser.screens : [];",
+rep("  let assignedKeys = (currentUser && Array.isArray(currentUser.screens)) ? currentUser.screens : [];",
     """  // 📦 SM410SU044: مالک کے ہوم پر "مال کی فہرست" صرف ایک بار خود لگے
   try{
     if(currentUser && currentUser.role === 'admin' && AppState.currentRole === 'admin' && !AppState.settings.smProdTileOnce){
@@ -872,7 +872,7 @@ rep("  const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) 
       try{ if(typeof pushUsersToCloud === 'function') pushUsersToCloud(); }catch(e){}
     }
   }catch(e){}
-  const assignedKeys = (currentUser && Array.isArray(currentUser.screens)) ? currentUser.screens : [];""")
+  let assignedKeys = (currentUser && Array.isArray(currentUser.screens)) ? currentUser.screens : [];""")
 # ---------- ☁️ SM410SU045: CSV سے امپورٹ کی گئی سبزیاں کلاؤڈ پر نہیں جاتی تھیں — اس لیے ملازم کے فون پر نظر نہیں آتی تھیں ----------
 # (SM410SU046: امپورٹ کے بعد محفوظ + کلاؤڈ اب FM ماسٹر FM410SU302 میں ہے)
 _fp = s.index('async function fetchProductsFromCloud(silent){')
