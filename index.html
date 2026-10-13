@@ -9625,7 +9625,7 @@ function getDeveloperContact(){
 // 🆕 SM1210MO105: مکمل سمری کی پٹی دو حصوں میں — "اس وقت ہاتھ میں کیش" (کیش آیا − کیش گیا) رقم کے ساتھ + مکمل سمری بٹن
 // 🆕 SM1210MO106: بل کا کارٹ — گول سیریل نمبر ختم، نام دائیں کونے پر، قیمت کے ساتھ "مزدوری" کا کالم (پیچھے سے لگی مزدوری نظر آئے اور یہیں درست ہو سکے)
 // 🆕 SM1310TU107: فروٹ منڈی کے ساتھ سنک — (1) 👆 فنگر پرنٹ: بڑا بلاک ختم، صرف چھوٹا نشان، خودکار پاپ اپ، ایک سیشن میں ایک بار (ریفریش پر بار بار نہیں) (2) روزانہ ریکوری لسٹ: OK کے بعد ڈبہ گہرا سبز
-const APP_BUILD_VERSION = 'SM1310TU109'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM1310TU110'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -16224,10 +16224,20 @@ function finalizeInvoice(){
   // شمار نہیں ہوگا، صرف باقی/دوسرے پینڈنگ آرڈرز کا بک شدہ سٹاک شمار ہوگا ---------- -->
   if(stockGuardOn()){
     const flatVariants = getFlatVariants();
+    // ---------- 🔧 SM1310TU (صدام کی ہدایت — فوری فکس): آرڈر ٹیکنگ سے بنے بل کو فائنل کرتے وقت جھوٹی "سٹاک ختم" روک ختم۔
+    //   اس بل کے اپنے سورس آرڈر کی بکنگ reserved سے واپس گنیں تاکہ اپنی ہی بکنگ اپنا بل نہ روکے (باقی آرڈرز محفوظ)۔ ----------
+    const _srcOrder = (Billing.sourceAdvanceOrderId != null)
+      ? (advanceOrdersData || []).find(o => o.id === Billing.sourceAdvanceOrderId && o.status !== 'fulfilled' && !o.stockReleased)
+      : null;
+    const _myReservedFor = (vid) => {
+      if(!_srcOrder) return 0;
+      return (_srcOrder.items || []).reduce((s, i) => s + ((i && i.variant_id === vid) ? (Number(i.qty) || 0) : 0), 0);
+    };
     for(const item of Billing.cart){
       const v = flatVariants.find(f => f.variant_id === item.variant_id);
-      const availableFinalizeBl = v ? Math.max(0, (v.stock||0) - (v.reserved||0)) : 0;
-      if(v && item.qty > availableFinalizeBl){
+      const _othersReserved = v ? Math.max(0, (Number(v.reserved) || 0) - _myReservedFor(item.variant_id)) : 0;
+      const availableFinalizeBl = v ? Math.max(0, (v.stock||0) - _othersReserved) : 0;
+      if(v && item.qty > availableFinalizeBl + 0.0001){
         alert('"' + item.name + '" — ' + smStockMsg(availableFinalizeBl));
         return;
       }
