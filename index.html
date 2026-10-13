@@ -3223,7 +3223,11 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     <div id="loginPinWrap">
       <!-- ---------- 👑 ایڈمن کی قطار ---------- -->
       <div class="loginRoleRow">
-        <div class="loginRoleTitle">👑 ایڈمن</div>
+        <div class="loginRoleTitle" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <span>👑 ایڈمن</span>
+          <!-- 👆 صرف فنگر پرنٹ کا نشان، کوئی عبارت نہیں — دبانے پر فون کا فنگر پرنٹ پاپ اپ۔ آن ہونے پر JS اسے دکھاتا ہے -->
+          <span id="bioFpIcon" onclick="bioLogin()" title="فنگر پرنٹ سے لاگ اِن" style="display:none; font-size:22px; cursor:pointer; line-height:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));">👆</span>
+        </div>
         <div class="loginRoleInputBar">
           <button type="button"
             onmousedown="showPinWhilePressed('pinInput')" onmouseup="hidePinAfterRelease('pinInput')" onmouseleave="hidePinAfterRelease('pinInput')"
@@ -9620,7 +9624,8 @@ function getDeveloperContact(){
 // 🆕 SM1210MO104: ڈبہ ① میں صرف بیوپاریوں کا قرض، سارا جانے والا کیش (بیوپاری ادائیگی + اخراجات) صرف ڈبہ ⑤ میں
 // 🆕 SM1210MO105: مکمل سمری کی پٹی دو حصوں میں — "اس وقت ہاتھ میں کیش" (کیش آیا − کیش گیا) رقم کے ساتھ + مکمل سمری بٹن
 // 🆕 SM1210MO106: بل کا کارٹ — گول سیریل نمبر ختم، نام دائیں کونے پر، قیمت کے ساتھ "مزدوری" کا کالم (پیچھے سے لگی مزدوری نظر آئے اور یہیں درست ہو سکے)
-const APP_BUILD_VERSION = 'SM1210MO106'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1310TU107: فروٹ منڈی کے ساتھ سنک — (1) 👆 فنگر پرنٹ: بڑا بلاک ختم، صرف چھوٹا نشان، خودکار پاپ اپ، ایک سیشن میں ایک بار (ریفریش پر بار بار نہیں) (2) روزانہ ریکوری لسٹ: OK کے بعد ڈبہ گہرا سبز
+const APP_BUILD_VERSION = 'SM1310TU108'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -10809,7 +10814,7 @@ async function _origSetupLoginScreen(){
     // ---------- 🚀 سبسکرپشن/ٹرائل فعال ہو (یا PIN ابھی تک ڈیفالٹ ہو) تو خوش آمدید سکرین پر رکنے کی بجائے
     // خودکار سیدھا ایپ میں داخل کر دیں — ایک اضافی "Enter App" ٹیپ کی ضرورت نہ رہے ----------
     try{ applyLoginDeviceLock(); }catch(e){}
-    try{ renderBioLoginButton(); }catch(e){}
+    try{ _resetBioAutoFlag(); autoBioPrompt(); }catch(e){}
     if(skipPin){
       quickEnterApp();
       return;
@@ -12957,7 +12962,10 @@ function tryAutoLogin(){
   if(!user && remembered.role && remembered.name) user = usersData.find(u => u.role === remembered.role && u.name === remembered.name); // id بدل گئی ہو تو نام/عہدہ سے
   if(user && user.role === 'admin' && AppState.settings.smJoinedAsStaff){ saveToStorage('rememberedSession', null); return false; } // 🧑‍💼 SM210FR036
   try{ _migratePhoneOwner(); if(user && !isPhoneOwnerUser(user)){ saveToStorage('rememberedSession', null); return false; } }catch(e){}
-  try{ if(user && user.role === 'admin' && getBioCred() && _bioAdminUser()){ setTimeout(() => { try{ renderBioLoginButton(); }catch(e){} }, 300); return false; } }catch(e){}
+  // ---------- 👆 فنگر پرنٹ صرف اُسی وقت دوبارہ مانگے جب ٹیب/ایپ مکمل بند کر کے دوبارہ کھلے —
+  //   ایک بار دے کر اندر آ گئے تو اسی سیشن میں (ریفریش/اوپر کھینچنے پر) دوبارہ نہ مانگے۔ ----------
+  let _bioSessionOk = false; try{ _bioSessionOk = sessionStorage.getItem('fm_bioSessionOk') === '1'; }catch(e){}
+  try{ if(user && user.role === 'admin' && getBioCred() && _bioAdminUser() && !_bioSessionOk){ setTimeout(() => { try{ _resetBioAutoFlag(); autoBioPrompt(); }catch(e){} }, 300); return false; } }catch(e){}
   if(!user || !user.is_active){
     saveToStorage('rememberedSession', null); // یوزر ڈیلیٹ/غیرفعال ہو چکا ہو تو یاد رکھا ہوا سیشن بھی صاف کر دیں
     return false;
@@ -13402,6 +13410,7 @@ function logout(){
     document.body.classList.remove('role-admin','role-salesman','role-customer');
     document.getElementById('pinInput').value = '';
     saveToStorage('rememberedSession', null); // ---------- لاگ آؤٹ پر یاد رکھا ہوا سیشن ختم — اگلی بار پن دوبارہ مانگا جائے گا ----------
+    try{ sessionStorage.removeItem('fm_bioSessionOk'); }catch(e){} // 👆 لاگ آؤٹ پر فنگر پرنٹ کی سیشن نشانی بھی صاف
     document.getElementById('app').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     // ---------- 🧪 FMtest01: کسٹمر لاگ ان کی حالت بھی صاف کر دیں تاکہ اگلی بار خالی سکرین ملے ----------
@@ -21753,27 +21762,31 @@ async function bioLogin(){
       allowCredentials: [{ type: 'public-key', id: _bioUnB64(c.id), transports: ['internal'] }],
       userVerification: 'required', timeout: 60000
     }});
-    if(a){ window.__bioVerified = true; finishLogin(admin, true); }
+    if(a){ window.__bioVerified = true; try{ sessionStorage.setItem('fm_bioSessionOk','1'); }catch(e){} _bioBusy = false; finishLogin(admin, true); return; }
   }catch(e){
-    const m = document.getElementById('bioLoginMsg'); if(m){ m.textContent = '❌ ٹچ نہیں ہوا — دوبارہ دبائیں یا پن لکھیں'; }
+    const m = document.getElementById('bioLoginMsg'); if(m){ m.textContent = '❌ ٹچ نہیں ہوا — دوبارہ 👆 دبائیں یا پن لکھیں'; }
   }
   _bioBusy = false;
 }
-function renderBioLoginButton(){
-  const adminRow = document.querySelectorAll('#loginPinWrap > .loginRoleRow')[0];
-  if(!adminRow) return;
-  let b = document.getElementById('bioLoginBox');
+
+// ---------- 👆 کوئی بڑا بلاک/عبارت نہیں۔ "👑 ایڈمن" عنوان کے برابر صرف ایک فنگر پرنٹ کا نشان (👆)۔
+//   لاگ اِن اسکرین کھلتے ہی خودبخود فون کا فنگر پرنٹ پاپ اپ (باقی ایپس کی طرح)۔ منسوخ/ناکام پر وہی 👆 نشان دبا کر دوبارہ۔ ----------
+let _bioAutoTried = false;
+function _resetBioAutoFlag(){ _bioAutoTried = false; }
+function _showBioIcon(on){ const ic = document.getElementById('bioFpIcon'); if(ic) ic.style.display = on ? 'inline-block' : 'none'; }
+async function autoBioPrompt(){
   const on = !!(getBioCred() && _bioAdminUser());
-  if(!on){ if(b) b.style.display = 'none'; return; }
-  if(!b){
-    b = document.createElement('div'); b.id = 'bioLoginBox';
-    b.style.cssText = 'text-align:center; margin:8px 0 4px;';
-    b.innerHTML = `<button type="button" onclick="bioLogin()" style="width:auto; display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border:none; border-radius:14px; background:linear-gradient(160deg,#22c55e,#15803d); color:#fff; font-size:17px; font-weight:800; box-shadow:0 4px 0 #14532d; cursor:pointer; font-family:inherit;"><span style="font-size:24px;">👆</span> فنگر پرنٹ سے لاگ اِن</button><div id="bioLoginMsg" style="font-size:12px; color:#fecaca; margin-top:4px; min-height:14px;"></div>`;
-    const bar = adminRow.querySelector('.loginRoleInputBar');
-    if(bar) adminRow.insertBefore(b, bar); else adminRow.appendChild(b);
-  }
-  b.style.display = '';
+  _showBioIcon(on);
+  if(!on) return;
+  // 👆 اہم: اسی سیشن میں پہلے فنگر پرنٹ ہو چکا ہو یا بندہ لاگ اِن ہو تو خودکار پاپ اپ نہ کھولو — صرف نشان دکھاؤ
+  let _ses = false; try{ _ses = sessionStorage.getItem('fm_bioSessionOk') === '1'; }catch(e){}
+  if(_ses || (typeof AppState !== 'undefined' && AppState && AppState.currentUser)) return;
+  if(!(await isBioSupported())){ _showBioIcon(false); return; }
+  if(_bioAutoTried) return;
+  _bioAutoTried = true;
+  setTimeout(() => { try{ bioLogin(); }catch(e){} }, 350);
 }
+function renderBioLoginButton(){ try{ autoBioPrompt(); }catch(e){} }
 function renderBioSettingsCard(){
   const box = document.getElementById('bioSettingsBody'); if(!box) return;
   const c = getBioCred();
@@ -32818,9 +32831,9 @@ function buildRlEmployeeCard(c, dr){
       </div>` : '';
 
   return `
-    <div id="rlCard-${cid}" class="rlEmpRow" dir="rtl" style="background:${isDone ? '#f0fdf4' : '#fff'}; border:1.5px solid ${isDone ? '#86efac' : '#e5e9f0'}; border-radius:10px; padding:7px 8px; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','PDMSMultan','Noto Nastaliq Urdu',serif; font-size:${z(13)}px;">
+    <div id="rlCard-${cid}" class="rlEmpRow${isDone ? ' rlCardDone' : ''}" dir="rtl" style="background:${isDone ? 'linear-gradient(145deg,#4ade80,#16a34a)' : '#fff'}; border:2.5px solid ${isDone ? '#15803d' : '#e5e9f0'}; box-shadow:${isDone ? '0 3px 10px rgba(21,128,61,.35)' : 'none'}; border-radius:10px; padding:7px 8px; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','PDMSMultan','Noto Nastaliq Urdu',serif; font-size:${z(13)}px;">
       <div style="display:flex; justify-content:space-between; align-items:center; gap:4px; margin-bottom:4px;">
-        <div style="font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:3px; min-width:0;">
+        <div style="font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:3px; min-width:0; ${isDone ? 'color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.35);' : ''}">
           ${c.serial_no ? `<span class="serialBadgeBtn" style="cursor:default; flex:0 0 auto; width:${z(18)}px !important; height:${z(18)}px !important; min-width:${z(18)}px !important; min-height:${z(18)}px !important; font-size:${z(8.5)}px !important; box-shadow:none !important; border-width:1.2px !important; padding:0 !important;">${c.serial_no}</span>` : ''}
           <span style="overflow:hidden; text-overflow:ellipsis;">${c.name}</span>
           ${isDone ? '✅' : ''}
