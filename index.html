@@ -9625,7 +9625,7 @@ function getDeveloperContact(){
 // 🆕 SM1210MO105: مکمل سمری کی پٹی دو حصوں میں — "اس وقت ہاتھ میں کیش" (کیش آیا − کیش گیا) رقم کے ساتھ + مکمل سمری بٹن
 // 🆕 SM1210MO106: بل کا کارٹ — گول سیریل نمبر ختم، نام دائیں کونے پر، قیمت کے ساتھ "مزدوری" کا کالم (پیچھے سے لگی مزدوری نظر آئے اور یہیں درست ہو سکے)
 // 🆕 SM1310TU107: فروٹ منڈی کے ساتھ سنک — (1) 👆 فنگر پرنٹ: بڑا بلاک ختم، صرف چھوٹا نشان، خودکار پاپ اپ، ایک سیشن میں ایک بار (ریفریش پر بار بار نہیں) (2) روزانہ ریکوری لسٹ: OK کے بعد ڈبہ گہرا سبز
-const APP_BUILD_VERSION = 'SM1310TU111'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM1310TU112'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -35301,10 +35301,15 @@ async function _renderAdvOrderToCanvasInner(order, canvasEl){
   // ---------- 🔄 ہدایت (FM4SEPFR25): ریٹ نہ لگا ہو تو گرینڈ ٹوٹل کا خانہ بالکل نہیں دکھانا —
   // خالص Order Taking/Advance Order میں قیمت کا کوئی مطلب نہیں، صرف تعداد اہم ہے ---------- -->
   if(hasRate){
-    ctx.textAlign = 'right';
-    ctx.font = F('bold 22px');
+    // ---------- 🔧 SM1310TU (صدام کی ہدایت): ٹوٹل اب پوری چوڑائی میں مرکز، فارمیٹ RS=رقم= ، لمبی رقم پر فونٹ خودکار فٹ (کوئی ہندسہ نہ کٹے) ----------
     const grandTotal = advOrderTotal(order);
-    ctx.fillText('ٹوٹل: Rs. ' + fmt(grandTotal), colX[1] - 6, y);
+    const totalTxt = 'RS=' + fmt(grandTotal) + '=';
+    let _tpx = 22;
+    ctx.font = F('bold ' + _tpx + 'px');
+    const _maxW = (tableRight - tableLeft) - 8;
+    while(ctx.measureText(totalTxt).width > _maxW && _tpx > 10){ _tpx -= 1; ctx.font = F('bold ' + _tpx + 'px'); }
+    ctx.textAlign = 'center';
+    ctx.fillText(totalTxt, (tableLeft + tableRight) / 2, y);
     y += 32 * scale;
   }
 
