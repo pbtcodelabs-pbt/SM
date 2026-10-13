@@ -9625,7 +9625,7 @@ function getDeveloperContact(){
 // 🆕 SM1210MO105: مکمل سمری کی پٹی دو حصوں میں — "اس وقت ہاتھ میں کیش" (کیش آیا − کیش گیا) رقم کے ساتھ + مکمل سمری بٹن
 // 🆕 SM1210MO106: بل کا کارٹ — گول سیریل نمبر ختم، نام دائیں کونے پر، قیمت کے ساتھ "مزدوری" کا کالم (پیچھے سے لگی مزدوری نظر آئے اور یہیں درست ہو سکے)
 // 🆕 SM1310TU107: فروٹ منڈی کے ساتھ سنک — (1) 👆 فنگر پرنٹ: بڑا بلاک ختم، صرف چھوٹا نشان، خودکار پاپ اپ، ایک سیشن میں ایک بار (ریفریش پر بار بار نہیں) (2) روزانہ ریکوری لسٹ: OK کے بعد ڈبہ گہرا سبز
-const APP_BUILD_VERSION = 'SM1310TU110'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM1310TU111'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -16188,7 +16188,7 @@ function finalizeInvoice(){
   }
 
   const custId = document.getElementById('customerSelect').value;
-  const customer = custId ? customersData.find(c => c.customer_id == custId) : null;
+  let customer = custId ? customersData.find(c => c.customer_id == custId) : null;
 
   const subtotal = Billing.cart.reduce((sum,i) => sum + (i.qty*i.unitPrice), 0);
   const laborTotal = Billing.cart.reduce((sum,i) => sum + (i.qty*(i.laborPerUnit||0)), 0);
@@ -16208,6 +16208,28 @@ function finalizeInvoice(){
   // اسی وجہ سے پوری رقم وصول ہو جانے کے باوجود بھی کسٹمر کا نام مانگا جاتا رہا (کیونکہ ٹوگل کسی وجہ سے درست
   // حالت میں نہیں تھا)۔ اب اصل بقایہ رقم دیکھ کر فیصلہ کریں — یہی حتمی سچائی ہے، ٹوگل کی پروا نہیں ---------- -->
   const willRemainPending = rawReceivedForCheck < grandTotal;
+  // ---------- 🔧 SM1310TU (صدام کی ہدایت — فوری فکس): آرڈر ٹیکنگ سے بنا بل فائنل کرتے وقت جھوٹی "کسٹمر کا نام چنیں"
+  //   روک ختم۔ select خالی ہو مگر بل سورس آرڈر سے بنا ہو تو اُسی آرڈر کے customer_id/نام سے کسٹمر خودکار بحال۔ ----------
+  if(!customer && Billing.sourceAdvanceOrderId != null){
+    try{
+      const _o = (advanceOrdersData || []).find(o => o.id === Billing.sourceAdvanceOrderId);
+      if(_o){
+        const _nn = s => String(s || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        customer = (_o.customer_id != null ? customersData.find(c => String(c.customer_id) === String(_o.customer_id)) : null)
+          || customersData.find(c => _nn(c.name) === _nn(_o.customerName));
+        if(customer){
+          const _sel = document.getElementById('customerSelect');
+          if(_sel){
+            if(!Array.from(_sel.options).some(op => String(op.value) === String(customer.customer_id))){
+              const _op = document.createElement('option'); _op.value = customer.customer_id; _op.textContent = customer.name; _sel.appendChild(_op);
+            }
+            _sel.value = customer.customer_id;
+          }
+          Billing.counterSale = false;
+        }
+      }
+    }catch(e){}
+  }
   if(!customer){ requireBillCustomer(); return; } // 🔒 بغیر نام بل کبھی نہیں
 
   // ---------- پیمنٹ خودکار طے ہوتی ہے — بلنگ کے دوران کوئی انتخاب نہیں کرنا پڑتا ----------
