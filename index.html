@@ -66,6 +66,12 @@ const SM_PLAN_LEGACY = { P2: 'P1+1', P3: 'P1+2', P4: 'P1+3', P5: 'P1+4', P6: 'P1
 function smNormPlan(p){ p = String(p || '').trim(); if(SM_PLAN_LEGACY[p]) p = SM_PLAN_LEGACY[p]; return SM_PLAN_STAFF[p] !== undefined ? p : null; }
 function smPlan(){ try{ return smNormPlan((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.smPlan) || _smSettings().smPlan) || 'P1'; }catch(e){ return 'P1'; } }
 function smIsCloudPlan(){ return (SM_PLAN_STAFF[smPlan()] || 0) > 0; }
+// 📱 SM1610FR128: سبسکرپشن/ٹرائل کی بحالی UID کے ساتھ مالک کے موبائل نمبر سے بھی جڑی — ایک جیسے ماڈل والے دو فونوں کا UID ایک ہو سکتا ہے
+function smMyMobile(){ try{ const st = AppState.settings || {}; if(!st.smRegistered) return ''; return String(st.businessPhone || '').replace(/[^0-9]/g, ''); }catch(e){ return ''; } }
+function smMobileOk(recMobile){ const r = String(recMobile || '').replace(/[^0-9]/g, ''); if(!r) return true; const m = smMyMobile(); return !!m && m === r; } // ریکارڈ میں نمبر نہیں (پرانا) → صرف UID کافی
+async function smPatchField(path, field, value){
+  try{ await authFirestoreFetch(`${path}?updateMask.fieldPaths=${field}&key=${FIREBASE_API_KEY}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { [field]: { stringValue: String(value) } } }) }); }catch(e){}
+}
 function smShopMobile(){ try{ return ((typeof AppState !== 'undefined' && AppState.settings && AppState.settings.businessPhone) || _smSettings().businessPhone || 'unregistered').replace(/[^0-9]/g, '') || 'unregistered'; }catch(e){ return 'unregistered'; } }
 function smMakeShopCode(){
   const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let out = '';
@@ -9666,7 +9672,8 @@ function getDeveloperContact(){
 // 🆕 SM1610FR125: بل کا 'کل کی ادائیگی' ڈبہ — ادا کی گئی رقم کی تقسیم (نقد/جاز کیش/ایزی پیسہ/بینک، صرف جن میں رقم آئی)؛ نیچے بڑا سرخ (پرنٹ میں سیاہ) ڈبہ: آج تک کی کل کم وصولی
 // 🆕 SM1610FR126: وصولی کی تقسیم الگ رقم والی لائنوں کی بجائے 'کل ادا کیا' کی اسی لائن کے نیچے چھوٹی ضمنی تحریر میں؛ ٹوٹل بڑا موٹا (الجھن ختم)
 // 🆕 SM1610FR127: بل — لال ڈبے کے اوپر جملہ 'کل 15 اکتوبر جمعرات تک ٹوٹل کم وصولی'، ڈبے میں صرف رقم
-const APP_BUILD_VERSION = 'SM1610FR127'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1610FR128: سبسکرپشن/ٹرائل کی بحالی UID کے ساتھ مالک کے موبائل نمبر سے بھی — ایک جیسے ماڈل کے فون پر کسی اور کی سبسکرپشن نہیں لگے گی؛ پرانے کوڈ پہلے کی طرح
+const APP_BUILD_VERSION = 'SM1610FR128'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -10045,6 +10052,7 @@ async function syncSubscriptionToCloud(){
       })
     });
   }catch(e){ /* آف لائن — کوئی مسئلہ نہیں، اگلی بار activation/سنک پر دوبارہ کوشش ہوگی */ }
+  if(smMyMobile()) await smPatchField(`devices/${encodeURIComponent(uid)}`, 'ownerMobile', smMyMobile()); // 📱 SM1610FR128
   try{ fmPushShopLicense(); }catch(e){} // 🏪 FM110TH274: پوری دکان کے لیے آئینہ
 }
 
@@ -10145,7 +10153,8 @@ async function activateSubscription(code){
   // ---------- 🎁 ہدایت (FM3SEPTH10): اگر کوڈ کسی خاص ڈیوائس سے bound نہیں (boundUid خالی) تو کوئی بھی ڈیوائس ایک بار استعمال کر سکتی ہے ----------
   if(data.boundUid && data.boundUid !== uid) return {success:false, message:'This code was issued for a different device.'};
   if(data.activatedAt){
-    if(String(data.activatedByUid || '') === String(uid) && Number(data.expiresAt) > Date.now()){
+    if(String(data.activatedByUid || '') === String(uid) && Number(data.expiresAt) > Date.now() && smMobileOk(data.activatedByMobile)){
+      if(!data.activatedByMobile && smMyMobile()) smPatchField(`licenses/${encodeURIComponent(trimmedCode)}`, 'activatedByMobile', smMyMobile()); // 📱 پرانے کوڈ پر نمبر جوڑ دیں
       const expStr = _smYMD(new Date(Number(data.expiresAt)));
       _licApplyRestore(expStr, _smYMD(new Date(Number(data.activatedAt))), trimmedCode);
       return {success:true, expiry: expStr, daysGranted: Math.max(0, Math.round((Number(data.expiresAt) - Date.now()) / 86400000)), restored: true};
@@ -10189,6 +10198,7 @@ async function activateSubscription(code){
       }
     );
     if(!updateRes.ok) return {success:false, message:'This code was already used or is no longer valid.'};
+    if(smMyMobile()) await smPatchField(`licenses/${encodeURIComponent(trimmedCode)}`, 'activatedByMobile', smMyMobile()); // 📱 SM1610FR128
   }catch(e){
     return {success:false, message:'No internet connection. Please connect to the internet and try again.'};
   }
@@ -20856,7 +20866,7 @@ async function _licFindByUid(uid){
     const res = await authFirestoreFetch(`devices/${encodeURIComponent(uid)}?key=${FIREBASE_API_KEY}`);
     if(res && res.status === 200){
       const d = _parseFirestoreFields((await res.json()).fields || {});
-      if(d.subscriptionExpiry) best = { expiry: d.subscriptionExpiry, on: d.subscriptionActivatedOn || '', code: d.lastActivationCode || '', plan: d.smPlan || '' };
+      if(d.subscriptionExpiry && smMobileOk(d.ownerMobile)) best = { expiry: d.subscriptionExpiry, on: d.subscriptionActivatedOn || '', code: d.lastActivationCode || '', plan: d.smPlan || '' }; // 📱 نمبر بھی ملے
     }
   }catch(e){}
   // 2) licenses جہاں activatedByUid = یہ فون
@@ -20876,6 +20886,7 @@ async function _licFindByUid(uid){
         if(!r || !r.document) return;
         const d = _parseFirestoreFields(r.document.fields || {});
         if(d.active === false) return;
+        if(!smMobileOk(d.activatedByMobile)) return; // 📱 SM1610FR128: اسی UID مگر کسی اور نمبر کا کوڈ — بحال نہیں
         const ms = Number(d.expiresAt) || 0;
         if(!ms) return;
         const exp = _smYMD(new Date(ms));
@@ -20919,10 +20930,17 @@ async function checkAndLockTrialOnline(){
   }
   const uid = AppState.settings.deviceUID;
   if(!uid) return;
+  if(!smMyMobile() && !AppState.settings.smJoinedAsStaff) return; // 📱 SM1610FR128: کاروبار (موبائل نمبر) سیٹ ہونے کے بعد ہی چیک
   try{
     if(await restoreSubscriptionFromCloud()) return;
     const res = await authFirestoreFetch(`trials/${uid}?key=${FIREBASE_API_KEY}`);
+    let _otherMobile = false;
     if(res.status === 200){
+      try{ const td = _parseFirestoreFields((await res.clone().json()).fields || {}); const tm = String(td.mobile || '').replace(/[^0-9]/g, ''); _otherMobile = !!tm && !!smMyMobile() && tm !== smMyMobile(); }catch(e){}
+    }
+    if(res.status === 200 && _otherMobile){
+      // 📱 یہ UID کسی اور نمبر والے فون نے ٹرائل میں لیا تھا (ایک جیسا ماڈل) — اس نئے دکان والے کا ٹرائل جاری رہے
+    } else if(res.status === 200){
       AppState.settings.subscriptionExpiry = null;
       AppState.settings.isOnFreeTrial = false;
       AppState.settings.trialLockConfirmedOnline = true;
@@ -20936,6 +20954,7 @@ async function checkAndLockTrialOnline(){
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fields: { usedAt: { integerValue: String(Date.now()) } } })
       });
+      if(smMyMobile()) await smPatchField(`trials/${uid}`, 'mobile', smMyMobile()); // 📱 SM1610FR128
     } else {
       return; // کوئی اور جواب — اگلی بار
     }
