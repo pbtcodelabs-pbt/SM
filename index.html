@@ -593,7 +593,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   .dobPicker .dpYearWrap{flex:1.5; display:flex; gap:4px; align-items:center; min-width:0;}
   .dobPicker .dpYearWrap select, .dobPicker .dpYearWrap input.dpYearManual{flex:1; min-width:0; padding:10px 4px; border:1px solid #dbe1ea; border-radius:8px; font-size:13.5px; text-align:center;}
   .dpYearToggleBtn{border:none; background:#eef2ff; color:var(--primary-dark); border-radius:8px; padding:10px 7px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap; flex:0 0 auto;}
-  .welcomeTrialBanner{background:linear-gradient(145deg,#dcfce7,#bbf7d0); border:1.5px solid #86efac; border-radius:12px; padding:14px 16px; margin-bottom:14px; text-align:center;}
+  .welcomeTrialBanner{font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif; direction:rtl; line-height:2; background:linear-gradient(145deg,#dcfce7,#bbf7d0); border:1.5px solid #86efac; border-radius:12px; padding:14px 16px; margin-bottom:14px; text-align:center;}
   .welcomeTrialBanner .wtbHeadline{font-size:15px; font-weight:800; color:#166534; line-height:1.3;}
   .welcomeTrialBanner .wtbSubline{font-size:12.5px; font-weight:700; color:#166534; margin-top:4px;}
   .welcomeTrialBanner .wtbUrduNote{font-size:12.5px; color:#3f6212; margin-top:10px; line-height:1.7;}
@@ -3197,9 +3197,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
 
     <!-- ---------- 🎉 خوش آمدید بینر — بیٹا ٹیسٹنگ کی صاف وضاحت، پہلی نظر میں ---------- -->
     <div class="welcomeTrialBanner" style="display:none;">
-      <div class="wtbHeadline">🎉 Best Billing App — Try it FREE for 7 Days!</div>
-      <div class="wtbSubline">Your 7-Day Free Trial starts now.</div>
-      <div class="wtbUrduNote">This app is currently in Beta (testing) version. Please don't forget to take daily backups, and keep running your old method alongside it too. If you notice any issue — big or small — please report it to the developer right away, so this app can become the best it can be for you.</div>
+      <div class="wtbHeadline">🎉 بہترین بلنگ ایپ — 3 دن مفت آزمائیں</div>
+      <div class="wtbSubline">آپ کا 3 دن کا مفت ٹرائل شروع ہو گیا ہے</div>
     </div>
 
     <!-- ---------- ہمیشہ نظر آنے والی سبسکرپشن/ٹرائل کی حیثیت — لاگ ان سے پہلے ہی صاف پتا چل جائے ---------- -->
@@ -7763,7 +7762,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <!-- ---------- 👤 ہدایت (FM3SEPTH10): کسٹمر کا نام بھی ساتھ محفوظ ہو — بعد میں فہرست میں پہچانا جا سکے ---------- -->
       <input type="text" id="giftCodeNameInput" placeholder="کسٹمر کا نام (مثلاً: احمد فروٹ شاپ)" style="width:100%; padding:9px; margin-bottom:8px; border:1px solid #dbe1ea; border-radius:8px; font-size:13px;">
       <select id="giftCodeDaysInput" onchange="toggleCustomGiftDaysInput()" style="width:100%; padding:9px; margin-bottom:8px; border:1px solid #dbe1ea; border-radius:8px; font-size:13px;">
-        <option value="7">7 دن (Free Trial جتنا)</option>
+        <option value="3">3 دن (Free Trial جتنا)</option>
+        <option value="7">7 دن</option>
         <option value="30" selected>30 دن (1 مہینہ)</option>
         <option value="90">90 دن (3 مہینے)</option>
         <option value="180">180 دن (6 مہینے)</option>
@@ -9639,7 +9639,8 @@ function getDeveloperContact(){
 // 🆕 SM1410WE119: ریکوری کارڈ کی ترتیب — کل کی خریداری اوپر، آج کی خریداری نیچے (وصولی کے خانے کے سامنے)
 // 🆕 SM1510TH120: (1) بیوپاری کے پرچیز آرڈر — رنگین لمبا کیپسول، اوپر تاریخ، اس دن کی ادائیگی/بقایا کے کیپسول (2) آرڈر بکنگ میں چالان کا سٹاک بچا ہو تو دو وارننگ + PIN، باقی سٹاک کی ایڈمن کو فوراً اطلاع (ہوم پر پٹی + پاپ اپ)
 // 🆕 SM1610FR121: فری ٹرائل کی عبارت درست — ویلکم سکرین اور ختم ہونے والے پیغام میں 30 کی جگہ اصل 7 دن
-const APP_BUILD_VERSION = 'SM1610FR121'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1610FR122: فری ٹرائل 3 دن؛ پہلی بار صرف خوش آمدید + 'مفت ٹرائل شروع کریں' بٹن → 'اپنا کاروبار سیٹ کریں' فارم → سیدھا ایپ؛ ٹرائل کی عبارتیں اردو نستعلیق میں
+const APP_BUILD_VERSION = 'SM1610FR122'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -9754,7 +9755,7 @@ async function authFirestoreFetch(path, options = {}){
 // ---------- ہر انسٹالیشن کی منفرد شناخت — ڈیوائس کے fingerprint سے بنتی ہے (بالکل بے ترتیب نہیں) —
 // اسی لیے Data Clear/Uninstall کے بعد بھی وہی ID دوبارہ بنتی ہے (اسی فون پر)، تاکہ کوئی ٹرائل بار بار
 // ری سیٹ کر کے دوبارہ مفت استعمال نہ کر سکے۔ ٹرائل کا اصل تالا Firestore میں لگتا ہے (نیچے دیکھیں) ----------
-// نوٹ: بالکل پہلی بار (نیا ڈیوائس) پر خودکار 7 دن کا مفت (Beta) ٹرائل بھی شروع ہو جاتا ہے — تاکہ
+// نوٹ: بالکل پہلی بار (نیا ڈیوائس) پر خودکار 3 دن کا مفت (Beta) ٹرائل بھی شروع ہو جاتا ہے — تاکہ
 // کسی نئے صارف کو فائل کھولتے ہی PIN/Activation کے چکر میں نہ الجھنا پڑے، وہ فوراً ایپ آزما سکے۔
 function getOrCreateDeviceUID(){
   if(AppState.settings.deviceUID) return AppState.settings.deviceUID;
@@ -9772,7 +9773,7 @@ function getOrCreateDeviceUID(){
   AppState.settings.deviceUID = uid;
   if(!AppState.settings.subscriptionExpiry && !AppState.settings.freeTrialGranted){
     const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 7);
+    trialEnd.setDate(trialEnd.getDate() + 3); // 🎁 SM1610FR122: فری ٹرائل 3 دن
     AppState.settings.subscriptionExpiry = _smYMD(trialEnd);
     AppState.settings.subscriptionActivatedOn = _smYMD(new Date());
     AppState.settings.freeTrialGranted = true;
@@ -10779,7 +10780,7 @@ async function _origSetupLoginScreen(){
   // ---------- کوئی بھی غیر متوقع خرابی ہو (پرانا براؤزر، ڈیٹا کرپشن وغیرہ) تو صارف کبھی بھی خالی/غیر فعال اسکرین پر نہ رہے —
   // ناکامی کی صورت میں محفوظ ترین حالت (Free Trial کا سیدھا بٹن) خودکار دکھائیں ----------
   try{
-    getOrCreateDeviceUID(); // ---------- پہلی بار کھلنے پر یہیں سے 7 دن کا مفت ٹرائل بھی شروع ہو جاتا ہے ----------
+    getOrCreateDeviceUID(); // ---------- پہلی بار کھلنے پر یہیں سے 3 دن کا مفت ٹرائل بھی شروع ہو جاتا ہے ----------
 
     const trialActive = !!AppState.settings.isOnFreeTrial && isSubscriptionActive();
 
@@ -10787,8 +10788,9 @@ async function _origSetupLoginScreen(){
     let subscriptionExpired = false;
     if(isSubscriptionActive()){
       const days = daysLeftInSubscription();
+      if(AppState.settings.isOnFreeTrial) statusEl.style.fontFamily = "'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif";
       statusEl.textContent = AppState.settings.isOnFreeTrial
-        ? `🎁 Free Trial Active — ${days} day${days===1?'':'s'} remaining`
+        ? `🎁 مفت ٹرائل جاری — ${days} دن باقی`
         : `✅ Subscribed — ${days} day${days===1?'':'s'} remaining`;
       statusEl.style.background = '#eef2ff';
       statusEl.style.color = 'var(--primary-dark)';
@@ -10842,6 +10844,13 @@ async function _origSetupLoginScreen(){
       quickEnterApp();
       return;
     }
+    // 🎁 SM1610FR122: کاروبار ابھی سیٹ ہوا — ایک بار سیدھا ایپ میں (ڈیفالٹ PIN والا نیا مالک)
+    try{
+      if(localStorage.getItem('smAutoEnterOnce') === '1'){
+        localStorage.removeItem('smAutoEnterOnce');
+        if(stillDefaultPin && !subscriptionExpired){ quickEnterApp(); return; }
+      }
+    }catch(e){}
   }catch(err){
     console.error('setupLoginScreen ناکام ہو گیا، محفوظ حالت پر واپس جا رہے ہیں:', err);
     const statusEl = document.getElementById('loginSubStatus');
@@ -10919,7 +10928,7 @@ function finishLogin(user, rememberOverride){
   if(empPinEl) empPinEl.value = '';
 
   // ---------- سبسکرپشن فعال نہ ہو تو ایپ نہیں کھلے گی، فعال سازی صفحہ دکھایا جائے گا ----------
-  // (getOrCreateDeviceUID یہاں پہلے چلانا ضروری ہے — بالکل نئے ڈیوائس پر یہی 7 دن کا مفت ٹرائل شروع کرتا ہے)
+  // (getOrCreateDeviceUID یہاں پہلے چلانا ضروری ہے — بالکل نئے ڈیوائس پر یہی 3 دن کا مفت ٹرائل شروع کرتا ہے)
   getOrCreateDeviceUID();
   if(!isSubscriptionActive()){
     showSubscriptionGate();
@@ -11917,7 +11926,7 @@ function _origShowSubscriptionGate(){
   const exp = AppState.settings.subscriptionExpiry;
   document.getElementById('subGateStatus').textContent = exp
     ? (AppState.settings.isOnFreeTrial
-        ? `Your 7-day free trial ended on ${formatDateDMY(exp)}. Please contact the developer to continue.`
+        ? `آپ کا 3 دن کا مفت ٹرائل ${formatDateDMY(exp)} کو ختم ہو گیا۔ آگے چلانے کے لیے ڈویلپر سے رابطہ کریں۔`
         : `Your subscription expired on ${formatDateDMY(exp)}.`)
     : `This app is not yet activated.`;
   document.getElementById('subscriptionGateScreen').style.display = 'flex';
@@ -51026,12 +51035,20 @@ document.addEventListener('DOMContentLoaded', () => {
     #smRegOverlay .smPicBtn{ flex:1; text-align:center; padding:6px 2px; background:#eef2ff; color:#1e3a8a; border-radius:9px; font-size:12.5px; font-weight:800; cursor:pointer; border:1px solid #c7d2fe; }
     #smRegOverlay .smPic small{ display:block; font-size:10.5px; color:#64748b; line-height:1.5; }
   </style>
-  <div class="smWrap"><div class="smCard">
+  <!-- 🎁 SM1610FR122: پہلی بار — صرف خوش آمدید + ایک بٹن "3 دن کا مفت ٹرائل شروع کریں"؛ دبانے پر نیچے "اپنا کاروبار سیٹ کریں" فارم -->
+  <div class="smWrap" id="smWelcomeStep"><div class="smCard" style="text-align:center; gap:14px; padding:26px 18px;">
+    <img src="icons/icon-192.png" alt="" style="width:96px; height:96px; border-radius:22px; margin:0 auto; box-shadow:0 6px 16px rgba(0,0,0,.3); object-fit:cover;">
+    <div style="font-size:34px; font-weight:800; color:#065f46; line-height:1.6;">سبزی منڈی</div>
+    <div style="font-size:19px; color:#334155; line-height:2;">🎉 منڈی کے حساب کتاب کی بہترین ایپ</div>
+    <div style="background:linear-gradient(145deg,#dcfce7,#bbf7d0); border:2px solid #86efac; border-radius:16px; padding:10px 12px; font-size:22px; font-weight:800; color:#166534; line-height:2;">🎁 3 دن کا مفت ٹرائل</div>
+    <button type="button" onclick="smStartTrial()" style="width:100%; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:22px; font-weight:800; cursor:pointer; box-shadow:0 5px 0 rgba(0,0,0,.25); line-height:1.8;">🎁 مفت ٹرائل شروع کریں</button>
+  </div></div>
+  <div class="smWrap" id="smRegStep" style="display:none;"><div class="smCard">
     <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
       <img src="icons/icon-192.png" alt="" style="width:58px; height:58px; border-radius:14px; box-shadow:0 4px 10px rgba(0,0,0,.25); object-fit:cover;">
       <div style="text-align:right;">
         <div style="font-size:24px; font-weight:800; color:#065f46; line-height:1.5;">سبزی منڈی</div>
-        <div style="font-size:13px; color:#475569; line-height:1.6;">اپنی دکان رجسٹر کریں</div>
+        <div style="font-size:15px; color:#475569; line-height:1.6; font-weight:800;">🏪 اپنا کاروبار سیٹ کریں</div>
       </div>
     </div>
     <div>
@@ -51066,7 +51083,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
     <div>
-      <button type="button" onclick="smRegSave()" style="width:100%; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ رجسٹر کریں</button>
+      <button type="button" onclick="smRegSave()" style="width:100%; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ محفوظ کریں اور ایپ کھولیں</button>
       <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; flex-wrap:wrap;">
         <span style="font-size:12px; color:#64748b;">ابتدائی پن: <b dir="ltr">1234</b></span>
         <a href="javascript:void(0)" onclick="smJoinAsStaff()" style="font-size:12.5px; color:#1d4ed8; font-weight:800;">📲 ملازم ہیں؟ دکان سے جڑیں</a>
@@ -51077,6 +51094,12 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 <script>
 const smRegImgs = { Logo: '', Owner: '' };
+// 🎁 SM1610FR122: ٹرائل بٹن → کاروبار سیٹ کرنے والا فارم
+function smStartTrial(){
+  document.getElementById('smWelcomeStep').style.display = 'none';
+  document.getElementById('smRegStep').style.display = '';
+  setTimeout(() => { try{ document.getElementById('smRegShop').focus(); }catch(e){} }, 200);
+}
 // ---------- تصویر چھوٹی کر کے (256px) محفوظ — ایپ ہلکی رہے ----------
 function smShrinkImage(file, cb){
   const r = new FileReader();
@@ -51139,6 +51162,7 @@ function smRegSave(){
   }catch(e){}
   document.getElementById('smRegOverlay').style.display = 'none';
   smApplyBranding();
+  try{ localStorage.setItem('smAutoEnterOnce', '1'); }catch(e){} // 🎁 SM1610FR122: ری لوڈ کے بعد سیدھا ایپ میں (لاگ اِن سکرین نہیں)
   setTimeout(() => location.reload(), 300); // دکان کا کلاؤڈ راستہ (موبائل نمبر) نئے سرے سے بنے
 }
 // ---------- 📲 ملازم کا فون: پہلے سے رجسٹر دکان سے جڑیں (مالک کا موبائل نمبر) ----------
