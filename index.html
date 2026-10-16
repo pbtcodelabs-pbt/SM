@@ -7773,6 +7773,14 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <div class="settingsSubLabel" style="margin-top:18px; padding-top:14px; border-top:1px solid #eef2f7; color:#15803d;">🎁 Generate Gift / Activation Code</div>
       <div class="settingsHint" style="margin-top:0; margin-bottom:6px;">دورانیہ منتخب کریں — کوڈ بن کر نیچے نظر آئے گا، اسی وقت WhatsApp پر شیئر کر سکتے ہیں۔ خالی چھوڑیں تو کوئی بھی ڈیوائس اسے ایک بار استعمال کر سکے گی۔</div>
       <!-- ---------- 👤 ہدایت (FM3SEPTH10): کسٹمر کا نام بھی ساتھ محفوظ ہو — بعد میں فہرست میں پہچانا جا سکے ---------- -->
+      <!-- 📋 SM1610FR124: گاہک کا واٹس ایپ "کوڈ منگوائیں" پیغام یہاں پیسٹ کریں — نام، موبائل، پیکج، UID خود بھر جائیں -->
+      <div style="background:#fefce8; border:2px dashed #ca8a04; border-radius:10px; padding:8px; margin-bottom:8px;">
+        <div style="font-weight:800; font-size:13px; color:#854d0e; margin-bottom:5px;">📋 گاہک کا پیغام پیسٹ کریں (سب خانے خود بھر جائیں گے)</div>
+        <textarea id="giftCodePasteInput" rows="3" dir="auto" placeholder="واٹس ایپ پیغام کاپی کر کے یہاں پیسٹ کریں" oninput="giftParseRequest(this.value)" style="width:100%; box-sizing:border-box; padding:7px; border:1px solid #ca8a04; border-radius:8px; font-size:12.5px;"></textarea>
+        <button class="testPrintBtn" style="margin:5px 0 0; background:#ca8a04; color:#fff;" onclick="giftPasteFromClipboard()">📋 کلپ بورڈ سے پیسٹ کریں</button>
+        <div id="giftCodePasteMsg" style="font-size:12.5px; font-weight:800; margin-top:4px;"></div>
+      </div>
+      <input type="hidden" id="giftCodeMobileInput">
       <input type="text" id="giftCodeNameInput" placeholder="کسٹمر کا نام (مثلاً: احمد فروٹ شاپ)" style="width:100%; padding:9px; margin-bottom:8px; border:1px solid #dbe1ea; border-radius:8px; font-size:13px;">
       <select id="giftCodeDaysInput" onchange="toggleCustomGiftDaysInput()" style="width:100%; padding:9px; margin-bottom:8px; border:1px solid #dbe1ea; border-radius:8px; font-size:13px;">
         <option value="3">3 دن (Free Trial جتنا)</option>
@@ -9654,7 +9662,8 @@ function getDeveloperContact(){
 // 🆕 SM1610FR121: فری ٹرائل کی عبارت درست — ویلکم سکرین اور ختم ہونے والے پیغام میں 30 کی جگہ اصل 7 دن
 // 🆕 SM1610FR122: فری ٹرائل 3 دن؛ پہلی بار صرف خوش آمدید + 'مفت ٹرائل شروع کریں' بٹن → 'اپنا کاروبار سیٹ کریں' فارم → سیدھا ایپ؛ ٹرائل کی عبارتیں اردو نستعلیق میں
 // 🆕 SM1610FR123: پہلی بار سیدھا 'اپنا کاروبار سیٹ کریں' — نیچے پیکج کی تفصیل، '3 دن کا مفت ٹرائل' بٹن، 'ایکٹیویشن کوڈ لگائیں'، 'کوڈ منگوائیں' (نام ضروری، پیکج، UID خودکار → واٹس ایپ)؛ لاگ اِن پر ٹرائل کے باقی دن + کوڈ لگانے/منگوانے کے بٹن
-const APP_BUILD_VERSION = 'SM1610FR123'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1610FR124: کوڈ منگوانے کا پیغام کاپی والے بلاک میں؛ ڈویلپر پینل میں پیغام پیسٹ کرتے ہی نام/موبائل/پیکج/UID خود بھریں؛ گاہک کو واٹس ایپ پر صرف کوڈ؛ کوڈ لگاتے وقت فالتو لفظ خود ہٹیں
+const APP_BUILD_VERSION = 'SM1610FR124'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -10109,7 +10118,9 @@ function _parseFirestoreFields(fields){
 
 // ---------- کسٹمر کا درج کردہ کوڈ Firestore سے آن لائن تصدیق کریں (اب فارمولا فائل کے اندر کہیں نہیں) ----------
 async function activateSubscription(code){
-  const trimmedCode = (code || '').trim();
+  let trimmedCode = (code || '').trim();
+  // 🔑 SM1610FR124: کوڈ کے ساتھ غلطی سے کوئی لفظ/نشان بھی کاپی ہو جائے تو صرف اصل کوڈ (XXXXX-XXXXX) نکال لیں
+  { const m = trimmedCode.toUpperCase().match(/[A-Z2-9]{5}-[A-Z2-9]{5}/); if(m) trimmedCode = m[0]; }
   if(!trimmedCode) return {success:false, message:'Please enter an activation code.'};
 
   const uid = getOrCreateDeviceUID();
@@ -45118,6 +45129,7 @@ async function generateGiftCode(){
   else fields.days = { integerValue: daysVal };
   if(uidVal) fields.boundUid = { stringValue: uidVal };
   if(nameVal) fields.customerName = { stringValue: nameVal };
+  const _mobVal = ((document.getElementById('giftCodeMobileInput') || {}).value || '').trim(); if(_mobVal) fields.customerMobile = { stringValue: _mobVal };
   fields.plan = { stringValue: (document.getElementById('giftCodePlanInput') || {}).value || 'P1' }; // 📦 پیکج
 
   try{
@@ -45289,14 +45301,41 @@ async function deleteLicenseCode(code){
   loadIssuedCodesList();
 }
 
+// 📋 SM1610FR124: گاہک کے پیغام سے نام/دکان/موبائل/پیکج/UID نکالیں
+function giftParseRequest(txt){
+  txt = String(txt || '');
+  const get = k => { const m = txt.match(new RegExp(k + '\\s*[:：]\\s*([^\\n`]+)', 'i')); return m ? m[1].trim() : ''; };
+  const name = get('NAME') || get('نام'), shop = get('SHOP') || get('دکان');
+  const mob = (get('MOBILE') || get('موبائل')).replace(/[^0-9]/g, '');
+  const uid = (get('UID').match(/\d{4,}/) || [''])[0];
+  let plan = (get('PLAN').toUpperCase().match(/P1(\+[1-5])?/) || [''])[0];
+  if(!plan){ const pm = txt.match(/\(?(P1(?:\+[1-5])?)\)?/i); if(pm) plan = pm[1].toUpperCase(); }
+  const set = (id, v) => { const el = document.getElementById(id); if(el && v) el.value = v; };
+  set('giftCodeNameInput', name ? (shop ? name + ' — ' + shop : name) : '');
+  set('giftCodeUidInput', uid);
+  set('giftCodeMobileInput', mob);
+  if(plan){ const ps = document.getElementById('giftCodePlanInput'); if(ps && [...ps.options].some(o => o.value === plan)) ps.value = plan; }
+  const msg = document.getElementById('giftCodePasteMsg');
+  if(msg){
+    const ok = [name && '👤 ' + name, mob && '📱 ' + mob, plan && '📦 ' + plan, uid && '🆔 ' + uid].filter(Boolean);
+    msg.style.color = ok.length ? '#15803d' : '#b91c1c';
+    msg.textContent = ok.length ? '✅ بھر گیا: ' + ok.join(' · ') : (txt.trim() ? '⚠️ پیغام میں نام/UID نہیں ملا' : '');
+  }
+}
+async function giftPasteFromClipboard(){
+  try{ const t = await navigator.clipboard.readText(); const el = document.getElementById('giftCodePasteInput'); el.value = t; giftParseRequest(t); }
+  catch(e){ alert('کلپ بورڈ نہیں کھل سکا — خانے میں دبا کر رکھیں اور Paste کریں'); }
+}
 function copyGiftCode(){
   if(!lastGeneratedGiftCode) return;
   navigator.clipboard?.writeText(lastGeneratedGiftCode).then(() => alert('📋 Copied: ' + lastGeneratedGiftCode));
 }
 function shareGiftCodeWhatsapp(){
   if(!lastGeneratedGiftCode) return;
-  const msg = `🍇 ${smBiz()} — آپ کا ایکٹیویشن کوڈ:\n\n${lastGeneratedGiftCode}\n\nایپ میں Settings → Subscription میں جا کر یہ کوڈ درج کریں۔`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  // 📤 SM1610FR124: گاہک کو صرف کوڈ — کوئی اور لفظ نہیں، تاکہ کاپی کرتے وقت غلطی نہ ہو؛ موبائل معلوم ہو تو سیدھا اسی کی چیٹ
+  const mob = ((document.getElementById('giftCodeMobileInput') || {}).value || '').replace(/[^0-9]/g, '');
+  const to = /^03\d{9}$/.test(mob) ? '92' + mob.slice(1) : '';
+  window.open(`https://wa.me/${to}?text=${encodeURIComponent(lastGeneratedGiftCode)}`, '_blank');
 }
 
 let devVersionTapCount = 0, devVersionTapTimer = null;
@@ -51112,7 +51151,8 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- 📦 SM1610FR123: پیکج کی سادہ تفصیل + تین راستے: مفت ٹرائل / ایکٹیویشن کوڈ / کوڈ منگوائیں -->
       <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:6px 10px; font-size:13.5px; color:#14532d; line-height:2;">
         <b>📦 پیکج:</b> مفت ٹرائل = 3 دن، صرف مالک<br>
-        پورا پیکج کوڈ سے: <b>1+1</b> (مالک + 1 ملازم)، <b>1+2</b>، <b>1+3</b> …
+        پورا پیکج کوڈ سے: <b>1+1</b> (مالک + 1 ملازم)، <b>1+2</b>، <b>1+3</b> …<br>
+        <span style="color:#1d4ed8;">🔄 ایپ دوبارہ انسٹال کی ہے؟ اسی فون پر پرانی سبسکرپشن خود بحال ہو جائے گی — نیا کوڈ نہیں چاہیے</span>
       </div>
       <button type="button" onclick="smRegSave()" style="width:100%; margin-top:8px; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); line-height:1.9;">🎁 3 دن کا مفت ٹرائل شروع کریں</button>
       <div style="display:flex; gap:8px; margin-top:8px;">
@@ -51171,8 +51211,9 @@ function smSendCodeRequest(){
   const shop = ((document.getElementById('smRegShop') || {}).value || '').trim() || AppState.settings.businessName || '';
   const mob = ((document.getElementById('smRegPhone') || {}).value || '').replace(/[^0-9]/g, '') || AppState.settings.businessPhone || '';
   const uid = getOrCreateDeviceUID();
-  const msg = 'السلام علیکم ڈویلپر صاحب\n\nمجھے سبزی منڈی ایپ کا کوڈ چاہیے۔\n\n👤 نام: ' + name + (shop ? '\n🏪 دکان: ' + shop : '') + (mob ? '\n📱 موبائل: ' + mob : '')
-    + '\n📦 پیکج: ' + smPlanText(plan) + ' (' + plan + ')\n🆔 UID: ' + uid;
+  // 📋 SM1610FR124: نیچے والا حصہ واٹس ایپ میں کاپی والے (کوڈ) انداز میں — ڈویلپر پورا پیغام کاپی کر کے پینل میں پیسٹ کرے، سب خانے خود بھر جائیں
+  const msg = 'السلام علیکم ڈویلپر صاحب، مجھے سبزی منڈی ایپ کا کوڈ چاہیے (' + smPlanText(plan) + ')۔\n\n'
+    + '```\nSM-CODE\nNAME: ' + name + (shop ? '\nSHOP: ' + shop : '') + (mob ? '\nMOBILE: ' + mob : '') + '\nPLAN: ' + plan + '\nUID: ' + uid + '\n```';
   const c = getDeveloperContact();
   window.open('https://wa.me/' + c.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
 }
