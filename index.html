@@ -3205,6 +3205,19 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     <div id="loginSubStatus" style="display:inline-block; background:#eef2ff; border-radius:16px; padding:4px 14px; margin-bottom:6px; font-size:11px; font-weight:800; color:var(--primary-dark);"></div>
     <div style="margin:0 0 8px;"><button type="button" id="smSubCheckBtn" onclick="smRefreshSubscription(this)" style="width:auto !important; margin:0 !important; padding:5px 14px !important; font-size:12px !important; border-radius:999px !important; background:#ecfdf5 !important; color:#065f46 !important; border:1.5px solid #6ee7b7 !important; font-weight:800; cursor:pointer; box-shadow:none !important;">🔄 سبسکرپشن چیک / تازہ کریں</button></div>
     <div id="smSubCheckMsg" style="display:none;"></div>
+    <!-- 🎁 SM1610FR123: ٹرائل کے دوران — باقی دن + ایکٹیویشن کوڈ لگائیں / کوڈ منگوائیں (سادہ اردو) -->
+    <div id="smTrialLoginBox" dir="rtl" style="display:none; background:linear-gradient(145deg,#fef9c3,#fde68a); border:2px solid #f59e0b; border-radius:14px; padding:8px 10px; margin:0 0 8px; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif; color:#78350f; text-align:center;">
+      <div id="smTrialLoginTxt" style="font-size:16px; font-weight:800; line-height:2;"></div>
+      <div style="display:flex; gap:6px; margin-top:4px;">
+        <button type="button" onclick="smTrialToggleCode()" style="flex:1; width:auto !important; margin:0 !important; padding:6px 4px !important; border-radius:10px !important; background:#1d4ed8 !important; color:#fff !important; font-family:inherit; font-size:14px !important; font-weight:800; box-shadow:none !important; line-height:1.9;">🔑 کوڈ لگائیں</button>
+        <button type="button" onclick="smOpenCodeRequest(false)" style="flex:1; width:auto !important; margin:0 !important; padding:6px 4px !important; border-radius:10px !important; background:#16a34a !important; color:#fff !important; font-family:inherit; font-size:14px !important; font-weight:800; box-shadow:none !important; line-height:1.9;">📲 کوڈ منگوائیں</button>
+      </div>
+      <div id="smTrialCodeBox" style="display:none; margin-top:6px;">
+        <input id="smTrialCodeInput" type="text" dir="ltr" placeholder="ایکٹیویشن کوڈ" style="width:100% !important; box-sizing:border-box; text-align:center; font-family:'Arial Black',Arial,sans-serif; font-size:16px; border:2px solid #93c5fd !important; border-radius:10px !important;">
+        <button type="button" onclick="smTrialActivate()" style="margin-top:6px !important; border-radius:10px !important; background:#1d4ed8 !important; font-family:inherit; font-size:15px !important; line-height:1.9;">✅ کوڈ لگائیں</button>
+        <div id="smTrialCodeMsg" style="font-size:13px; font-weight:800; line-height:1.9;"></div>
+      </div>
+    </div>
 
     <!-- ---------- 🩺 تشخیصی بینر — اگر یہ ڈومین (مثلاً Firebase والا) Cloud (Firestore) سے یوزر/PIN ڈیٹا حاصل نہ کر سکے
     // تو یہاں صاف وجہ دکھائیں — تاکہ ڈویلپر بغیر براؤزر Console کھولے فوراً سمجھ سکے کہ کیا مسئلہ ہے ---------- -->
@@ -3212,7 +3225,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
 
     <!-- ---------- 🆕 ڈیفالٹ PIN (1234) ابھی تک تبدیل نہیں ہوا — پہلی بار کھلنے پر واضح دعوت دیں کہ اپنا PIN ابھی سیٹ کر لیں ---------- -->
     <div id="loginFirstPinBanner" style="display:none; background:#fffbeb; border:1px solid #fde68a; color:#92400e; border-radius:8px; padding:6px 10px; margin-bottom:6px; font-size:11px; font-weight:700; text-align:center;">
-      🆕 Default PIN (1234) — <a href="javascript:void(0)" onclick="openFirstPinSetup()" style="color:var(--primary-dark); text-decoration:underline;">tap to set your own now.</a>
+      <span style="font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif; font-size:14px; line-height:2;">🆕 ابتدائی PIN (1234) — <a href="javascript:void(0)" onclick="openFirstPinSetup()" style="color:var(--primary-dark); text-decoration:underline;">اپنا PIN ابھی بنائیں</a></span>
     </div>
 
     <!-- ---------- ڈیفالٹ PIN (1234) پر موجود نئے/ٹرائل صارف کے لیے — کوئی PIN ٹائپ نہیں کرنی، سیدھا اندر ---------- -->
@@ -9640,7 +9653,8 @@ function getDeveloperContact(){
 // 🆕 SM1510TH120: (1) بیوپاری کے پرچیز آرڈر — رنگین لمبا کیپسول، اوپر تاریخ، اس دن کی ادائیگی/بقایا کے کیپسول (2) آرڈر بکنگ میں چالان کا سٹاک بچا ہو تو دو وارننگ + PIN، باقی سٹاک کی ایڈمن کو فوراً اطلاع (ہوم پر پٹی + پاپ اپ)
 // 🆕 SM1610FR121: فری ٹرائل کی عبارت درست — ویلکم سکرین اور ختم ہونے والے پیغام میں 30 کی جگہ اصل 7 دن
 // 🆕 SM1610FR122: فری ٹرائل 3 دن؛ پہلی بار صرف خوش آمدید + 'مفت ٹرائل شروع کریں' بٹن → 'اپنا کاروبار سیٹ کریں' فارم → سیدھا ایپ؛ ٹرائل کی عبارتیں اردو نستعلیق میں
-const APP_BUILD_VERSION = 'SM1610FR122'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1610FR123: پہلی بار سیدھا 'اپنا کاروبار سیٹ کریں' — نیچے پیکج کی تفصیل، '3 دن کا مفت ٹرائل' بٹن، 'ایکٹیویشن کوڈ لگائیں'، 'کوڈ منگوائیں' (نام ضروری، پیکج، UID خودکار → واٹس ایپ)؛ لاگ اِن پر ٹرائل کے باقی دن + کوڈ لگانے/منگوانے کے بٹن
+const APP_BUILD_VERSION = 'SM1610FR123'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -10786,6 +10800,14 @@ async function _origSetupLoginScreen(){
 
     const statusEl = document.getElementById('loginSubStatus');
     let subscriptionExpired = false;
+    try{
+      const tb = document.getElementById('smTrialLoginBox');
+      if(tb){
+        const onTrial = !!AppState.settings.isOnFreeTrial && isSubscriptionActive() && !AppState.settings.smJoinedAsStaff;
+        tb.style.display = onTrial ? 'block' : 'none';
+        if(onTrial) document.getElementById('smTrialLoginTxt').textContent = '🎁 آپ کا مفت ٹرائل: ' + daysLeftInSubscription() + ' دن باقی — پورا پیکج چلانے کے لیے ایکٹیویشن کوڈ لگائیں';
+      }
+    }catch(e){}
     if(isSubscriptionActive()){
       const days = daysLeftInSubscription();
       if(AppState.settings.isOnFreeTrial) statusEl.style.fontFamily = "'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif";
@@ -10848,7 +10870,7 @@ async function _origSetupLoginScreen(){
     try{
       if(localStorage.getItem('smAutoEnterOnce') === '1'){
         localStorage.removeItem('smAutoEnterOnce');
-        if(stillDefaultPin && !subscriptionExpired){ quickEnterApp(); return; }
+        if(stillDefaultPin && !subscriptionExpired){ quickEnterApp(); return; } // ٹرائل یا کوڈ — دونوں کے بعد سیدھا اندر
       }
     }catch(e){}
   }catch(err){
@@ -12947,6 +12969,18 @@ async function deleteProductRowInSheet(productId){
 function toggleLoginActivationBox(){
   const box = document.getElementById('loginActivationBox');
   if(box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+// 🎁 SM1610FR123: لاگ اِن پر ٹرائل والا ڈبہ — کوڈ لگانا
+function smTrialToggleCode(){ const b = document.getElementById('smTrialCodeBox'); b.style.display = b.style.display === 'none' ? 'block' : 'none'; }
+async function smTrialActivate(){
+  const msg = document.getElementById('smTrialCodeMsg');
+  const code = (document.getElementById('smTrialCodeInput').value || '').trim();
+  if(!code){ msg.style.color = '#b91c1c'; msg.textContent = 'پہلے کوڈ لکھیں'; return; }
+  msg.style.color = '#334155'; msg.textContent = '⏳ کوڈ چیک ہو رہا ہے…';
+  let r = null; try{ r = await activateSubscription(code); }catch(e){ r = {success:false, message:'انٹرنیٹ چیک کریں'}; }
+  if(r && r.success){ msg.style.color = '#15803d'; msg.textContent = smActMsg(r); setTimeout(() => { setupLoginScreen(); }, 1200); }
+  else { msg.style.color = '#b91c1c'; msg.textContent = '❌ کوڈ درست نہیں — ' + ((r && r.message) || ''); }
 }
 
 // ---------- PIN درج کیے بغیر ہی، سیدھا Login سکرین سے کوڈ لگا کر ٹرائل/سبسکرپشن فعال کریں ----------
@@ -51035,15 +51069,7 @@ document.addEventListener('DOMContentLoaded', () => {
     #smRegOverlay .smPicBtn{ flex:1; text-align:center; padding:6px 2px; background:#eef2ff; color:#1e3a8a; border-radius:9px; font-size:12.5px; font-weight:800; cursor:pointer; border:1px solid #c7d2fe; }
     #smRegOverlay .smPic small{ display:block; font-size:10.5px; color:#64748b; line-height:1.5; }
   </style>
-  <!-- 🎁 SM1610FR122: پہلی بار — صرف خوش آمدید + ایک بٹن "3 دن کا مفت ٹرائل شروع کریں"؛ دبانے پر نیچے "اپنا کاروبار سیٹ کریں" فارم -->
-  <div class="smWrap" id="smWelcomeStep"><div class="smCard" style="text-align:center; gap:14px; padding:26px 18px;">
-    <img src="icons/icon-192.png" alt="" style="width:96px; height:96px; border-radius:22px; margin:0 auto; box-shadow:0 6px 16px rgba(0,0,0,.3); object-fit:cover;">
-    <div style="font-size:34px; font-weight:800; color:#065f46; line-height:1.6;">سبزی منڈی</div>
-    <div style="font-size:19px; color:#334155; line-height:2;">🎉 منڈی کے حساب کتاب کی بہترین ایپ</div>
-    <div style="background:linear-gradient(145deg,#dcfce7,#bbf7d0); border:2px solid #86efac; border-radius:16px; padding:10px 12px; font-size:22px; font-weight:800; color:#166534; line-height:2;">🎁 3 دن کا مفت ٹرائل</div>
-    <button type="button" onclick="smStartTrial()" style="width:100%; padding:14px; border:none; border-radius:14px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:22px; font-weight:800; cursor:pointer; box-shadow:0 5px 0 rgba(0,0,0,.25); line-height:1.8;">🎁 مفت ٹرائل شروع کریں</button>
-  </div></div>
-  <div class="smWrap" id="smRegStep" style="display:none;"><div class="smCard">
+  <div class="smWrap" id="smRegStep"><div class="smCard">
     <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
       <img src="icons/icon-192.png" alt="" style="width:58px; height:58px; border-radius:14px; box-shadow:0 4px 10px rgba(0,0,0,.25); object-fit:cover;">
       <div style="text-align:right;">
@@ -51083,7 +51109,21 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     </div>
     <div>
-      <button type="button" onclick="smRegSave()" style="width:100%; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25);">✅ محفوظ کریں اور ایپ کھولیں</button>
+      <!-- 📦 SM1610FR123: پیکج کی سادہ تفصیل + تین راستے: مفت ٹرائل / ایکٹیویشن کوڈ / کوڈ منگوائیں -->
+      <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:6px 10px; font-size:13.5px; color:#14532d; line-height:2;">
+        <b>📦 پیکج:</b> مفت ٹرائل = 3 دن، صرف مالک<br>
+        پورا پیکج کوڈ سے: <b>1+1</b> (مالک + 1 ملازم)، <b>1+2</b>، <b>1+3</b> …
+      </div>
+      <button type="button" onclick="smRegSave()" style="width:100%; margin-top:8px; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); line-height:1.9;">🎁 3 دن کا مفت ٹرائل شروع کریں</button>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button type="button" onclick="smRegToggleCode()" style="flex:1; padding:8px 4px; border:2px solid #1d4ed8; border-radius:12px; background:#eff6ff; color:#1e3a8a; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">🔑 ایکٹیویشن کوڈ لگائیں</button>
+        <button type="button" onclick="smOpenCodeRequest(true)" style="flex:1; padding:8px 4px; border:2px solid #16a34a; border-radius:12px; background:#f0fdf4; color:#14532d; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">📲 کوڈ منگوائیں</button>
+      </div>
+      <div id="smRegCodeBox" style="display:none; margin-top:8px; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:12px; padding:8px;">
+        <input id="smRegCodeInput" type="text" dir="ltr" placeholder="ایکٹیویشن کوڈ یہاں لکھیں" style="width:100%; box-sizing:border-box; padding:9px; border:2px solid #93c5fd; border-radius:10px; font-size:17px; text-align:center; font-family:'Arial Black',Arial,sans-serif;">
+        <button type="button" onclick="smRegActivate()" style="width:100%; margin-top:6px; padding:8px; border:none; border-radius:10px; background:#1d4ed8; color:#fff; font-family:inherit; font-size:17px; font-weight:800; cursor:pointer; line-height:1.9;">✅ کوڈ لگا کر ایپ کھولیں</button>
+        <div id="smRegCodeMsg" style="font-size:13px; font-weight:800; margin-top:4px; line-height:1.9;"></div>
+      </div>
       <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; flex-wrap:wrap;">
         <span style="font-size:12px; color:#64748b;">ابتدائی پن: <b dir="ltr">1234</b></span>
         <a href="javascript:void(0)" onclick="smJoinAsStaff()" style="font-size:12.5px; color:#1d4ed8; font-weight:800;">📲 ملازم ہیں؟ دکان سے جڑیں</a>
@@ -51092,14 +51132,72 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </div></div>
 </div>
+<!-- 📲 SM1610FR123: کوڈ منگوائیں — نام (ضروری)، پیکج، UID خودکار → ڈویلپر کو واٹس ایپ -->
+<div id="smCodeReqModal" dir="rtl" style="display:none; position:fixed; inset:0; z-index:2147483100; background:rgba(15,23,42,.6); align-items:center; justify-content:center; padding:16px; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;">
+  <div style="width:100%; max-width:400px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 18px 50px rgba(0,0,0,.35);">
+    <div style="background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; padding:10px 14px; font-size:22px; font-weight:800; text-align:center; line-height:1.9;">📲 کوڈ منگوائیں</div>
+    <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
+      <label style="font-weight:800; font-size:15px;">👤 آپ کا نام *</label>
+      <input id="smCrName" type="text" dir="rtl" placeholder="اپنا نام لکھیں (ضروری)" style="padding:9px; border:2px solid #86efac; border-radius:10px; font-family:inherit; font-size:16px;">
+      <label style="font-weight:800; font-size:15px;">📦 کون سا پیکج چاہیے؟</label>
+      <select id="smCrPlan" style="padding:9px; border:2px solid #16a34a; border-radius:10px; font-family:inherit; font-size:15px; font-weight:800;">
+        <option value="P1">1 — صرف مالک</option>
+        <option value="P1+1" selected>1+1 — مالک + 1 ملازم</option>
+        <option value="P1+2">1+2 — مالک + 2 ملازم</option>
+        <option value="P1+3">1+3 — مالک + 3 ملازم</option>
+        <option value="P1+4">1+4 — مالک + 4 ملازم</option>
+        <option value="P1+5">1+5 — مالک + 5 ملازم</option>
+      </select>
+      <div style="background:#f1f5f9; border-radius:10px; padding:6px 10px; font-size:14px; display:flex; justify-content:space-between; align-items:center;"><span>🆔 آپ کا UID (خودکار)</span><b id="smCrUid" dir="ltr" style="font-family:'Arial Black',Arial,sans-serif; font-size:17px;"></b></div>
+      <button type="button" onclick="smSendCodeRequest()" style="padding:10px; border:none; border-radius:12px; background:#25d366; color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; line-height:1.9;">💬 واٹس ایپ پر کوڈ منگوائیں</button>
+      <button type="button" onclick="document.getElementById('smCodeReqModal').style.display='none'" style="padding:8px; border:none; border-radius:12px; background:#e2e8f0; color:#334155; font-family:inherit; font-size:16px; font-weight:800; cursor:pointer;">✖ بند کریں</button>
+    </div>
+  </div>
+</div>
 <script>
 const smRegImgs = { Logo: '', Owner: '' };
-// 🎁 SM1610FR122: ٹرائل بٹن → کاروبار سیٹ کرنے والا فارم
-function smStartTrial(){
-  document.getElementById('smWelcomeStep').style.display = 'none';
-  document.getElementById('smRegStep').style.display = '';
-  setTimeout(() => { try{ document.getElementById('smRegShop').focus(); }catch(e){} }, 200);
+// ---------- 📲 SM1610FR123: کوڈ منگوانا / کوڈ لگانا ----------
+function smOpenCodeRequest(fromReg){
+  const nm = document.getElementById('smCrName');
+  const own = fromReg ? ((document.getElementById('smRegOwner') || {}).value || '').trim() : (AppState.settings.ownerName || '');
+  if(nm && !nm.value) nm.value = own;
+  document.getElementById('smCrUid').textContent = getOrCreateDeviceUID();
+  document.getElementById('smCodeReqModal').style.display = 'flex';
 }
+function smSendCodeRequest(){
+  const name = (document.getElementById('smCrName').value || '').trim();
+  if(!name){ alert('اپنا نام لکھنا ضروری ہے'); document.getElementById('smCrName').focus(); return; }
+  const plan = document.getElementById('smCrPlan').value;
+  const shop = ((document.getElementById('smRegShop') || {}).value || '').trim() || AppState.settings.businessName || '';
+  const mob = ((document.getElementById('smRegPhone') || {}).value || '').replace(/[^0-9]/g, '') || AppState.settings.businessPhone || '';
+  const uid = getOrCreateDeviceUID();
+  const msg = 'السلام علیکم ڈویلپر صاحب\n\nمجھے سبزی منڈی ایپ کا کوڈ چاہیے۔\n\n👤 نام: ' + name + (shop ? '\n🏪 دکان: ' + shop : '') + (mob ? '\n📱 موبائل: ' + mob : '')
+    + '\n📦 پیکج: ' + smPlanText(plan) + ' (' + plan + ')\n🆔 UID: ' + uid;
+  const c = getDeveloperContact();
+  window.open('https://wa.me/' + c.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
+}
+function smRegToggleCode(){
+  const b = document.getElementById('smRegCodeBox');
+  b.style.display = b.style.display === 'none' ? '' : 'none';
+  if(b.style.display === '') setTimeout(() => document.getElementById('smRegCodeInput').focus(), 100);
+}
+async function smRegActivate(){
+  const msg = document.getElementById('smRegCodeMsg');
+  const code = (document.getElementById('smRegCodeInput').value || '').trim();
+  if(!code){ msg.style.color = '#b91c1c'; msg.textContent = 'پہلے کوڈ لکھیں'; return; }
+  if(!smRegCollect()) return;
+  msg.style.color = '#334155'; msg.textContent = '⏳ کوڈ چیک ہو رہا ہے…';
+  let r = null; try{ r = await activateSubscription(code); }catch(e){ r = {success:false, message:'انٹرنیٹ چیک کریں'}; }
+  if(r && r.success){
+    msg.style.color = '#15803d'; msg.textContent = smActMsg(r);
+    try{ localStorage.setItem('smAutoEnterOnce', '1'); }catch(e){}
+    setTimeout(() => location.reload(), 1200);
+  } else {
+    msg.style.color = '#b91c1c'; msg.textContent = '❌ کوڈ درست نہیں — ' + ((r && r.message) || '') ;
+  }
+}
+// 🎁 SM1610FR122: ٹرائل بٹن → کاروبار سیٹ کرنے والا فارم
+
 // ---------- تصویر چھوٹی کر کے (256px) محفوظ — ایپ ہلکی رہے ----------
 function smShrinkImage(file, cb){
   const r = new FileReader();
@@ -51141,12 +51239,17 @@ function smApplyBranding(){
   if(im){ im.src = st.ownerPhoto || st.businessLogo || 'icons/icon-192.png'; im.style.objectFit = 'cover'; im.style.cursor = 'pointer'; im.onclick = smChangeOwnerPhoto; }
 }
 function smRegSave(){
+  if(!smRegCollect()) return;
+  try{ localStorage.setItem('smAutoEnterOnce', '1'); }catch(e){} // 🎁 ری لوڈ کے بعد سیدھا ایپ میں
+  setTimeout(() => location.reload(), 300); // دکان کا کلاؤڈ راستہ (موبائل نمبر) نئے سرے سے بنے
+}
+function smRegCollect(){
   const shop = document.getElementById('smRegShop').value.trim();
   const owner = document.getElementById('smRegOwner').value.trim();
   const phone = document.getElementById('smRegPhone').value.replace(/[^0-9]/g, '');
-  if(!shop){ alert('دکان کا نام لکھیں'); return; }
-  if(!owner){ alert('مالک کا نام لکھیں'); return; }
-  if(!/^03\d{9}$/.test(phone)){ alert('درست موبائل نمبر لکھیں (03XXXXXXXXX)'); return; }
+  if(!shop){ alert('دکان کا نام لکھیں'); return false; }
+  if(!owner){ alert('مالک کا نام لکھیں'); return false; }
+  if(!/^03\d{9}$/.test(phone)){ alert('درست موبائل نمبر لکھیں (03XXXXXXXXX)'); return false; }
   AppState.settings.businessName = shop;
   AppState.settings.ownerName = owner;
   AppState.settings.businessPhone = phone;
@@ -51160,10 +51263,8 @@ function smRegSave(){
     const adm = usersData.find(u => u.role === 'admin');
     if(adm){ adm.name = owner; adm.phone = phone; saveToStorage('users', usersData); }
   }catch(e){}
-  document.getElementById('smRegOverlay').style.display = 'none';
   smApplyBranding();
-  try{ localStorage.setItem('smAutoEnterOnce', '1'); }catch(e){} // 🎁 SM1610FR122: ری لوڈ کے بعد سیدھا ایپ میں (لاگ اِن سکرین نہیں)
-  setTimeout(() => location.reload(), 300); // دکان کا کلاؤڈ راستہ (موبائل نمبر) نئے سرے سے بنے
+  return true;
 }
 // ---------- 📲 ملازم کا فون: پہلے سے رجسٹر دکان سے جڑیں (مالک کا موبائل نمبر) ----------
 async function smJoinAsStaff(pasted){
