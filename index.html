@@ -3197,8 +3197,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
 
     <!-- ---------- 🎉 خوش آمدید بینر — بیٹا ٹیسٹنگ کی صاف وضاحت، پہلی نظر میں ---------- -->
     <div class="welcomeTrialBanner" style="display:none;">
-      <div class="wtbHeadline">🎉 Best Billing App — Try it FREE for 30 Days!</div>
-      <div class="wtbSubline">Your 30-Day Free Trial starts now.</div>
+      <div class="wtbHeadline">🎉 Best Billing App — Try it FREE for 7 Days!</div>
+      <div class="wtbSubline">Your 7-Day Free Trial starts now.</div>
       <div class="wtbUrduNote">This app is currently in Beta (testing) version. Please don't forget to take daily backups, and keep running your old method alongside it too. If you notice any issue — big or small — please report it to the developer right away, so this app can become the best it can be for you.</div>
     </div>
 
@@ -9638,7 +9638,8 @@ function getDeveloperContact(){
 // 🆕 SM1410WE118: ریکوری والے کی سکرین — ہر گاہک کے کارڈ پر 'آج کی خریداری' ڈبہ (خریداری، وصولی، کم وصولی)، کل والے ڈبے کے اوپر
 // 🆕 SM1410WE119: ریکوری کارڈ کی ترتیب — کل کی خریداری اوپر، آج کی خریداری نیچے (وصولی کے خانے کے سامنے)
 // 🆕 SM1510TH120: (1) بیوپاری کے پرچیز آرڈر — رنگین لمبا کیپسول، اوپر تاریخ، اس دن کی ادائیگی/بقایا کے کیپسول (2) آرڈر بکنگ میں چالان کا سٹاک بچا ہو تو دو وارننگ + PIN، باقی سٹاک کی ایڈمن کو فوراً اطلاع (ہوم پر پٹی + پاپ اپ)
-const APP_BUILD_VERSION = 'SM1510TH120'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1610FR121: فری ٹرائل کی عبارت درست — ویلکم سکرین اور ختم ہونے والے پیغام میں 30 کی جگہ اصل 7 دن
+const APP_BUILD_VERSION = 'SM1610FR121'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -9753,7 +9754,7 @@ async function authFirestoreFetch(path, options = {}){
 // ---------- ہر انسٹالیشن کی منفرد شناخت — ڈیوائس کے fingerprint سے بنتی ہے (بالکل بے ترتیب نہیں) —
 // اسی لیے Data Clear/Uninstall کے بعد بھی وہی ID دوبارہ بنتی ہے (اسی فون پر)، تاکہ کوئی ٹرائل بار بار
 // ری سیٹ کر کے دوبارہ مفت استعمال نہ کر سکے۔ ٹرائل کا اصل تالا Firestore میں لگتا ہے (نیچے دیکھیں) ----------
-// نوٹ: بالکل پہلی بار (نیا ڈیوائس) پر خودکار 30 دن کا مفت (Beta) ٹرائل بھی شروع ہو جاتا ہے — تاکہ
+// نوٹ: بالکل پہلی بار (نیا ڈیوائس) پر خودکار 7 دن کا مفت (Beta) ٹرائل بھی شروع ہو جاتا ہے — تاکہ
 // کسی نئے صارف کو فائل کھولتے ہی PIN/Activation کے چکر میں نہ الجھنا پڑے، وہ فوراً ایپ آزما سکے۔
 function getOrCreateDeviceUID(){
   if(AppState.settings.deviceUID) return AppState.settings.deviceUID;
@@ -11916,7 +11917,7 @@ function _origShowSubscriptionGate(){
   const exp = AppState.settings.subscriptionExpiry;
   document.getElementById('subGateStatus').textContent = exp
     ? (AppState.settings.isOnFreeTrial
-        ? `Your 30-day free trial ended on ${formatDateDMY(exp)}. Please contact the developer to continue.`
+        ? `Your 7-day free trial ended on ${formatDateDMY(exp)}. Please contact the developer to continue.`
         : `Your subscription expired on ${formatDateDMY(exp)}.`)
     : `This app is not yet activated.`;
   document.getElementById('subscriptionGateScreen').style.display = 'flex';
