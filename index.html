@@ -3827,6 +3827,14 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         </div>
         <button class="homeEditModeToggle admin-only" id="homeEditModeToggle" onclick="toggleHomeEditMode()" title="آئیکن ترتیب بدلیں">✏️</button>
       </div>
+      <!-- 🎁 SM1710SA134: ٹرائل کے دوران ایپ کے اندر بھی کوڈ منگوانے/لگانے کی پٹی (لاگ اِن یاد رہتا ہے، اس لیے لاگ اِن والا صفحہ نہیں آتا) -->
+      <div id="smTrialHomeBar" dir="rtl" style="display:none; margin:0 2px 10px; padding:7px 9px; border-radius:14px; background:linear-gradient(145deg,#fef9c3,#fde68a); border:2px solid #f59e0b; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif; color:#78350f; text-align:center;">
+        <div id="smTrialHomeTxt" style="font-size:15px; font-weight:800; line-height:2;"></div>
+        <div style="display:flex; gap:6px; margin-top:3px;">
+          <button type="button" onclick="smOpenCodeRequest(false)" style="flex:1; padding:7px 4px; border:none; border-radius:10px; background:#16a34a; color:#fff; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">📲 کوڈ منگوائیں</button>
+          <button type="button" onclick="smHomeApplyCode()" style="flex:1; padding:7px 4px; border:none; border-radius:10px; background:#1d4ed8; color:#fff; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">🔑 کوڈ لگائیں</button>
+        </div>
+      </div>
 
       <!-- ---------- 🎁 روزانہ ایک بار، ہلکا سا چمکتا/حرکت کرتا یاد دہانی Toast — کوئی بٹن نہیں، خود بخود 4.5 سیکنڈ میں غائب ---------- -->
       <div id="trialReminderToast" class="admin-only" style="display:none;">
@@ -9680,7 +9688,8 @@ function getDeveloperContact(){
 // 🆕 SM1710SA131: ہوم 'کیش گیا' میں اب آج کی نقد خریداری (مال) بھی — بیوپاریوں کو ادائیگی + اخراجات + نقد خریداری؛ ہاتھ میں کیش اور مکمل سمری بھی اسی حساب سے
 // 🆕 SM1710SA132: کل کم وصولی کا حساب درست — صرف وصولی والے دن بھی منہا، بل کے ساتھ پرانے بقایا میں دی رقم بھی وصولی؛ بل کا لال ڈبہ اور ریکوری لسٹ کا کالم ایک ہی حساب
 // 🆕 SM1710SA133: (1) ادائیگی/وصولی کا نوٹ گاہک کے بل اور بیوپاری کی چٹ پر بھی، اور گاہک کی ٹرانزیکشن ہسٹری میں محفوظ/نظر (2) 'سبزی کس کس کو دی گئی' اور 'چالانوں کا حساب' کے ساتھ 'سابقہ ریکارڈ' — تاریخ چنیں، اسی دن کی رپورٹ، پرنٹ/شیئر
-const APP_BUILD_VERSION = 'SM1710SA133'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1710SA134: ٹرائل کے دوران ہوم پیج پر 'کوڈ منگوائیں' اور 'کوڈ لگائیں' کی پٹی — لاگ اِن یاد رہنے سے لاگ اِن والا صفحہ نہیں آتا تھا
+const APP_BUILD_VERSION = 'SM1710SA134'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -10227,6 +10236,12 @@ function _origRenderSubscriptionBanner(){
   // ---------- صرف Home صفحے پر نظر آئے — باقی صفحات پر چھپی رہے (اب یہ ایلیمنٹ سیدھا screen-home کے اندر ہی رہتا ہے) ----------
   const activeScreen = document.querySelector('.screen.active');
   const isHomePage = activeScreen && activeScreen.id === 'screen-home';
+  try{ // 🎁 SM1710SA134: ٹرائل کی پٹی — صرف مالک، صرف ٹرائل میں، صرف ہوم پر
+    const tb = document.getElementById('smTrialHomeBar');
+    if(tb){ const on = isHomePage && isSubscriptionActive() && AppState.currentRole === 'admin' && !!AppState.settings.isOnFreeTrial && !AppState.settings.smJoinedAsStaff;
+      tb.style.display = on ? 'block' : 'none';
+      if(on) document.getElementById('smTrialHomeTxt').textContent = '🎁 مفت ٹرائل: ' + daysLeftInSubscription() + ' دن باقی — پورا پیکج چلانے کے لیے کوڈ منگوائیں اور لگائیں'; }
+  }catch(e){}
   if(!isHomePage || !isSubscriptionActive() || AppState.currentRole !== 'admin'){ row.style.display = 'none'; return; } // 🏪 FM110TH274: ملازم کو دن/ایکسپائری نہیں
 
   const daysLeft = daysLeftInSubscription();
@@ -51458,6 +51473,14 @@ function smSendCodeRequest(){
     + '```\nSM-CODE\nNAME: ' + name + (shop ? '\nSHOP: ' + shop : '') + (mob ? '\nMOBILE: ' + mob : '') + '\nPLAN: ' + plan + '\nUID: ' + uid + '\n```';
   const c = getDeveloperContact();
   window.open('https://wa.me/' + c.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
+}
+// 🔑 SM1710SA134: ایپ کے اندر سے کوڈ لگانا
+async function smHomeApplyCode(){
+  const code = await uDialog({ title: '🔑 ایکٹیویشن کوڈ لگائیں', message: 'ڈویلپر کا بھیجا ہوا کوڈ یہاں لکھیں یا پیسٹ کریں:', input: 'text', okText: '✅ کوڈ لگائیں', cancelText: '✖ منسوخ', tone: 'green' });
+  if(code === null || code === false || !String(code).trim()) return;
+  let r = null; try{ r = await activateSubscription(String(code)); }catch(e){ r = { success: false, message: 'انٹرنیٹ چیک کریں' }; }
+  if(r && r.success){ await uAlert('✅ کوڈ لگ گیا', smActMsg(r) + '<br>📦 پیکج: ' + smPlanText(smPlan()), 'green'); try{ renderSubscriptionBanner(); }catch(e){} try{ smApplyBranding(); }catch(e){} }
+  else await uAlert('❌ کوڈ نہیں لگا', 'کوڈ درست نہیں — ' + ((r && r.message) || ''), 'red');
 }
 function smRegToggleCode(){
   const b = document.getElementById('smRegCodeBox');
