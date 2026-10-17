@@ -9691,7 +9691,8 @@ function getDeveloperContact(){
 // 🆕 SM1710SA134: ٹرائل کے دوران ہوم پیج پر 'کوڈ منگوائیں' اور 'کوڈ لگائیں' کی پٹی — لاگ اِن یاد رہنے سے لاگ اِن والا صفحہ نہیں آتا تھا
 // 🆕 SM1710SA135: ڈویلپر پینل کی کوڈ فہرست میں گاہک کا موبائل اور پیکج بھی؛ استعمال شدہ کوڈ ڈیلیٹ کرنے سے پہلے وارننگ (روکنے کے لیے معطل)؛ معطلی کا پیغام اردو میں
 // 🆕 SM1710SA136: 'کوڈ منگوائیں' میں گاہک پیکج نہیں چنتا — صرف نام/دکان/موبائل/UID؛ پیکج ڈویلپر پینل میں پیمنٹ کے حساب سے
-const APP_BUILD_VERSION = 'SM1710SA136'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1710SA137: سروس ورکر — فون میں محفوظ فائلیں (فونٹ، ایپ) ہر بار دوبارہ ڈاؤن لوڈ نہیں ہوتیں؛ فائربیس ہوسٹنگ کا ڈیٹا خرچ بہت کم، نیا ورژن پھر بھی فوراً
+const APP_BUILD_VERSION = 'SM1710SA137'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -51445,7 +51446,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <label style="font-weight:800; font-size:15px;">👤 آپ کا نام *</label>
       <input id="smCrName" type="text" dir="rtl" placeholder="اپنا نام لکھیں (ضروری)" style="padding:9px; border:2px solid #86efac; border-radius:10px; font-family:inherit; font-size:16px;">
       <!-- 📦 SM1710SA136: پیکج گاہک نہیں چنتا — ڈویلپر پیمنٹ کے حساب سے پینل میں خود چنتا ہے (غلطی کا امکان ختم) -->
-      <div style="background:#f1f5f9; border-radius:10px; padding:6px 10px; font-size:14px; display:flex; justify-content:space-between; align-items:center;"><span>🆔 آپ کا UID (خودکار)</span><b id="smCrUid" dir="ltr" style="font-family:'Arial Black',Arial,sans-serif; font-size:17px;"></b></div>
+      <span id="smCrUid" style="display:none;"></span><!-- 🆔 SM1710SA137: UID گاہک کو نہیں دکھتا، صرف پیغام میں خود جاتا ہے -->
       <button type="button" onclick="smSendCodeRequest()" style="padding:10px; border:none; border-radius:12px; background:#25d366; color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; line-height:1.9;">💬 واٹس ایپ پر کوڈ منگوائیں</button>
       <button type="button" onclick="document.getElementById('smCodeReqModal').style.display='none'" style="padding:8px; border:none; border-radius:12px; background:#e2e8f0; color:#334155; font-family:inherit; font-size:16px; font-weight:800; cursor:pointer;">✖ بند کریں</button>
     </div>
