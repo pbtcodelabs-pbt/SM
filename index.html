@@ -9690,7 +9690,8 @@ function getDeveloperContact(){
 // 🆕 SM1710SA133: (1) ادائیگی/وصولی کا نوٹ گاہک کے بل اور بیوپاری کی چٹ پر بھی، اور گاہک کی ٹرانزیکشن ہسٹری میں محفوظ/نظر (2) 'سبزی کس کس کو دی گئی' اور 'چالانوں کا حساب' کے ساتھ 'سابقہ ریکارڈ' — تاریخ چنیں، اسی دن کی رپورٹ، پرنٹ/شیئر
 // 🆕 SM1710SA134: ٹرائل کے دوران ہوم پیج پر 'کوڈ منگوائیں' اور 'کوڈ لگائیں' کی پٹی — لاگ اِن یاد رہنے سے لاگ اِن والا صفحہ نہیں آتا تھا
 // 🆕 SM1710SA135: ڈویلپر پینل کی کوڈ فہرست میں گاہک کا موبائل اور پیکج بھی؛ استعمال شدہ کوڈ ڈیلیٹ کرنے سے پہلے وارننگ (روکنے کے لیے معطل)؛ معطلی کا پیغام اردو میں
-const APP_BUILD_VERSION = 'SM1710SA135'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+// 🆕 SM1710SA136: 'کوڈ منگوائیں' میں گاہک پیکج نہیں چنتا — صرف نام/دکان/موبائل/UID؛ پیکج ڈویلپر پینل میں پیمنٹ کے حساب سے
+const APP_BUILD_VERSION = 'SM1710SA136'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -45583,7 +45584,7 @@ function giftParseRequest(txt){
   if(msg){
     const ok = [name && '👤 ' + name, mob && '📱 ' + mob, plan && '📦 ' + plan, uid && '🆔 ' + uid].filter(Boolean);
     msg.style.color = ok.length ? '#15803d' : '#b91c1c';
-    msg.textContent = ok.length ? '✅ بھر گیا: ' + ok.join(' · ') : (txt.trim() ? '⚠️ پیغام میں نام/UID نہیں ملا' : '');
+    msg.textContent = ok.length ? '✅ بھر گیا: ' + ok.join(' · ') + (plan ? '' : ' — 📦 پیکج اور دن نیچے خود چنیں') : (txt.trim() ? '⚠️ پیغام میں نام/UID نہیں ملا' : '');
   }
 }
 async function giftPasteFromClipboard(){
@@ -51443,15 +51444,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
       <label style="font-weight:800; font-size:15px;">👤 آپ کا نام *</label>
       <input id="smCrName" type="text" dir="rtl" placeholder="اپنا نام لکھیں (ضروری)" style="padding:9px; border:2px solid #86efac; border-radius:10px; font-family:inherit; font-size:16px;">
-      <label style="font-weight:800; font-size:15px;">📦 کون سا پیکج چاہیے؟</label>
-      <select id="smCrPlan" style="padding:9px; border:2px solid #16a34a; border-radius:10px; font-family:inherit; font-size:15px; font-weight:800;">
-        <option value="P1">1 — صرف مالک</option>
-        <option value="P1+1" selected>1+1 — مالک + 1 ملازم</option>
-        <option value="P1+2">1+2 — مالک + 2 ملازم</option>
-        <option value="P1+3">1+3 — مالک + 3 ملازم</option>
-        <option value="P1+4">1+4 — مالک + 4 ملازم</option>
-        <option value="P1+5">1+5 — مالک + 5 ملازم</option>
-      </select>
+      <!-- 📦 SM1710SA136: پیکج گاہک نہیں چنتا — ڈویلپر پیمنٹ کے حساب سے پینل میں خود چنتا ہے (غلطی کا امکان ختم) -->
       <div style="background:#f1f5f9; border-radius:10px; padding:6px 10px; font-size:14px; display:flex; justify-content:space-between; align-items:center;"><span>🆔 آپ کا UID (خودکار)</span><b id="smCrUid" dir="ltr" style="font-family:'Arial Black',Arial,sans-serif; font-size:17px;"></b></div>
       <button type="button" onclick="smSendCodeRequest()" style="padding:10px; border:none; border-radius:12px; background:#25d366; color:#fff; font-family:inherit; font-size:18px; font-weight:800; cursor:pointer; line-height:1.9;">💬 واٹس ایپ پر کوڈ منگوائیں</button>
       <button type="button" onclick="document.getElementById('smCodeReqModal').style.display='none'" style="padding:8px; border:none; border-radius:12px; background:#e2e8f0; color:#334155; font-family:inherit; font-size:16px; font-weight:800; cursor:pointer;">✖ بند کریں</button>
@@ -51471,13 +51464,12 @@ function smOpenCodeRequest(fromReg){
 function smSendCodeRequest(){
   const name = (document.getElementById('smCrName').value || '').trim();
   if(!name){ alert('اپنا نام لکھنا ضروری ہے'); document.getElementById('smCrName').focus(); return; }
-  const plan = document.getElementById('smCrPlan').value;
   const shop = ((document.getElementById('smRegShop') || {}).value || '').trim() || AppState.settings.businessName || '';
   const mob = ((document.getElementById('smRegPhone') || {}).value || '').replace(/[^0-9]/g, '') || AppState.settings.businessPhone || '';
   const uid = getOrCreateDeviceUID();
   // 📋 SM1610FR124: نیچے والا حصہ واٹس ایپ میں کاپی والے (کوڈ) انداز میں — ڈویلپر پورا پیغام کاپی کر کے پینل میں پیسٹ کرے، سب خانے خود بھر جائیں
-  const msg = 'السلام علیکم ڈویلپر صاحب، مجھے سبزی منڈی ایپ کا کوڈ چاہیے (' + smPlanText(plan) + ')۔\n\n'
-    + '```\nSM-CODE\nNAME: ' + name + (shop ? '\nSHOP: ' + shop : '') + (mob ? '\nMOBILE: ' + mob : '') + '\nPLAN: ' + plan + '\nUID: ' + uid + '\n```';
+  const msg = 'السلام علیکم ڈویلپر صاحب، مجھے سبزی منڈی ایپ کا کوڈ چاہیے۔\n\n'
+    + '```\nSM-CODE\nNAME: ' + name + (shop ? '\nSHOP: ' + shop : '') + (mob ? '\nMOBILE: ' + mob : '') + '\nUID: ' + uid + '\n```';
   const c = getDeveloperContact();
   window.open('https://wa.me/' + c.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
 }
