@@ -333,18 +333,18 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
        اس لیے راستہ (path) اسی مطابق ٹھیک کیا گیا ہے ---------- */
   @font-face{
     font-family:'JameelNooriNastaleeq';
-    src:url('./fonts/JameelNooriNastaleeq-Regular.ttf') format('truetype');
+    src:url('./fonts/JameelNooriNastaleeq-Regular.woff2') format('woff2'), url('./fonts/JameelNooriNastaleeq-Regular.ttf') format('truetype'); /* 🪶 SM1710SA139: ہلکی WOFF2 (وہی فونٹ، 57% کم وزن) — نہ چلے تو پرانی TTF */
     font-weight:400; font-style:normal; font-display:swap;
   }
   @font-face{
     font-family:'JameelNooriNastaleeqKasheeda';
-    src:url('./fonts/JameelNooriNastaleeq-Kasheeda.ttf') format('truetype');
+    src:url('./fonts/JameelNooriNastaleeq-Kasheeda.woff2') format('woff2'), url('./fonts/JameelNooriNastaleeq-Kasheeda.ttf') format('truetype'); /* 🪶 SM1710SA139: ہلکی WOFF2 (وہی فونٹ، 57% کم وزن) — نہ چلے تو پرانی TTF */
     font-weight:400; font-style:normal; font-display:swap;
   }
   /* ---------- FM1110SU367: ہر اردو حرف کے لیے نوری نستعلیق کشیدہ — صرف عربی/اردو حروف (unicode-range) پر لاگو، انگریزی/ہندسے اپنے فونٹ میں ہی رہیں گے ---------- */
   @font-face{
     font-family:'UrduAll';
-    src:url('./fonts/JameelNooriNastaleeq-Kasheeda.ttf') format('truetype');
+    src:url('./fonts/JameelNooriNastaleeq-Kasheeda.woff2') format('woff2'), url('./fonts/JameelNooriNastaleeq-Kasheeda.ttf') format('truetype'); /* 🪶 SM1710SA139: ہلکی WOFF2 (وہی فونٹ، 57% کم وزن) — نہ چلے تو پرانی TTF */
     unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+FB50-FDFF,U+FE70-FEFF,U+200C-200F,U+061F,U+060C,U+06D4;
     font-weight:100 900; font-style:normal; font-display:swap;
   }
@@ -9691,9 +9691,10 @@ function getDeveloperContact(){
 // 🆕 SM1710SA134: ٹرائل کے دوران ہوم پیج پر 'کوڈ منگوائیں' اور 'کوڈ لگائیں' کی پٹی — لاگ اِن یاد رہنے سے لاگ اِن والا صفحہ نہیں آتا تھا
 // 🆕 SM1710SA135: ڈویلپر پینل کی کوڈ فہرست میں گاہک کا موبائل اور پیکج بھی؛ استعمال شدہ کوڈ ڈیلیٹ کرنے سے پہلے وارننگ (روکنے کے لیے معطل)؛ معطلی کا پیغام اردو میں
 // 🆕 SM1710SA136: 'کوڈ منگوائیں' میں گاہک پیکج نہیں چنتا — صرف نام/دکان/موبائل/UID؛ پیکج ڈویلپر پینل میں پیمنٹ کے حساب سے
+// 🆕 SM1710SA139: اردو فونٹ ہلکی WOFF2 شکل میں (24 MB → 10.3 MB)، نئے ورژن پر فونٹ دوبارہ ڈاؤن لوڈ نہیں
 // 🆕 SM1710SA138: ہوم کے "کیش آیا / کیش گیا / ہاتھ میں کیش" ڈبے دبانے پر پوری تفصیل
 // 🆕 SM1710SA137: سروس ورکر — فون میں محفوظ فائلیں (فونٹ، ایپ) ہر بار دوبارہ ڈاؤن لوڈ نہیں ہوتیں؛ فائربیس ہوسٹنگ کا ڈیٹا خرچ بہت کم، نیا ورژن پھر بھی فوراً
-const APP_BUILD_VERSION = 'SM1710SA138'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM1710SA139'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
