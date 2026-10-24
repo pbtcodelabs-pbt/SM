@@ -6,8 +6,8 @@
   "orientation": "portrait",
   "description": "سبزی منڈی — بلنگ اور حساب کتاب",
   "display": "standalone",
-  "background_color": "#065f46",
-  "theme_color": "#065f46",
+  "background_color": "#1565c0",
+  "theme_color": "#1565c0",
   "dir": "rtl",
   "lang": "ur",
   "icons": [
