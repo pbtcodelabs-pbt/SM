@@ -126,7 +126,7 @@ function smShowRestoreCard(expiryStr, plan){
     el.innerHTML = `<div dir="rtl" style="background:#fff; border-radius:22px; max-width:380px; width:100%; padding:22px 18px 18px; text-align:center; box-shadow:0 14px 44px rgba(0,0,0,.5); font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq',serif;">
       <div style="font-size:48px; line-height:1.2;">✅</div>
       <div style="font-size:22px; font-weight:900; color:#065f46; margin:4px 0 10px;">آپ کی سبسکرپشن بحال ہو گئی</div>
-      <div style="font-size:16px; color:#334155; line-height:2;">آپ کی پرانی سبسکرپشن کے <b style="color:#15803d; font-family:Arial,sans-serif;">${days}</b> دن باقی ہیں۔<br>پیکج: <b style="font-family:Arial,sans-serif; color:#0f766e;">📦 ${p}</b> — ${smPlanText(p)}<br><span style="color:#0f766e; font-weight:900;">نیا کوڈ لگانے کی ضرورت نہیں</span><br>آپ کی ایپ کھل رہی ہے…</div>
+      <div style="font-size:16px; color:#334155; line-height:2;">آپ کی پرانی سبسکرپشن کے <b style="color:#15803d; font-family:Arial,sans-serif;">${days}</b> دن باقی ہیں۔<br>پیکج: <b style="font-family:Arial,sans-serif; color:#1e88e5;">📦 ${p}</b> — ${smPlanText(p)}<br><span style="color:#1e88e5; font-weight:900;">نیا کوڈ لگانے کی ضرورت نہیں</span><br>آپ کی ایپ کھل رہی ہے…</div>
       <button type="button" onclick="document.getElementById('smRestoreCard').remove()" style="margin-top:14px; width:auto !important; padding:8px 28px !important; border:none !important; border-radius:999px !important; background:#16a34a !important; color:#fff !important; font-size:15px !important; font-weight:800; cursor:pointer;">ٹھیک ہے</button>
     </div>`;
     document.body.appendChild(el);
@@ -301,7 +301,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#0f766e">
+  <meta name="theme-color" content="#1565c0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -313,10 +313,10 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
 <style>
   /* ===================== THEME VARIABLES (بعد میں Theme Selector یہاں تبدیل کرے گا) ===================== */
   :root{
-    --primary:#0f766e;
-    --primary-dark:#0b4a45;
+    --primary:#1e88e5; /* 💙 SM2410SA178: سبزی منڈی کا اپنا رنگ — چمکتا نیلا (صدام والی FM سبز رہے گی) */
+    --primary-dark:#1565c0;
     --accent:#c2790f;
-    --bg:#f3f6f2;
+    --bg:#f2f6fc;
     --card:#ffffff;
     --text:#292524;
     --muted:#78716c;
@@ -375,7 +375,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   .pscCompactRow:has(#pscA4Chk), .pscCompactRow:has(#aopscA4Chk),
   .pscCompactRow:has(#popscA4Chk), .pscCompactRow:has(#rpscA4Chk)
   { display:none !important; }
-  body{font-family:UrduAll,var(--font); font-weight:var(--font-weight); background:linear-gradient(180deg, #f6f9f4 0%, var(--bg) 18%, #eef3ea 100%); color:var(--text); height:100vh; overflow:hidden;}
+  body{font-family:UrduAll,var(--font); font-weight:var(--font-weight); background:linear-gradient(180deg, #f5f9ff 0%, var(--bg) 18%, #e9f1fc 100%); color:var(--text); height:100vh; overflow:hidden;}
 
   /* ===================== LOGIN SCREEN ===================== */
   /* ---------- 🐞 ہدایت (FM10SEPTH0844AM) — اصل خرابی: body{overflow:hidden} + یہ باکس align-items:center
@@ -708,7 +708,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
      کبھی بھی دائیں طرف خالی جگہ نہیں بچتی، چاہے گروپ میں 1 آئیکن ہو یا 4 */
   #screen-home{
     background:
-      radial-gradient(circle at 15% 0%, rgba(15,118,110,.10), transparent 45%),
+      radial-gradient(circle at 15% 0%, rgba(30,136,229,.10), transparent 45%),
       radial-gradient(circle at 100% 25%, rgba(194,121,15,.09), transparent 40%),
       linear-gradient(180deg, #f2ede2 0%, var(--bg) 260px);
     border-radius:20px; margin:-6px; padding:6px 10px 18px;
@@ -716,12 +716,12 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   /* ---------- 🍇 ہدایت پر: ہوم پیج پر لمبی عمودی لائن کی بجائے اب صرف 3 باریک آئٹم ایک ہی
        قطار میں (Pending Orders / Customers / Suppliers) — باقی مین ایریا خالی رہتا ہے ---------- */
   /* ✅ FM110TH273 (ہدایت): 26 ستمبر والی پابندی ختم — ملازم/منشی آرڈر بکنگ سے خود بھی سبزیاں حاضر/غیر حاضر کر سکے */
-  .homeColsBtn{width:38px; height:38px; border-radius:50%; border:2px solid #0f766e; background:#fff; color:#0f766e; font:900 17px/1 Arial,sans-serif; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,.12); padding:0;}
-  .homeColsBtn.active{background:#0f766e; color:#fff; box-shadow:0 3px 8px rgba(15,118,110,.45);}
+  .homeColsBtn{width:38px; height:38px; border-radius:50%; border:2px solid #1e88e5; background:#fff; color:#1e88e5; font:900 17px/1 Arial,sans-serif; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,.12); padding:0;}
+  .homeColsBtn.active{background:#1e88e5; color:#fff; box-shadow:0 3px 8px rgba(30,136,229,.45);}
   .homeIconGrid{display:grid; grid-template-columns:repeat(var(--homeCols,3), 1fr); gap:6px 4px; margin-top:2px;}
   /* 🎨 26 ستمبر: سفید ڈبے/بارڈر/سایہ ختم — صرف رنگین آئیکن اور اس کے نیچے نستعلیق نام، کم جگہ میں زیادہ آئیکن */
   .homeIconGrid .homeIconTile{background:transparent !important; box-shadow:none !important; border:none !important; padding:6px 2px 2px !important; gap:3px !important; border-radius:14px !important; justify-content:flex-start !important;}
-  .homeIconGrid .homeIconTile:active{background:rgba(15,118,110,.08) !important;}
+  .homeIconGrid .homeIconTile:active{background:rgba(30,136,229,.08) !important;}
   .homeIconGrid .hitIconWrap{width:var(--homeIconBox,64px) !important; height:var(--homeIconBox,64px) !important; border-radius:calc(var(--homeIconBox,64px) * .28) !important;}
   .homeIconGrid .hitIcon{font-size:var(--homeIconEmoji,34px) !important;}
   .homeIconGrid .homeIconTile .hitLabel{font-size:var(--homeLabelSize,16px) !important; line-height:1.8 !important; text-shadow:none !important; color:#134e2c !important;}
@@ -731,7 +731,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   .homeIconGrid .hitLabel{font-size:10px;}
   /* ---------- 📂 "دیگر فیچرز" ڈراپ ڈاؤن — Products اور Billing کے علاوہ باقی سب سیٹنگز/فیچرز یہاں ایک لائن فہرست میں، آئیکنز کا ڈھیر نہیں ---------- */
   .otherFeaturesDropWrap{position:relative; margin-top:10px;}
-  .otherFeaturesBtn{width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:13px 16px; border-radius:12px; border:1.5px solid rgba(15,118,110,.18); background:var(--card); color:var(--text); font-size:14px; font-weight:800; cursor:pointer;}
+  .otherFeaturesBtn{width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:13px 16px; border-radius:12px; border:1.5px solid rgba(30,136,229,.18); background:var(--card); color:var(--text); font-size:14px; font-weight:800; cursor:pointer;}
   .ofdArrow{transition:transform .15s ease; font-size:11px; color:var(--muted);}
   .otherFeaturesDropWrap.open .ofdArrow{transform:rotate(180deg);}
   .otherFeaturesList{display:none; margin-top:6px; background:var(--card); border-radius:12px; box-shadow:var(--shadow); overflow-y:auto; max-height:360px;}
@@ -746,7 +746,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     color:var(--primary-dark); text-transform:uppercase; margin:9px 2px 5px; opacity:.92;
   }
   .homeSectionLabel::after{content:''; flex:1; height:2px; border-radius:2px;
-    background:linear-gradient(90deg, rgba(15,118,110,.25), rgba(15,118,110,0));}
+    background:linear-gradient(90deg, rgba(30,136,229,.25), rgba(30,136,229,0));}
   .homeSectionLabel:first-child{margin-top:1px;}
   .homeSectionGrid{display:grid; grid-template-columns:repeat(auto-fit, minmax(84px, 1fr)); gap:10px;}
   .homeIconTile{
@@ -770,8 +770,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     width:52px; height:52px; border-radius:15px; display:flex; align-items:center; justify-content:center;
     background:linear-gradient(155deg, var(--primary), var(--primary-dark));
     box-shadow:
-      0 5px 12px -3px rgba(15,118,110,.6),
-      0 2px 4px rgba(15,118,110,.35),
+      0 5px 12px -3px rgba(30,136,229,.6),
+      0 2px 4px rgba(30,136,229,.35),
       0 1px 0 rgba(255,255,255,.3) inset,
       0 -3px 6px rgba(0,0,0,.18) inset;
   }
@@ -797,7 +797,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     flex:1; display:flex; align-items:center; justify-content:center; gap:4px;
     padding:7px 6px; border:none; border-radius:9px; cursor:pointer;
     font-size:11px; font-weight:800; color:#fff; white-space:nowrap;
-    background:linear-gradient(155deg, #0d9488, #0f766e);
+    background:linear-gradient(155deg, #2196f3, #1e88e5);
     box-shadow:0 3px 0 rgba(0,0,0,.15), 0 4px 8px rgba(0,0,0,.12);
   }
   .homeQuickBackupBtn.restore{background:linear-gradient(155deg, #2563eb, #1d4ed8);}
@@ -1172,7 +1172,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     position:fixed; left:16px; right:16px; bottom:16px; z-index:200;
     background:var(--primary); color:#fff; border-radius:14px; padding:14px 18px;
     display:flex; justify-content:space-between; align-items:center;
-    box-shadow:0 6px 20px rgba(15,118,110,.35); cursor:pointer; font-weight:700; font-size:14px;
+    box-shadow:0 6px 20px rgba(30,136,229,.35); cursor:pointer; font-weight:700; font-size:14px;
   }
 
   /* --- کارٹ/چیک آؤٹ Bottom Sheet --- */
@@ -1262,8 +1262,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   #cartSheetModal .cartWrap{max-height:52vh; border-radius:14px; border:1.5px solid #d1e7dd; box-shadow:0 3px 12px rgba(19,78,44,.10);}
   .bcCustBanner{display:flex; flex-direction:column; align-items:center; gap:0; margin:8px 12px 6px; padding:6px 12px 8px;
     border-radius:16px; background:linear-gradient(180deg,#ffffff 0%,#ecfdf5 55%,#d1fae5 100%);
-    border:2px solid #0f766e; box-shadow:0 4px 0 #115e59, 0 6px 12px rgba(15,118,110,.25), inset 0 2px 0 #ffffff; text-align:center;}
-  .bcCustBanner .bcCustLbl{font-size:11px; color:#0f766e; font-weight:800; line-height:1.6;}
+    border:2px solid #1e88e5; box-shadow:0 4px 0 #1976d2, 0 6px 12px rgba(30,136,229,.25), inset 0 2px 0 #ffffff; text-align:center;}
+  .bcCustBanner .bcCustLbl{font-size:11px; color:#1e88e5; font-weight:800; line-height:1.6;}
   .bcCustBanner .bcCustName{font-size:23px; font-weight:900; color:#0b3b33; line-height:1.9; text-shadow:0 1px 0 #fff, 0 2px 3px rgba(0,0,0,.18);}
   .bcCustBanner .bcCustPhone{font-size:12px; color:#334155; font-weight:800; direction:ltr; line-height:1.5;}
   #cartSheetModal .bcCustBanner .bcCustPhone{font-family:UrduAll,Arial,Helvetica,sans-serif !important;}
@@ -1364,7 +1364,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   .modeToggle button.active{
     background:linear-gradient(180deg, var(--primary), var(--primary-dark));
     color:#fff;
-    box-shadow:inset 0 1px 2px rgba(0,0,0,.25), 0 0 0 2px rgba(15,118,110,.25), 0 2px 6px rgba(15,118,110,.4);
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.25), 0 0 0 2px rgba(30,136,229,.25), 0 2px 6px rgba(30,136,229,.4);
     transform:scale(1.03);
   }
   /* ---------- ڈائری کے "I Gave"/"I Got" ٹوگل — یہاں تھیم کا عام رنگ نہیں، ہمیشہ سرخ/سبز ہی ہونا چاہیے
@@ -1495,7 +1495,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     max-height:calc(100vh - 310px); overflow-y:auto; overflow-x:hidden; box-sizing:border-box;
     padding:10px 7px; border-radius:16px;
     background:linear-gradient(180deg,#eef6f5,#dceae7 55%,#d3e6e2);
-    box-shadow:inset 0 1px 3px rgba(15,118,110,.10), inset 0 -1px 2px rgba(255,255,255,.6), 0 2px 6px rgba(41,29,10,.08);
+    box-shadow:inset 0 1px 3px rgba(30,136,229,.10), inset 0 -1px 2px rgba(255,255,255,.6), 0 2px 6px rgba(41,29,10,.08);
   }
   .categorySideRailEditBtn{
     flex:0 0 auto; display:flex; align-items:center; justify-content:center; gap:4px;
@@ -1509,7 +1509,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     padding:10px 3px; border-radius:11px; background:#fff; color:var(--text);
     font-weight:700; font-size:10px; line-height:1.18; text-align:center; cursor:pointer;
     word-break:break-word; overflow-wrap:anywhere;
-    border:1px solid rgba(15,118,110,.12);
+    border:1px solid rgba(30,136,229,.12);
     box-shadow:0 1px 4px rgba(41,29,10,.10);
     min-height:52px; box-sizing:border-box;
     transition:box-shadow .15s ease, transform .1s ease, background .15s ease;
@@ -1517,13 +1517,13 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   .categorySideRailItem:active{ transform:scale(.95); }
   .categorySideRailItem.active{
     background:linear-gradient(145deg, var(--primary), var(--primary-dark)); color:#fff; font-weight:800;
-    box-shadow:0 0 0 1.5px rgba(15,118,110,.4), 0 0 16px 4px rgba(15,118,110,.55), 2px 2px 5px rgba(41,29,10,.25);
+    box-shadow:0 0 0 1.5px rgba(30,136,229,.4), 0 0 16px 4px rgba(30,136,229,.55), 2px 2px 5px rgba(41,29,10,.25);
   }
   .categorySideRailItem .csrCount{font-size:8.5px; font-weight:800; opacity:.8;}
   .csrPencil{
     position:absolute; top:-5px; right:-5px; width:17px; height:17px; border-radius:50%;
     background:linear-gradient(145deg,#fff,#f1f5f9); color:var(--primary-dark); font-size:9.5px;
-    display:flex; align-items:center; justify-content:center; box-shadow:1px 1px 4px rgba(41,29,10,.35), 0 0 0 1px rgba(15,118,110,.25);
+    display:flex; align-items:center; justify-content:center; box-shadow:1px 1px 4px rgba(41,29,10,.35), 0 0 0 1px rgba(30,136,229,.25);
     z-index:2; cursor:pointer;
   }
   .categorySideRailItem.active .csrPencil{ background:linear-gradient(145deg,#fff,#e7fbf8); }
@@ -1573,7 +1573,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   .categoryDropdownItem .cdiName{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .categoryDropdownItem .cdiPencil{
     flex:0 0 auto; width:24px; height:24px; border-radius:7px; display:flex; align-items:center; justify-content:center;
-    font-size:12px; background:rgba(15,118,110,.08); color:var(--primary-dark);
+    font-size:12px; background:rgba(30,136,229,.08); color:var(--primary-dark);
   }
   .categoryDropdownItem.active .cdiPencil{ background:rgba(255,255,255,.25); color:#fff; }
   .categoryDropdownItem .cdiPencil:active{ transform:scale(.88); }
@@ -1586,7 +1586,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     left:0; right:auto; top:calc(100% + 6px);
     min-width:220px; max-width:min(280px, calc(100vw - 26px));
     font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','PDMSMultan','Noto Nastaliq Urdu',serif;
-    padding:7px; border:1px solid rgba(15,118,110,.18); border-radius:14px;
+    padding:7px; border:1px solid rgba(30,136,229,.18); border-radius:14px;
     background:#fbfffc; box-shadow:0 14px 32px rgba(6,60,40,.28);
   }
   #stockAdjReportsDropdownPanel .categoryDropdownItem{
@@ -1601,7 +1601,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     border-top:1.5px dashed #bfe3cf; margin:5px 2px 7px; padding-top:8px;
   }
   #stockAdjReportsDropdownPanel .stockAdjReportsSortLabel{
-    font-size:12.5px; font-weight:800; color:#0f766e; padding:0 4px 5px; text-align:right;
+    font-size:12.5px; font-weight:800; color:#1e88e5; padding:0 4px 5px; text-align:right;
   }
   #stockAdjReportsDropdownPanel #stockAdjSortFilter{
     width:100%; margin:0; padding:9px 8px; border:1.5px solid #bfe3cf; border-radius:10px;
@@ -1617,7 +1617,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     background:var(--card); border-radius:12px; overflow:hidden; position:relative; cursor:default;
     height:152px; display:flex; flex-direction:column;
     box-shadow:0 1px 5px rgba(41,29,10,.12);
-    border:1px solid rgba(15,118,110,.08);
+    border:1px solid rgba(30,136,229,.08);
   }
   .productGridCard.outOfStock{box-shadow:0 0 0 2px var(--danger) inset, 0 1px 5px rgba(41,29,10,.12);}
   .productGridCard.negativeStock{box-shadow:0 0 0 2.5px var(--danger) inset, 3px 3px 7px rgba(41,29,10,.16);}
@@ -2448,7 +2448,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   .triPrintBtn .triIcon{font-size:17px; line-height:1;}
   .triPrintBtn:active{transform:translateY(3px); box-shadow:none !important;}
   .triBtnDirect{background:linear-gradient(180deg,#38bdf8,#0284c7); box-shadow:0 4px 0 #075985, 0 6px 10px rgba(2,132,199,.35);}
-  .triBtnMain{background:linear-gradient(180deg,#14b8a6,#0f766e); box-shadow:0 4px 0 #0b4a45, 0 6px 10px rgba(15,118,110,.35);}
+  .triBtnMain{background:linear-gradient(180deg,#42a5f5,#1e88e5); box-shadow:0 4px 0 #1565c0, 0 6px 10px rgba(30,136,229,.35);}
   .triBtnShare{background:linear-gradient(180deg,#4ade80,#16a34a); box-shadow:0 4px 0 #14532d, 0 6px 10px rgba(22,163,74,.35);}
 
   /* ===================== SETTINGS SCREEN ===================== */
@@ -2610,7 +2610,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
 
   /* --- تھیم: کسٹمر = ہلکا سبز، سپلائر = ہلکا نیلا --- */
   .profileBox.themeCustomer{background:linear-gradient(180deg, #ecfdf5 0%, #f6fefb 220px, #ffffff 420px);}
-  .profileBox.themeCustomer .profileHead{background:linear-gradient(135deg, #0f766e, #065f52);}
+  .profileBox.themeCustomer .profileHead{background:linear-gradient(135deg, #1e88e5, #065f52);}
   .profileBox.themeSupplier{background:linear-gradient(180deg, #eff6ff 0%, #f5f9ff 220px, #ffffff 420px);}
   .profileBox.themeSupplier .profileHead{background:linear-gradient(135deg, #1d4ed8, #1e3a8a);}
 
@@ -3202,7 +3202,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   + '.aupd-shield{position:fixed;inset:0;z-index:2147483645;background:rgba(8,20,40,.5);backdrop-filter:blur(2px);display:none}'
   + '.aupd-shield.show{display:block}.aupd-shield.passive{background:rgba(8,20,40,.15);backdrop-filter:none;pointer-events:none}'
   + '.aupd-wait{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:2147483646;width:min(360px,calc(100vw - 24px));'
-  +   'display:none;align-items:center;gap:12px;padding:10px 14px;border-radius:16px;color:#fff;background:linear-gradient(135deg,#0d3b66,#0f766e);'
+  +   'display:none;align-items:center;gap:12px;padding:10px 14px;border-radius:16px;color:#fff;background:linear-gradient(135deg,#0d3b66,#1e88e5);'
   +   'box-shadow:0 10px 28px rgba(0,0,0,.35);font-family:inherit;overflow:hidden}'
   + '.aupd-wait.show{display:flex;animation:aupdDrop .35s ease}'
   + '.aupd-wait .aw-t{font-size:15px;font-weight:800;line-height:1.5}.aupd-wait .aw-s{font-size:12px;opacity:.9;line-height:1.6}'
@@ -3222,7 +3222,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
   + '.aupd-card .anote{margin:10px 0 4px;padding:8px 12px;border-radius:12px;background:#fffbeb;border:1px solid #fcd34d;color:#78350f;font-size:13.5px;font-weight:700;line-height:1.7;'
   +   'white-space:normal;overflow-wrap:anywhere;max-height:40vh;overflow-y:auto}'
   + '.aupd-card .af{padding:10px 16px 16px;display:flex;justify-content:center}'
-  + '.aupd-card .aok{min-width:140px;height:44px;border:none;border-radius:14px;background:linear-gradient(135deg,#0d3b66,#0f766e);color:#fff;font-size:17px;font-weight:800;font-family:inherit;box-shadow:0 5px 0 #0a2c4d;cursor:pointer}'
+  + '.aupd-card .aok{min-width:140px;height:44px;border:none;border-radius:14px;background:linear-gradient(135deg,#0d3b66,#1e88e5);color:#fff;font-size:17px;font-weight:800;font-family:inherit;box-shadow:0 5px 0 #0a2c4d;cursor:pointer}'
   + '.aupd-card .aok:active{transform:translateY(3px);box-shadow:0 2px 0 #0a2c4d}'
   + '@keyframes aupdDrop{from{transform:translate(-50%,-120%)}to{transform:translate(-50%,0)}}'
   + '@keyframes aupdPop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}'
@@ -3741,13 +3741,13 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     <div class="navItem admin-only" data-screen="customers" data-navkey="customers" data-navlabel="Customers" onclick="goTo('customers')" style="background:#D97706; color:#fff;">🧑‍🤝‍🧑 کسٹمرز<span class="navDragHandle">⠿</span></div>
     <div class="navItem admin-only" data-screen="suppliers" data-navkey="suppliers" data-navlabel="Suppliers" onclick="goTo('suppliers')" style="background:#0284C7; color:#fff;">🚚 سپلائرز<span class="navDragHandle">⠿</span></div>
     <!-- 📊 FM1010SA355 (ہدایت): میری ڈائری مینیو سے چھپا دی گئی (کوڈ/ڈیٹا محفوظ) — اس کی جگہ "کاروبار کی سمری" -->
-    <div class="navItem admin-only" data-screen="bizsummary" data-navkey="bizsummary" data-navlabel="Business Summary" onclick="goTo('bizsummary')" style="background:#0F766E; color:#fff;">📊 کاروبار کی سمری<span class="navDragHandle">⠿</span></div>
+    <div class="navItem admin-only" data-screen="bizsummary" data-navkey="bizsummary" data-navlabel="Business Summary" onclick="goTo('bizsummary')" style="background:#1e88e5; color:#fff;">📊 کاروبار کی سمری<span class="navDragHandle">⠿</span></div>
     <div class="navItem admin-only" data-screen="mydiary" data-navkey="mydiary" data-navlabel="My Diary" onclick="goTo('mydiary')" style="background:#DB2777; color:#fff;">📔 میری ڈائری<span class="navDragHandle">⠿</span></div>
     <div class="navItem" data-screen="advanceorders" data-navkey="advanceorders" data-navlabel="Advance Orders" onclick="goTo('advanceorders')" style="background:#059669; color:#fff;">📝 ایڈوانس آرڈرز<span class="navDragHandle">⠿</span></div>
     <div class="navItem admin-only" data-screen="billsettings" data-navkey="billsettings" data-navlabel="Bill & Print Settings" onclick="goTo('billsettings')" style="background:#7C3AED; color:#fff;">🖨️ بل اور پرنٹ سیٹنگز<span class="navDragHandle">⠿</span></div>
     <div class="navItem" data-screen="billhistory" data-navkey="billhistory" data-navlabel="Bill History" onclick="goTo('billhistory')" style="background:#EA580C; color:#fff;">🧾 بل ہسٹری<span class="navDragHandle">⠿</span></div>
     <!-- ---------- 🔄 ہدایت (FM3SEPTH10): "نیا بل بنائیں" ٹیب دوبارہ فعال — کسٹمر کے لیے نیا بل تیار کرنے کا پورشن ---------- -->
-    <div class="navItem" data-screen="billing" data-navkey="billing" data-navlabel="New Bill" onclick="goTo('billing')" style="background:#0D9488; color:#fff;">🛒 نیا بل بنائیں<span class="navDragHandle">⠿</span></div>
+    <div class="navItem" data-screen="billing" data-navkey="billing" data-navlabel="New Bill" onclick="goTo('billing')" style="background:#2196f3; color:#fff;">🛒 نیا بل بنائیں<span class="navDragHandle">⠿</span></div>
     <!-- ---------- 🍇 ہدایت پر: Categories مینیو سے مکمل ہٹا دی گئی — کوڈ محفوظ ہے، صرف display:none ---------- -->
     <div class="navItem admin-only" data-screen="categories" onclick="goTo('categories')" style="display:none;">🏷️ کیٹیگری</div>
     <!-- ---------- 🍇 ہدایت پر: Dashboard مینیو سے مکمل ہٹا دی گئی — کوڈ محفوظ ہے، صرف display:none ---------- -->
@@ -3772,7 +3772,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     <div class="navItem admin-only" data-screen="safevault" data-navkey="safevault" data-navlabel="Safe Almari" onclick="goTo('safevault')" style="background:#7c2d12; color:#fff;">🗄️ سیف الماری<span class="navDragHandle">⠿</span></div>
     <!-- ---------- 🔒 ہدایت (FM13SEPSU): "روزانہ ریکوری لسٹ" پہلے صرف رپورٹس سینٹر کے اندر چھپی ہوئی تھی —
          اب اپنا الگ مینیو آئٹم، تاکہ یہ مخصوص ملازم (یوزرز سکرین کی اجازتی فہرست) کو الاٹ کی جا سکے ---------- -->
-    <div class="navItem" data-screen="dailyRecovery" data-navkey="dailyRecovery" data-navlabel="Daily Recovery List" onclick="goTo('dailyRecovery')" style="background:#0D9488; color:#fff;">📋 روزانہ ریکوری لسٹ<span class="navDragHandle">⠿</span></div>
+    <div class="navItem" data-screen="dailyRecovery" data-navkey="dailyRecovery" data-navlabel="Daily Recovery List" onclick="goTo('dailyRecovery')" style="background:#2196f3; color:#fff;">📋 روزانہ ریکوری لسٹ<span class="navDragHandle">⠿</span></div>
     <div class="navItem admin-only" data-screen="" data-navkey="reports" data-navlabel="Reports" onclick="closeSidebar(); openReportCenterModal();" style="display:none !important; background:#2563EB; color:#fff;"><!-- 🙈 FM510MO316: مینیو سے رپورٹس چھپا دیا -->📑 رپورٹس<span class="navDragHandle">⠿</span></div>
     <div class="navItem admin-only" data-screen="settings" data-navkey="settings" data-navlabel="Settings" onclick="goTo('settings')" style="background:#CA8A04; color:#fff;">⚙️ سیٹنگز<span class="navDragHandle">⠿</span></div>
     <!-- ---------- 🔄 ہدایت (FM4SEPFR25): Stock Adjustment دوبارہ فعال — مینیو اور یوزر اسکرین اجازت دونوں میں نظر آئے ---------- -->
@@ -3882,7 +3882,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         #homeMoneyRow2 .hmCap{display:flex; flex-direction:column; justify-content:space-between; padding:3px 3px 4px;}
         #homeMoneyRow2 .hmLbl{white-space:normal; line-height:1.45; font-size:12.5px; padding-bottom:2px;}
         #homeMoneyRow .hmCap.hmK6,#homeMoneyRow2 .hmCap.hmK6{--hmB:#be185d; --hmEdge:#831843; --hmNum:#be185d;}
-        #homeMoneyRow2 .hmCap.hmK7.profit{--hmB:#0f766e; --hmEdge:#134e4a; --hmNum:#0f766e;}
+        #homeMoneyRow2 .hmCap.hmK7.profit{--hmB:#1e88e5; --hmEdge:#0d47a1; --hmNum:#1e88e5;}
         #homeMoneyRow2 .hmCap.hmK7.loss{--hmB:#b91c1c; --hmEdge:#7f1d1d; --hmNum:#b91c1c;}
         /* 💵 SM1210MO105: ہاتھ میں کیش + مکمل سمری — ایک لائن میں دو ڈبے */
         #homeMoneyBottom{display:grid; grid-template-columns:3fr 2fr; gap:7px; margin-top:7px; align-items:stretch;}
@@ -4005,8 +4005,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <!-- ---------- 🧭 بڑے بڑے نیویگیشن آئیکن — Admin کے لیے اب انہی کی منتخب کردہ Shortcut اسکرینیں،
            Salesman کے لیے اسے Assign کی گئی اسکرینیں ---------- -->
       <!-- 🔢 SM1410WE115: سلائیڈر ختم — اب ایک لائن میں 1، 2، 3، 4 یا 5 آئیکن چننے کے بٹن (سائز خود فٹ) -->
-      <div id="homeSizeBar" dir="rtl" style="display:flex; align-items:center; justify-content:center; gap:8px; margin:4px 2px 8px; padding:6px 10px; border-radius:20px; background:rgba(15,118,110,.07);">
-        <span style="font-family:'JameelNooriNastaleeqKasheeda','Noto Nastaliq Urdu',serif; font-size:14px; color:#0f766e;">فی لائن</span>
+      <div id="homeSizeBar" dir="rtl" style="display:flex; align-items:center; justify-content:center; gap:8px; margin:4px 2px 8px; padding:6px 10px; border-radius:20px; background:rgba(30,136,229,.07);">
+        <span style="font-family:'JameelNooriNastaleeqKasheeda','Noto Nastaliq Urdu',serif; font-size:14px; color:#1e88e5;">فی لائن</span>
         <div id="homeColsBtns" dir="ltr" style="display:flex; gap:8px;">
           <button type="button" class="homeColsBtn" data-cols="1" onclick="setHomeGridCols(1)">1</button>
           <button type="button" class="homeColsBtn" data-cols="2" onclick="setHomeGridCols(2)">2</button>
@@ -4706,7 +4706,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
             </div>
             <div class="categoryDropdownItem" onclick="event.stopPropagation();">
               <label title="📦 انوینٹری ٹریک کریں (سٹاک ختم ہونے پر بکری روک دیں)" style="display:flex; align-items:center; gap:8px; cursor:pointer; width:100%;">
-                <input type="checkbox" id="stockAdjTrackInventoryChk" onchange="toggleTrackInventory(this.checked)" style="width:16px; height:16px; margin:0; accent-color:#0f766e;">
+                <input type="checkbox" id="stockAdjTrackInventoryChk" onchange="toggleTrackInventory(this.checked)" style="width:16px; height:16px; margin:0; accent-color:#1e88e5;">
                 <span class="cdiName">📦 انوینٹری ٹریک کریں</span>
               </label>
             </div>
@@ -6044,7 +6044,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       #screen-bizsummary .bsDate{font-size:12px; color:var(--muted); text-align:left;}
       #screen-bizsummary .bsBar{display:flex; gap:8px; margin-bottom:10px; align-items:center;}
       #screen-bizsummary .bsBar select, #screen-bizsummary .bsBar input{flex:1; padding:9px 10px; border:1.5px solid #cbd5e1; border-radius:10px; font-size:14px; font-family:inherit; background:#fff; min-width:0;}
-      #screen-bizsummary .bsPrintBtn{flex:0 0 auto; background:#0f766e; color:#fff; border:none; border-radius:10px; padding:9px 14px; font-weight:800; font-size:14px; cursor:pointer; font-family:inherit;}
+      #screen-bizsummary .bsPrintBtn{flex:0 0 auto; background:#1e88e5; color:#fff; border:none; border-radius:10px; padding:9px 14px; font-weight:800; font-size:14px; cursor:pointer; font-family:inherit;}
       #screen-bizsummary .bsHero{border-radius:16px; padding:12px 14px; margin-bottom:12px; color:#fff; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,.18);}
       #screen-bizsummary .bsHero.bsUp{background:linear-gradient(160deg,#059669,#065f46);}
       #screen-bizsummary .bsHero.bsDown{background:linear-gradient(160deg,#e11d48,#881337);}
@@ -6158,7 +6158,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <div style="font-size:21px; font-weight:700; color:var(--primary-dark); line-height:1.9;">آج کا اوپننگ کیش</div>
         <div id="openingCashDailyDate" style="font-size:13px; color:var(--muted); line-height:1.8;"></div>
         <div id="openingCashDailySub" style="font-size:14.5px; color:#334155; line-height:1.9; margin:6px 0 10px;"></div>
-        <input type="number" inputmode="numeric" id="openingCashDailyInput" placeholder="رقم (Rs.)" onfocus="this.select()" onkeydown="if(event.key==='Enter') saveOpeningCashDaily(false)" style="width:100%; padding:12px; border:2px solid #0f766e; border-radius:12px; font-size:22px; font-weight:900; text-align:center; font-family:UrduAll,Arial,sans-serif; direction:ltr;">
+        <input type="number" inputmode="numeric" id="openingCashDailyInput" placeholder="رقم (Rs.)" onfocus="this.select()" onkeydown="if(event.key==='Enter') saveOpeningCashDaily(false)" style="width:100%; padding:12px; border:2px solid #1e88e5; border-radius:12px; font-size:22px; font-weight:900; text-align:center; font-family:UrduAll,Arial,sans-serif; direction:ltr;">
         <div class="modalActions" style="margin-top:12px;">
           <button class="cancelBtn" onclick="saveOpeningCashDaily(true)">آج کیش نہیں تھا (0)</button>
           <button class="saveBtn" onclick="saveOpeningCashDaily(false)">✅ محفوظ کریں</button>
@@ -6544,7 +6544,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <div class="pageTitle admin-only">📋 آرڈر لسٹ — ملازمین</div>
 
       <!-- ---------- 📊 آج کی مکمل آرڈر رپورٹ (میٹرکس) — ہدایت (FM3SEPTH10): کسٹمر × آئٹم جدول ---------- -->
-      <button onclick="generateTodayOrderMatrixReport()" style="width:100%; padding:12px; margin-bottom:10px; background:linear-gradient(135deg,#134e2c,#0b4a45); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.2);">📊 آج کی مکمل آرڈر رپورٹ بنائیں</button>
+      <button onclick="generateTodayOrderMatrixReport()" style="width:100%; padding:12px; margin-bottom:10px; background:linear-gradient(135deg,#134e2c,#1565c0); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.2);">📊 آج کی مکمل آرڈر رپورٹ بنائیں</button>
 
       <!-- ---------- 🔒 ہدایت (FM12SEPSA07:19PM): ایڈمن کو "حتمی/Fulfilled" ہو چکے آرڈر بھی نظر آئیں —
            پہلے یہ صرف پینڈنگ لسٹ دیکھتا تھا، حتمی بھیجا گیا آرڈر کہیں نظر ہی نہیں آتا تھا (نہ دیکھا جا سکتا تھا نہ ڈیلیٹ) ---------- -->
@@ -6636,7 +6636,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
              حاضر/غیر حاضر والے بٹن، بڑے سبز "نیا کسٹمر ایڈ کریں" اور بڑے نارنجی چالان بٹن ختم ---------- -->
         <div style="display:flex; gap:6px; margin-bottom:6px;">
           <button type="button" onclick="openMyDraftOrders()" style="flex:1; padding:7px 4px; background:linear-gradient(180deg,#c2790f,#8a530a); color:#fff; border:none; border-radius:9px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.15); white-space:nowrap;">📝 ڈرافٹ</button>
-          <button type="button" onclick="openMySentOrders()" style="flex:1; padding:7px 4px; background:linear-gradient(180deg,#0f766e,#0b4a45); color:#fff; border:none; border-radius:9px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.15); white-space:nowrap;">✅ فائنل سینڈ آرڈر</button>
+          <button type="button" onclick="openMySentOrders()" style="flex:1; padding:7px 4px; background:linear-gradient(180deg,#1e88e5,#1565c0); color:#fff; border:none; border-radius:9px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.15); white-space:nowrap;">✅ فائنل سینڈ آرڈر</button>
         </div>
         <button type="button" onclick="pdOpenList()" style="width:100%; padding:9px 6px; margin-bottom:6px; background:linear-gradient(180deg,#0ea5e9,#0369a1); color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 #075985;">📦 مال کے حساب سے تقسیم — چالان آیا ہے؟ پہلے ایک سبزی سب میں بانٹیں</button>
         <div style="display:flex; gap:6px; width:100%; flex:1 1 100%; margin-bottom:6px;"><button type="button" onclick="openDistReport()" style="flex:1; min-width:0;  padding:8px 6px;  background:linear-gradient(180deg,#7c3aed,#5b21b6); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:900; cursor:pointer;">📊 آج کی سبزی کس کس کو دی گئی</button><button type="button" onclick="openDistHistory()" style="flex:1; min-width:0;  padding:8px 6px;  background:linear-gradient(180deg,#7c3aed,#5b21b6); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:900; cursor:pointer; background:linear-gradient(180deg,#a78bfa,#6d28d9);">📅 سابقہ ریکارڈ</button></div><div style="width:100%; flex:1 1 100%; margin:6px 0;"><button type="button" onclick="openRetailRates()" style="width:100%; padding:10px 6px; background:linear-gradient(180deg,#10b981,#047857); color:#fff; border:none; border-radius:10px; font-size:14px; font-weight:900; cursor:pointer;">🏷️ آج کے پرچون ریٹ — گاہکوں کو واٹس ایپ کریں</button></div>
@@ -6714,7 +6714,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
               <button type="button" onclick="openOtStockReport()" style="padding:9px 10px; background:#7c3aed; color:#fff; border:none; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer;">📊 سٹاک رپورٹ</button>
               <!-- ---------- 🧾 ہدایت (17 ستمبر، صبح 7:35): "منڈی سیل ریکارڈ (برائے منشی)" — منشی/مزدور
                    (غیر ایڈمن) کے لیے یہاں سے بھی کھلے، بالکل ایڈمن کی سٹاک ایڈجسٹمنٹ ← 📊 رپورٹس ڈراپ ڈاؤن جیسی رپورٹ ---------- -->
-              <button type="button" onclick="openMandiSaleRecordReport()" style="padding:9px 10px; background:#0f766e; color:#fff; border:none; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer;">🧾 منڈی سیل ریکارڈ</button>
+              <button type="button" onclick="openMandiSaleRecordReport()" style="padding:9px 10px; background:#1e88e5; color:#fff; border:none; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer;">🧾 منڈی سیل ریکارڈ</button>
               <button type="button" onclick="toggleOtViewMode()" id="otViewModeBtn" style="display:none; padding:9px 10px; background:#134e2c; color:#fff; border:none; border-radius:10px; font-weight:800; font-size:12px; cursor:pointer;">📊 جدول</button>
               <button type="button" id="otBackTopBtn" onclick="otBackButtonClick()" style="padding:9px 10px; background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:10px; font-weight:800; font-size:13px; cursor:pointer;">◀ کسٹمر</button>
               <button type="button" onclick="openOtReview()" style="padding:9px 14px; background:var(--success); color:#fff; border:none; border-radius:10px; font-weight:800; font-size:14px; cursor:pointer; white-space:nowrap;">✅ آرڈر مکمل</button>
@@ -6771,7 +6771,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
           <canvas id="otReviewCanvas" style="width:100%; max-width:340px; display:block;"></canvas>
         </div>
         <div style="position:sticky; bottom:8px; display:flex; flex-direction:column; gap:8px; padding-top:6px; padding-bottom:8px;">
-          <button type="button" onclick="printOtReviewOrder()" style="padding:14px; background:linear-gradient(180deg,#0f766e,#0b4a45); color:#fff; border:none; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">🖨️ تھرمل پرنٹ کریں</button>
+          <button type="button" onclick="printOtReviewOrder()" style="padding:14px; background:linear-gradient(180deg,#1e88e5,#1565c0); color:#fff; border:none; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">🖨️ تھرمل پرنٹ کریں</button>
           <button type="button" onclick="shareOtReviewOrder()" style="padding:14px; background:#25D366; color:#fff; border:none; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">💬 واٹس ایپ شیئر</button>
           <div style="display:flex; gap:8px;">
             <button type="button" onclick="backToOtItems()" style="flex:1; padding:15px; background:#fff; border:2px solid var(--primary); color:var(--primary); border-radius:14px; font-size:15px; font-weight:800; cursor:pointer;">✏️ ترمیم کریں</button>
@@ -6859,7 +6859,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
             <canvas id="otOrderSheetCanvas" style="width:100%; max-width:340px; display:block;"></canvas>
           </div>
           <div style="display:flex; flex-direction:column; gap:8px;">
-            <button type="button" onclick="printOtOrderSheet()" style="padding:13px; background:linear-gradient(180deg,#0f766e,#0b4a45); color:#fff; border:none; border-radius:14px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">🖨️ تھرمل پرنٹ کریں</button>
+            <button type="button" onclick="printOtOrderSheet()" style="padding:13px; background:linear-gradient(180deg,#1e88e5,#1565c0); color:#fff; border:none; border-radius:14px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">🖨️ تھرمل پرنٹ کریں</button>
             <button type="button" onclick="shareOtOrderSheet()" style="padding:13px; background:#25D366; color:#fff; border:none; border-radius:14px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">💬 واٹس ایپ شیئر</button>
           </div>
         </div>
@@ -6954,10 +6954,10 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <div id="rlEmployeeView" class="admin-hide-only">
         <!-- ---------- 📊 ہدایت (FM3SEPTH10): ملازم بھی اپنی آج کی جمع کردہ وصولی کی رپورٹ خود بنا سکتا ہے —
              اپنے پاس رکھنے، چیک کرنے، یا ایڈمن کو بھیجنے کے لیے (کوئی غلط اندراج تو نہیں ہوا) ---------- -->
-        <button type="button" onclick="generateTodayRecoveryReport()" style="width:100%; padding:12px; margin-bottom:8px; background:linear-gradient(135deg,#134e2c,#0b4a45); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.2);">📊 میری آج کی وصولی رپورٹ بنائیں</button>
+        <button type="button" onclick="generateTodayRecoveryReport()" style="width:100%; padding:12px; margin-bottom:8px; background:linear-gradient(135deg,#134e2c,#1565c0); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.2);">📊 میری آج کی وصولی رپورٹ بنائیں</button>
         <!-- ---------- 📋 ہدایت (5 ستمبر): ملازم کے بھیجے گئے وصولی ریکارڈز کا مستقل ریکارڈ —
              بھیجنے کے بعد نہ ترمیم ہو سکے نہ حذف، صرف دیکھنا/دوبارہ شیئر کرنا ---------- -->
-        <button type="button" onclick="openMyRecoveryRecords()" style="width:100%; padding:12px; margin-bottom:12px; background:linear-gradient(135deg,#0f766e,#0b4a45); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.2);">📋 میری تمام وصولیوں کا ریکارڈ</button>
+        <button type="button" onclick="openMyRecoveryRecords()" style="width:100%; padding:12px; margin-bottom:12px; background:linear-gradient(135deg,#1e88e5,#1565c0); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.2);">📋 میری تمام وصولیوں کا ریکارڈ</button>
         <!-- ---------- 🔒 ہدایت (FM13SEPSU): علاقہ/آج کے خریدار فلٹر + بقایہ کے حساب سے ترتیب —
              بالکل آرڈر ٹیکنگ جیسا نظام، تاکہ ریکوری والا آدمی آسانی سے اپنے علاقے کے کسٹمر چھانٹ سکے ---------- -->
         <!-- ---------- 🔍 ہدایت (FM15SEPTU): کسٹمر سرچ بار یہاں بھی — نام یا سیریل نمبر دونوں سے ---------- -->
@@ -6988,7 +6988,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <!-- ---------- ایڈمن کا منظر: ٹوٹل + طریقہ ادائیگی کے حساب سے بریک ڈاؤن + ہر انٹری کنفرم کرنے کا بٹن ---------- -->
       <div id="rlAdminView" class="admin-only">
         <!-- ---------- 📊 آج کی ریکوری رپورٹ — ہدایت (FM3SEPTH10): پرنٹ/شیئر کے لیے تیار پوسٹر ---------- -->
-        <button type="button" onclick="generateTodayRecoveryReport()" style="width:100%; padding:12px; margin-bottom:12px; background:linear-gradient(135deg,#134e2c,#0b4a45); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.2);">📊 آج کی ریکوری رپورٹ بنائیں</button>
+        <button type="button" onclick="generateTodayRecoveryReport()" style="width:100%; padding:12px; margin-bottom:12px; background:linear-gradient(135deg,#134e2c,#1565c0); color:#fff; border:none; border-radius:12px; font-size:14.5px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,.2);">📊 آج کی ریکوری رپورٹ بنائیں</button>
         <div id="rlAdminSummary" style="background:#eef2ff; border-radius:12px; padding:12px 14px; margin-bottom:12px;"></div>
         <div id="rlAdminList" style="display:flex; flex-direction:column; gap:8px;"></div>
       </div>
@@ -8181,7 +8181,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <div class="modalBtns" style="flex-wrap:wrap;">
           <button class="cancelBtn" onclick="closeStockValueReport()">بند کریں</button>
           <button class="saveBtn" style="background:#7c3aed;" onclick="openImageReviewModal(document.getElementById('stockReportCanvas'), '📊 سٹاک رپورٹ')">🔍 ریویو</button>
-          <button class="saveBtn" style="background:#0f766e;" onclick="printStockValueReport()">🖨️ پرنٹ (A4)</button>
+          <button class="saveBtn" style="background:#1e88e5;" onclick="printStockValueReport()">🖨️ پرنٹ (A4)</button>
           <button class="saveBtn" style="background:#25D366;" onclick="shareStockValueReport()">💬 واٹس ایپ شیئر</button>
         </div>
       </div>
@@ -8221,7 +8221,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <div class="modalBtns" style="flex-wrap:wrap;">
           <button class="cancelBtn" onclick="closeVegListReport()">بند کریں</button>
           <div class="categoryDropdownWrap" id="vegListReportDropdownWrap" style="margin:0;">
-            <button type="button" class="categoryDropdownBtn" onclick="toggleVegListReportDropdown(event)" style="background:#0f766e; color:#fff; padding:9px 16px; font-size:13px; max-width:none;">
+            <button type="button" class="categoryDropdownBtn" onclick="toggleVegListReportDropdown(event)" style="background:#1e88e5; color:#fff; padding:9px 16px; font-size:13px; max-width:none;">
               <span>🖨️ رپورٹ</span>
               <span class="categoryDropdownArrow">▾</span>
             </button>
@@ -8254,7 +8254,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <div class="modalBtns" style="flex-wrap:wrap;">
           <button class="cancelBtn" onclick="closeCustListReport()">بند کریں</button>
           <button class="saveBtn" style="background:#7c3aed;" onclick="openImageReviewModal(document.getElementById('custListReportCanvas'), '👥 کسٹمر لسٹ')">🔍 ریویو</button>
-          <button class="saveBtn" style="background:#0f766e;" onclick="printCustListReport('a4')">🖨️ پرنٹ (A4)</button>
+          <button class="saveBtn" style="background:#1e88e5;" onclick="printCustListReport('a4')">🖨️ پرنٹ (A4)</button>
           <button class="saveBtn" style="background:#0369a1;" onclick="printCustListReport('thermal')">🖨️ پرنٹ (تھرمل)</button>
           <button class="saveBtn" style="background:#334155;" onclick="saveCustListPdf()">💾 PDF محفوظ کریں</button>
           <button class="saveBtn" style="background:#25D366;" onclick="shareCustListReport()">💬 واٹس ایپ شیئر</button>
@@ -8274,7 +8274,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <div class="modalBtns" style="flex-wrap:wrap;">
           <button class="cancelBtn" onclick="closeCustomerLedgerReport()">بند کریں</button>
           <button class="saveBtn" style="background:#7c3aed;" onclick="openImageReviewModal(document.getElementById('custLedgerReportCanvas'), '📒 کسٹمر لیجر')">🔍 ریویو</button>
-          <button class="saveBtn" style="background:#0f766e;" onclick="printCustomerLedgerReport('a4')">🖨️ پرنٹ (A4)</button>
+          <button class="saveBtn" style="background:#1e88e5;" onclick="printCustomerLedgerReport('a4')">🖨️ پرنٹ (A4)</button>
           <button class="saveBtn" style="background:#0369a1;" onclick="printCustomerLedgerReport('thermal')">🖨️ پرنٹ (تھرمل)</button>
           <button class="saveBtn" style="background:#334155;" onclick="saveCustomerLedgerPdf()">💾 PDF محفوظ کریں</button>
           <button class="saveBtn" style="background:#25D366;" onclick="shareCustomerLedgerReport()">💬 واٹس ایپ شیئر</button>
@@ -8293,7 +8293,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <div class="modalBtns" style="flex-wrap:wrap;">
           <button class="cancelBtn" onclick="closeSupListReport()">بند کریں</button>
           <button class="saveBtn" style="background:#7c3aed;" onclick="openImageReviewModal(document.getElementById('supListReportCanvas'), '🚚 سپلائرز لسٹ')">🔍 ریویو</button>
-          <button class="saveBtn" style="background:#0f766e;" onclick="printSupListReport('a4')">🖨️ پرنٹ (A4)</button>
+          <button class="saveBtn" style="background:#1e88e5;" onclick="printSupListReport('a4')">🖨️ پرنٹ (A4)</button>
           <button class="saveBtn" style="background:#0369a1;" onclick="printSupListReport('thermal')">🖨️ پرنٹ (تھرمل)</button>
           <button class="saveBtn" style="background:#334155;" onclick="saveSupListPdf()">💾 PDF محفوظ کریں</button>
           <button class="saveBtn" style="background:#25D366;" onclick="shareSupListReport()">💬 واٹس ایپ شیئر</button>
@@ -8312,7 +8312,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         <div class="modalBtns" style="flex-wrap:wrap;">
           <button class="cancelBtn" onclick="closeLaborReport()">بند کریں</button>
           <button class="saveBtn" style="background:#7c3aed;" onclick="openImageReviewModal(document.getElementById('laborReportCanvas'), '💪 مزدوری فروخت رپورٹ')">🔍 ریویو</button>
-          <button class="saveBtn" style="background:#0f766e;" onclick="printLaborReport()">🖨️ پرنٹ (A4)</button>
+          <button class="saveBtn" style="background:#1e88e5;" onclick="printLaborReport()">🖨️ پرنٹ (A4)</button>
           <button class="saveBtn" style="background:#25D366;" onclick="shareLaborReport()">💬 واٹس ایپ شیئر</button>
         </div>
       </div>
@@ -9588,7 +9588,7 @@ window.addEventListener('beforeunload', persistAllData);
 
 // ---------- STATE (اب localStorage سے جُڑا ہوا ہے) ----------
 const DEFAULT_SETTINGS = {
-  themeId: 'teal',
+  themeId: 'skyblue', // 💙 سبزی منڈی کا ڈیفالٹ نیلا
   font: "'Open Sans', Tahoma, sans-serif",
   fontId: 'tahoma',
   fontWeight: 400,
@@ -9859,8 +9859,9 @@ function getDeveloperContact(){
 // 🆕 SM2310FR174: ادائیگی/وصولی کی تاریخ اب تین چمکتے ویل (سال، مہینہ، دن) — اوپر بڑا دن
 // 🆕 SM2310FR175: تاریخ کا ویل چھوٹا — فارم میں سب سے اوپر ایک لائن (ویل + دن)
 // 🆕 SM2310FR177: بیوپاری کا الگ لیجر بٹن ختم — پورا لیجر اب 📜 لین دین کے اندر
-const APP_BUILD_VERSION = 'SM2310FR177'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'دوسری ایپس کا کیش اور ڈیٹا اب کبھی نہیں مٹتا؛ دوسری ایپ کی بیک اپ فائل رد'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+// 🆕 SM2410SA178: سبزی منڈی کا ڈیفالٹ رنگ چمکتا نیلا (لاگ اِن، ہیڈر، بٹن، سیٹ اپ) — صدام والی FM سبز ہی
+const APP_BUILD_VERSION = 'SM2410SA178'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'سبزی منڈی اب نیلے رنگ میں — دور سے پہچانی جائے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -10166,7 +10167,7 @@ function renderDevPinList(){
   wrap.innerHTML = list.map(u => `
     <div style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; margin-bottom:6px;">
       <div style="flex:1; min-width:0; font-size:13.5px; font-weight:800;">${roleLabel[u.role] || u.role} — ${u.name}${u.is_active ? '' : ' <span style="color:#b91c1c; font-weight:600;">(بند)</span>'}</div>
-      <div id="devPin_${u.user_id}" style="min-width:64px; text-align:center; font-family:UrduAll,Arial,sans-serif; font-weight:900; font-size:17px; letter-spacing:3px; color:#0f766e; direction:ltr;">••••</div>
+      <div id="devPin_${u.user_id}" style="min-width:64px; text-align:center; font-family:UrduAll,Arial,sans-serif; font-weight:900; font-size:17px; letter-spacing:3px; color:#1e88e5; direction:ltr;">••••</div>
       <button type="button" onclick="devRevealPin(${u.user_id}, this)" style="width:auto; margin:0; padding:7px 11px; border:none; border-radius:9px; background:#e0f2fe; color:#075985; font-weight:800; cursor:pointer;">👁️</button>
     </div>`).join('') || '<div style="color:#64748b; font-size:12px;">کوئی اکاؤنٹ نہیں</div>';
 }
@@ -10778,7 +10779,7 @@ function hmExplain(kind){
   ov.id = 'hmExplainOv';
   ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100000;display:flex;align-items:center;justify-content:center;padding:12px;';
   ov.innerHTML = `<div dir="rtl" style="background:#f8fafc;border-radius:18px;max-width:460px;width:100%;max-height:88vh;overflow:auto;padding:14px;box-shadow:0 10px 40px rgba(0,0,0,.35);">
-      <div style="font-weight:900;font-size:19px;color:#0f766e;text-align:center;">${title}</div>
+      <div style="font-weight:900;font-size:19px;color:#1e88e5;text-align:center;">${title}</div>
       <div style="text-align:center;font-size:13px;color:#475569;margin:4px 0 8px;">${sub}</div>
       ${body}
       <div style="display:flex;gap:8px;margin-top:10px;">
@@ -11597,7 +11598,7 @@ function renderCustomerHomeScreen(){
   if(!wrap) return;
   if(!cust){ wrap.innerHTML = '<div style="text-align:center; color:var(--danger); padding:20px;">Customer record not found.</div>'; return; }
   wrap.innerHTML = `
-    <div style="background:linear-gradient(155deg,#0f766e,#0b4a45); color:#fff; border-radius:16px; padding:20px; text-align:center; margin-bottom:16px;">
+    <div style="background:linear-gradient(155deg,#1e88e5,#1565c0); color:#fff; border-radius:16px; padding:20px; text-align:center; margin-bottom:16px;">
       <div style="font-size:13px; opacity:.85;">Welcome</div>
       <div style="font-size:20px; font-weight:900; margin-top:4px;">🧑‍🤝‍🧑 ${cust.name}</div>
     </div>
@@ -11618,7 +11619,7 @@ function renderCustomerHomeScreen(){
     <button type="button" onclick="goTo('orderTaking')" style="width:100%; margin-top:18px; padding:16px; background:linear-gradient(180deg,#4F46E5,#3730a3); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">🛒 نیا آرڈر دیں</button>
 
     <!-- ---------- 🧪 FMtest03 Phase 4 (Step 1): تیسرا بٹن — پیمنٹ بھیجنے کی اسکرین پر لے جائے ---------- -->
-    <button type="button" onclick="goTo('customerPayment')" style="width:100%; margin-top:12px; padding:16px; background:linear-gradient(180deg,#16A34A,#0b4a45); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">💰 پیمنٹ بھیجیں</button>
+    <button type="button" onclick="goTo('customerPayment')" style="width:100%; margin-top:12px; padding:16px; background:linear-gradient(180deg,#16A34A,#1565c0); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:800; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.2);">💰 پیمنٹ بھیجیں</button>
 
     <!-- ---------- 📇 ہدایت (6 ستمبر): کسٹمر کے لیے بھی ایڈمن سے فوری رابطہ — نمبر کہیں لکھا نظر نہیں آتا، صرف بٹن ---------- -->
     <div style="background:#fff; border:1.5px solid #dbe1ea; border-radius:14px; padding:12px; margin-top:16px;">
@@ -11909,7 +11910,7 @@ function renderCustomerPaymentScreen(){
       <input type="text" id="cpaNumber" placeholder="اکاؤنٹ/موبائل نمبر" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #dbe1ea; border-radius:8px;">
       <div style="display:flex; gap:10px;">
         <button type="button" onclick="closeCustomerPaymentAccountForm()" style="flex:1; padding:11px; background:#f1f5f9 !important; color:#334155 !important;">منسوخ کریں</button>
-        <button type="button" onclick="saveCustomerPaymentAccount()" style="flex:1; padding:11px; background:linear-gradient(180deg,#16A34A,#0b4a45) !important; color:#fff !important;">💾 محفوظ کریں</button>
+        <button type="button" onclick="saveCustomerPaymentAccount()" style="flex:1; padding:11px; background:linear-gradient(180deg,#16A34A,#1565c0) !important; color:#fff !important;">💾 محفوظ کریں</button>
       </div>
     </div>
 
@@ -16554,7 +16555,7 @@ function fmBillRecoveryGate(cid, onProceed){
   const key = st.c.customer_id + '|' + st.Y;
   if(st.goodsY > 0 && st.recY <= 0 && !fmBillNoRecOk.has(key)){
     fmGateDialog('⚠️ کل کی وصولی درج نہیں', `<b>${escRlHtml(st.c.name)}</b> کو کل (${bizFmt(st.Y)}) <b>Rs. ${f(st.goodsY)}</b> کا مال گیا، مگر کل کی کوئی وصولی درج نہیں۔<br>اگر وصولی آئی ہے تو پہلے درج کریں۔`,
-      [{ txt: '📥 وصولی درج کرنے چلیں', bg: '#0f766e', sh: '#134e4a', fn: () => fmGoConfirmRecovery(st.c.customer_id) },
+      [{ txt: '📥 وصولی درج کرنے چلیں', bg: '#1e88e5', sh: '#0d47a1', fn: () => fmGoConfirmRecovery(st.c.customer_id) },
        { txt: '✅ کل کوئی وصولی نہیں ہوئی — بل بنائیں', bg: '#b45309', sh: '#78350f', fn: () => { fmBillNoRecOk.add(key); if(onProceed) onProceed(); } }]);
     return false;
   }
@@ -19696,7 +19697,7 @@ function renderChalanPicker(){
     const mine = Number(ctx.alloc[c.chalanNo]) || 0;
     const sel = mine > 0;
     const rateHtml = admin
-      ? (c.ratePending ? `<span style="color:#b45309; font-weight:900;">⏳ ریٹ باقی</span>` : `<span style="color:#0f766e; font-weight:900; font-family:UrduAll,Arial,Helvetica,sans-serif;">Rs. ${c.rate}</span>`)
+      ? (c.ratePending ? `<span style="color:#b45309; font-weight:900;">⏳ ریٹ باقی</span>` : `<span style="color:#1e88e5; font-weight:900; font-family:UrduAll,Arial,Helvetica,sans-serif;">Rs. ${c.rate}</span>`)
       : '';
     return `
       <div onclick="chalanPickerQuickFill(${c.chalanNo})" style="display:flex; align-items:center; gap:8px; padding:9px 10px; margin-bottom:7px; border-radius:12px; cursor:pointer; background:${sel ? 'linear-gradient(155deg,#dcfce7,#bbf7d0)' : 'linear-gradient(155deg,#ffffff,#f1f5f9)'}; border:2px solid ${sel ? '#16a34a' : '#e2e8f0'}; box-shadow:0 2px 0 ${sel ? '#15803d' : '#cbd5e1'};">
@@ -20594,7 +20595,7 @@ function renderChalanSplit(){
         <button type="button" id="chSrc_split${i}" data-value="${pt.src}" onclick="openChSupplierPicker('split${i}')" style="width:100%; height:40px; border:2px solid #0369a1; border-radius:10px; background:#fff; font-family:'JameelNooriNastaleeqKasheeda','Noto Nastaliq Urdu',serif; font-size:15px; color:#0c4a6e; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 8px;">${_chSrcLabel(pt.src)} ▾</button>
       </div>
       <div id="chS_paywrap_${i}" style="margin-top:6px; display:flex; gap:6px; align-items:flex-end;">
-        ${inp(i, 'pay', pt.pay, '💸 آج اسے دیا (روپے)', '#0f766e', 1)}
+        ${inp(i, 'pay', pt.pay, '💸 آج اسے دیا (روپے)', '#1e88e5', 1)}
       </div>
       <div id="chS_info_${i}" style="margin-top:6px; font-size:12.5px; line-height:1.7; color:#334155;"></div>
     </div>`).join('');
@@ -20829,7 +20830,7 @@ async function renderSupplierSlipToCanvas(){
     ctx.fillStyle = '#1a1a1a'; ctx.textAlign = 'center';
     y += fsTitle + 4; const bn = AppState.settings.businessName || smBiz(); fit(bn, W, fsTitle, 'bold'); ctx.fillText(bn, pxWidth/2, y);
     y += Math.round(fsSub * 1.9); const t1 = `🧾 بیوپاری چٹ — ${sl.s.name}`; fit(t1, W, fsSub, 'bold'); ctx.fillText(t1, pxWidth/2, y);
-    y += Math.round(fsSub * 1.9); ctx.fillStyle = '#0f766e'; const t2 = `دورانیہ: ${rangeTxt}`; fit(t2, W, fsSmall, 'bold'); ctx.fillText(t2, pxWidth/2, y);
+    y += Math.round(fsSub * 1.9); ctx.fillStyle = '#1e88e5'; const t2 = `دورانیہ: ${rangeTxt}`; fit(t2, W, fsSmall, 'bold'); ctx.fillText(t2, pxWidth/2, y);
     y += Math.round(fsSmall * 1.9); ctx.fillStyle = '#1a1a1a'; ctx.font = `${fsSmall}px ${numFam}`; ctx.fillText(dstr, pxWidth/2, y);
     y += 10;
     // سرخی
@@ -22257,7 +22258,7 @@ function svRenderList(){
       ${svTab !== 'order' ? `<span style="color:#15803d;">Rs. ${total.toLocaleString()}</span>` : ''}
     </div>
     <div style="display:flex;gap:6px;margin-bottom:10px;">
-      <button type="button" onclick="svExport()" ${list.length ? '' : 'disabled'} style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #0f766e;background:#f0fdfa;color:#0f766e;font-weight:900;font-size:13px;cursor:pointer;">💾 کاپی ڈاؤن لوڈ</button>
+      <button type="button" onclick="svExport()" ${list.length ? '' : 'disabled'} style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #1e88e5;background:#eff6ff;color:#1e88e5;font-weight:900;font-size:13px;cursor:pointer;">💾 کاپی ڈاؤن لوڈ</button>
       <button type="button" onclick="svDeleteFiltered()" ${list.length ? '' : 'disabled'} style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #fca5a5;background:#fef2f2;color:#b91c1c;font-weight:900;font-size:13px;cursor:pointer;">🗑️ یہ ${list.length} حذف کریں</button>
     </div>
     ${list.length === 0 ? '<div style="text-align:center;color:var(--muted);padding:30px 10px;">اس فلٹر میں کوئی ریکارڈ نہیں</div>' : ''}
@@ -28280,7 +28281,7 @@ function openCustomerProfile(customerId){
   // --- بائیں طرف چھوٹے 3D آئیکن بٹنوں کا کالم (New Bill سب سے اوپر — سب سے زیادہ استعمال ہونے والا عمل)؛ Transactions سب سے نیچے ---
   const sideEl = document.getElementById('profileQuickActions');
   sideEl.innerHTML = `
-    <button style="background:linear-gradient(155deg,#0f766e,#0b4a45);" onclick="startNewBillForCustomer(${c.customer_id})"><span class="sideIcon">🧾</span><span class="sideLabel">نیا بل</span></button>
+    <button style="background:linear-gradient(155deg,#1e88e5,#1565c0);" onclick="startNewBillForCustomer(${c.customer_id})"><span class="sideIcon">🧾</span><span class="sideLabel">نیا بل</span></button>
     <button style="background:linear-gradient(155deg,#ef4444,#b91c1c);" onclick="closeProfileModal(); openCollectModal(${c.customer_id});"><span class="sideIcon">📥</span><span class="sideLabel">وصولی</span></button>
     <button style="background:linear-gradient(155deg,#fb923c,#c2410c);" onclick="openCustLoanModal(${c.customer_id});"><span class="sideIcon">💸</span><span class="sideLabel">ادھار دیا</span></button>
     ${AppState.currentRole === 'admin' ? `<button style="background:linear-gradient(155deg,${c.isDormant ? '#22c55e,#15803d' : '#a16207,#78350f'});" onclick="closeProfileModal(); toggleCustomerActiveStatus(${c.customer_id}, ${c.isDormant ? 'true' : 'false'});"><span class="sideIcon">${c.isDormant ? '✅' : '🪦'}</span><span class="sideLabel">${c.isDormant ? 'حاضر کریں' : 'کھوہ کھاتے'}</span></button>` : ''}
@@ -32951,7 +32952,7 @@ const SM_DIST_DEFAULT = {
   nameFont:'nast', nameSize:17, nameWeight:700, nameColor:'#0f172a',
   packFont:'nast', packSize:13, packWeight:700, packColor:'#b45309',
   cellFont:'arial', cellSize:15, cellWeight:900, cellColor:'#166534', cellBg:'#dcfce7',
-  headFont:'nast', headSize:13, headBg:'#0f766e', headColor:'#ffffff',
+  headFont:'nast', headSize:13, headBg:'#1e88e5', headColor:'#ffffff',
   stockBg:'#1d4ed8', leftBg:'#b91c1c', circle:'#dc2626',
   rowPad:6
 };
@@ -33022,7 +33023,7 @@ function smDistTableHtml(d, forPrint){
 // ---------- سیٹنگ پینل (اوپر کھلتا ہے، رپورٹ اس کے نیچے ہی نظر آتی رہتی ہے) ----------
 function _sdFonts(label, key){
   const S = smDistLoadStyle();
-  return `<div style="margin:6px 0 2px; font-size:12px; font-weight:900; color:#334155;">${label}</div><div style="display:flex; flex-wrap:wrap; gap:5px;">${SM_DIST_FONTS.map(f => `<button type="button" onclick="smDistSet('${key}','${f.id}')" style="padding:5px 9px; border-radius:9px; border:1.5px solid ${S[key] === f.id ? '#0f766e' : '#cbd5e1'}; background:${S[key] === f.id ? '#0f766e' : '#fff'}; color:${S[key] === f.id ? '#fff' : '#0f172a'}; font-family:UrduAll,${f.family}; font-size:13px; font-weight:800; cursor:pointer;">${f.label}</button>`).join('')}</div>`;
+  return `<div style="margin:6px 0 2px; font-size:12px; font-weight:900; color:#334155;">${label}</div><div style="display:flex; flex-wrap:wrap; gap:5px;">${SM_DIST_FONTS.map(f => `<button type="button" onclick="smDistSet('${key}','${f.id}')" style="padding:5px 9px; border-radius:9px; border:1.5px solid ${S[key] === f.id ? '#1e88e5' : '#cbd5e1'}; background:${S[key] === f.id ? '#1e88e5' : '#fff'}; color:${S[key] === f.id ? '#fff' : '#0f172a'}; font-family:UrduAll,${f.family}; font-size:13px; font-weight:800; cursor:pointer;">${f.label}</button>`).join('')}</div>`;
 }
 function _sdRange(label, key, min, max, step){
   const S = smDistLoadStyle();
@@ -33032,7 +33033,7 @@ function _sdColor(label, key){
   const S = smDistLoadStyle();
   return `<label style="display:inline-flex; align-items:center; gap:5px; margin:4px 10px 0 0; font-size:12px; font-weight:900; color:#334155;"><input type="color" value="${S[key]}" oninput="smDistSet('${key}', this.value)" style="width:34px; height:28px; padding:0; border:none; border-radius:6px;">${label}</label>`;
 }
-function _sdBox(title, inner){ return `<div style="background:#fff; border:1.5px solid #e2e8f0; border-radius:11px; padding:7px 9px; margin-bottom:7px;"><div style="font-size:13.5px; font-weight:900; color:#0f766e;">${title}</div>${inner}</div>`; }
+function _sdBox(title, inner){ return `<div style="background:#fff; border:1.5px solid #e2e8f0; border-radius:11px; padding:7px 9px; margin-bottom:7px;"><div style="font-size:13.5px; font-weight:900; color:#1e88e5;">${title}</div>${inner}</div>`; }
 function renderDistPanel(){
   const p = document.getElementById('smDistPanel'); if(!p) return;
   p.innerHTML =
@@ -33070,10 +33071,10 @@ function ensureDistReportModal(){
   const el = document.createElement('div');
   el.id = 'smDistOverlay';
   el.style.cssText = 'display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:10060; background:#fff; flex-direction:column;';
-  el.innerHTML = `<div dir="rtl" style="display:flex; align-items:center; gap:6px; padding:8px; background:#0f766e; color:#fff; font-family:UrduAll,${smDistFam('nast')};">
-      <button type="button" onclick="closeDistReport()" style="flex:0 0 auto; padding:7px 12px; border:none; border-radius:9px; background:#fff; color:#0f766e; font-weight:900; font-size:14px; cursor:pointer; font-family:UrduAll,${smDistFam('nast')};">✖ بند</button>
+  el.innerHTML = `<div dir="rtl" style="display:flex; align-items:center; gap:6px; padding:8px; background:#1e88e5; color:#fff; font-family:UrduAll,${smDistFam('nast')};">
+      <button type="button" onclick="closeDistReport()" style="flex:0 0 auto; padding:7px 12px; border:none; border-radius:9px; background:#fff; color:#1e88e5; font-weight:900; font-size:14px; cursor:pointer; font-family:UrduAll,${smDistFam('nast')};">✖ بند</button>
       <div id="smDistTitleEl" style="flex:1; text-align:center; font-weight:900; font-size:15px; line-height:1.9;">📊 آج کی سبزی کس کس کسٹمر کو دی گئی</div>
-      <button type="button" onclick="printDistReport()" style="flex:0 0 auto; padding:7px 10px; border:none; border-radius:9px; background:#fff; color:#0f766e; font-weight:900; font-size:14px; cursor:pointer; font-family:UrduAll,${smDistFam('nast')};">🖨️ پرنٹ</button>
+      <button type="button" onclick="printDistReport()" style="flex:0 0 auto; padding:7px 10px; border:none; border-radius:9px; background:#fff; color:#1e88e5; font-weight:900; font-size:14px; cursor:pointer; font-family:UrduAll,${smDistFam('nast')};">🖨️ پرنٹ</button>
     </div>
     <div dir="rtl" style="display:flex; align-items:center; gap:6px; padding:4px 8px; background:#f1f5f9;">
       <div id="smDistInfo" style="flex:1; font-size:13px; font-weight:800; color:#334155; text-align:center; font-family:UrduAll,${smDistFam('nast')}; line-height:1.9;"></div>
@@ -34294,7 +34295,7 @@ function renderRecoveryListEmployeeView(){
   if(!list) return;
   if(owing.length === 0){
     list.innerHTML = `<div class="placeholder" style="padding:20px 0; text-align:center;">فی الحال کسی کسٹمر کا بقایہ نہیں<br><span style="font-size:12px;">(فون میں کل کسٹمر: ${customersData.length})</span><br>
-      <button type="button" onclick="runCloudHealthCheck()" style="margin-top:10px; border:none; border-radius:999px; background:#0f766e; color:#fff; font-size:15px; padding:8px 18px; cursor:pointer; font-family:inherit;">🩺 کلاؤڈ چیک</button></div>`;
+      <button type="button" onclick="runCloudHealthCheck()" style="margin-top:10px; border:none; border-radius:999px; background:#1e88e5; color:#fff; font-size:15px; padding:8px 18px; cursor:pointer; font-family:inherit;">🩺 کلاؤڈ چیک</button></div>`;
     return;
   }
   const drAll = computeDailyRecoveryRows(rlEntryDate());
@@ -35619,7 +35620,7 @@ async function generateTodayOrderMatrixReport(){
     ctx.fillStyle = '#faf7f2'; ctx.fill();
     ctx.clip();
 
-    ctx.fillStyle = '#0b4a45'; ctx.fillRect(8, 8, W-16, headerH-8);
+    ctx.fillStyle = '#1565c0'; ctx.fillRect(8, 8, W-16, headerH-8);
     ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.font = `bold 22px "${fontName}"`;
     ctx.fillText('' + smBiz() + ' — آج کی مکمل آرڈر رپورٹ', W/2, 40);
     ctx.font = `13px "${fontName}"`; ctx.fillStyle = '#d1fae5';
@@ -35797,7 +35798,7 @@ async function generateTodayRecoveryReport(){
   ctx.direction = 'rtl';
 
   ctx.fillStyle = '#faf7f2'; ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = '#0b4a45'; ctx.fillRect(0, 0, W, 130);
+  ctx.fillStyle = '#1565c0'; ctx.fillRect(0, 0, W, 130);
   ctx.textAlign = 'center';
   ctx.fillStyle = '#fff'; ctx.font = 'bold 32px sans-serif';
   ctx.fillText(smBiz(), W/2, 55);
@@ -35854,7 +35855,7 @@ async function generateTodayRecoveryReport(){
 
   // ---------- 🏆 گرینڈ ٹوٹل ----------
   y += 15;
-  ctx.fillStyle = '#0b4a45'; ctx.fillRect(20, y, W-40, 65);
+  ctx.fillStyle = '#1565c0'; ctx.fillRect(20, y, W-40, 65);
   ctx.textAlign = 'center'; ctx.fillStyle = '#a7f3d0'; ctx.font = 'bold 18px sans-serif';
   ctx.fillText(`کل ٹوٹل ریکوری (${todayEntries.length} گاہک)`, W/2, y+27);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 30px sans-serif';
@@ -43211,7 +43212,7 @@ async function generateBillHistoryReport(){
   ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
 
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#0b4a45';
+  ctx.fillStyle = '#1565c0';
   ctx.font = `800 26px Poppins, sans-serif`;
   ctx.fillText(AppState.settings.businessName || 'Sabzi Mandi POS', W/2, 40);
   ctx.font = `600 14px Poppins, sans-serif`;
@@ -45785,7 +45786,7 @@ const RECEIPT_COLOR_PRESETS = [
   {id:'blue',     name:'Blue',     bg:'#dbeafe', text:'#1e3a8a', border:'#b45309'}, // نیلا پس منظر — کہرا بارڈر
   {id:'peach',    name:'Peach',    bg:'#fef3e2', text:'#9a3412', border:'#15803d'}, // پیچ پس منظر — سبز بارڈر
   {id:'lavender', name:'Lavender', bg:'#ede9fe', text:'#5b21b6', border:'#b45309'}, // لیوینڈر پس منظر — سنہری بارڈر
-  {id:'pink',     name:'Pink',     bg:'#fce7f3', text:'#9d174d', border:'#0f766e'}, // پنک پس منظر — سبزی مائل نیلا بارڈر
+  {id:'pink',     name:'Pink',     bg:'#fce7f3', text:'#9d174d', border:'#1e88e5'}, // پنک پس منظر — سبزی مائل نیلا بارڈر
   {id:'gray',     name:'Gray',     bg:'#f1f5f9', text:'#334155', border:'#3730a3'}, // گرے پس منظر — گہرا نیلا بارڈر
   // ---------- نئے گہرے تھیمز — گہرا پس منظر، سفید لکھائی — WhatsApp پر شیئر کرنے کے لیے خوبصورت اور وزنی نظر آئیں ----------
   {id:'navy',     name:'Navy',     bg:'#1e3a5f', text:'#ffffff', border:'#93c5fd', dark:true},   // گہرا نیوی — ہلکا نیلا بارڈر
@@ -45938,7 +45939,7 @@ function generateAndPrintRecoveryPoster(){
       const printCanvas = canvasToGrayscale(canvas);
       const mm = AppState.settings.paperWidth || 80;
       const dataUrl = brandCv(printCanvas).toDataURL('image/png');
-      const accentColor = canvas._accentColor || '#0d9488';
+      const accentColor = canvas._accentColor || '#2196f3';
       const pageHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>رسید — ${c.name}</title>
       <style>
         @page{ size: ${mm}mm auto; margin:0; }
@@ -45993,7 +45994,8 @@ function generateAndBluetoothPrintRecoveryPoster(){
 }
 
 const THEME_PRESETS = [
-  {id:'teal',   name:'Teal (Default)',  primary:'#0f766e', primaryDark:'#0b4a45'},
+  {id:'skyblue', name:'نیلا (Default)', primary:'#1e88e5', primaryDark:'#1565c0'}, // 💙 SM2410SA178: سبزی منڈی کا ڈیفالٹ — ہمیشہ یہی رہے
+  {id:'teal',   name:'Teal',            primary:'#0f766e', primaryDark:'#0b4a45'},
   {id:'brass',  name:'Brass',           primary:'#b45309', primaryDark:'#78350f'},
   {id:'blue',   name:'Blue',            primary:'#2563eb', primaryDark:'#1e3a8a'},
   {id:'green',  name:'Green',           primary:'#16a34a', primaryDark:'#14532d'},
@@ -47851,7 +47853,7 @@ async function sharePackagePlansPoster(){
     y += accountH;
   }
 
-  ctx.fillStyle = theme.primaryDark || '#0b4a45';
+  ctx.fillStyle = theme.primaryDark || '#1565c0';
   ctx.fillRect(0, H - footerH, W, footerH);
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'center';
@@ -48254,7 +48256,7 @@ const ACCOUNT_CARD_THEMES = {
   'Standard Chartered':{bg1:'#0473EA', bg2:'#02397A', text:'#ffffff'},
 };
 function getAccountCardTheme(bankName){
-  return ACCOUNT_CARD_THEMES[bankName] || {bg1:'#0f766e', bg2:'#0b4a45', text:'#ffffff'};
+  return ACCOUNT_CARD_THEMES[bankName] || {bg1:'#1e88e5', bg2:'#1565c0', text:'#ffffff'};
 }
 
 // ---------- کارڈ کینوس پر بنائیں (Async — مالک کی تصویر لوڈ ہونے کا انتظار کرتا ہے) ----------
@@ -48670,7 +48672,7 @@ async function renderPartyProfilePosterToCanvas(party, kind, accounts, dueAmount
   const cx = W / 2;
 
   // ---------- تھیم: کسٹمر = سبز، سپلائر = نیلا (پروفائل پیج جیسا ہی) ----------
-  const bg1 = isSupplier ? '#1d4ed8' : '#0f766e';
+  const bg1 = isSupplier ? '#1d4ed8' : '#1e88e5';
   const bg2 = isSupplier ? '#1e3a8a' : '#065f52';
   const accent = isSupplier ? '#93c5fd' : '#6ee7b7';
 
@@ -50914,7 +50916,7 @@ async function renderPurchaseChalanReportToCanvas(){
     blocks.push({t:'total', cols: purchaseCols, cells:{name:'کل', qty: Math.round(tq*100)/100, amount: pendingAny ? (ta > 0 ? ta.toLocaleString() + ' ⏳' : '⏳ باقی') : ta.toLocaleString()}});
     return ta;
   };
-  blocks.push({t:'section', text:'💵 نقد خرید', color:'#0f766e'});
+  blocks.push({t:'section', text:'💵 نقد خرید', color:'#1e88e5'});
   const cashTotal = pushPurchaseTable(data.cash);
   blocks.push({t:'gap'});
   blocks.push({t:'section', text:'🏭 بیوپاری خرید', color:'#1e3a8a'});
@@ -50976,7 +50978,7 @@ async function renderPurchaseChalanReportToCanvas(){
   y += Math.round(fsSubtitle * 1.8);
   px = fitFont('🧾 خرید اور چالان رپورٹ', totalW, fsSubtitle, 'bold'); ctx.fillText('🧾 خرید اور چالان رپورٹ', pxWidth/2, y);
   y += Math.round(fsSmall * 1.9);
-  ctx.fillStyle = '#0f766e'; px = fitFont(`دورانیہ: ${rangeLabelText}`, totalW, fsSmall, 'bold'); ctx.fillText(`دورانیہ: ${rangeLabelText}`, pxWidth/2, y);
+  ctx.fillStyle = '#1e88e5'; px = fitFont(`دورانیہ: ${rangeLabelText}`, totalW, fsSmall, 'bold'); ctx.fillText(`دورانیہ: ${rangeLabelText}`, pxWidth/2, y);
   y += Math.round(fsSmall * 1.9);
   ctx.fillStyle = '#1a1a1a';
   const now = new Date();
@@ -51211,7 +51213,7 @@ async function renderMunshiStockLogToCanvas(){
   ctx.fillText(titleFit.text, pxWidth/2, y);
   y += Math.round(fsSmall * 1.8);
   ctx.font = `${rangeFit.weight}${rangeFit.px}px ${fontFam}`;
-  ctx.fillStyle = '#0f766e';
+  ctx.fillStyle = '#1e88e5';
   ctx.fillText(rangeFit.text, pxWidth/2, y);
   ctx.fillStyle = '#1a1a1a';
   y += Math.round(fsSmall * 1.8);
@@ -52389,6 +52391,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('appBuildVersionText').textContent = APP_BUILD_VERSION;
   document.getElementById('loginVersionBadge').textContent = '🏷️ ' + APP_BUILD_VERSION;
 
+  // 💙 SM2410SA178: پرانی انسٹالیشن جو ڈیفالٹ (teal) پر تھی، ایک بار نیلے پر — بعد میں کوئی خود رنگ بدلے تو وہی رہے
+  if(AppState.settings.smBlueDefaultV1 !== true){ if(!AppState.settings.themeId || AppState.settings.themeId === 'teal'){ AppState.settings.themeId = 'skyblue'; AppState.settings.themeIntensity = 0; } AppState.settings.smBlueDefaultV1 = true; try{ saveToStorage('settings', AppState.settings); }catch(e){} }
   applyTheme(AppState.settings.themeId);
   // ---------- 🔤↕️ سائیڈبار مینیو: مالک کی پہلے سے محفوظ شدہ ترتیب لاگو کریں + ڈریگ ہینڈلز فعال کریں
   // (FM3SEPTH10) — localStorage میں محفوظ شدہ ترتیب اسی ڈیوائس پر ہمیشہ کے لیے یاد رہتی ہے ----------
@@ -52686,7 +52690,7 @@ document.addEventListener('DOMContentLoaded', () => {
     background-size:40px 40px; animation:presenceMove .8s linear infinite; box-shadow:0 2px 8px rgba(0,0,0,.3);}
   #presenceBar.show{display:none !important;}
   #presenceBar.p-admin{background-image:repeating-linear-gradient(45deg,#b45309 0 20px,#f59e0b 20px 40px);}
-  #presenceBar.p-staff{background-image:repeating-linear-gradient(45deg,#0f766e 0 20px,#14b8a6 20px 40px);}
+  #presenceBar.p-staff{background-image:repeating-linear-gradient(45deg,#1e88e5 0 20px,#42a5f5 20px 40px);}
   @keyframes presenceMove{from{background-position:0 0;} to{background-position:40px 0;}}
   #presenceBar span{background:rgba(0,0,0,.35); border-radius:10px; padding:2px 12px; display:inline-block; text-shadow:0 1px 2px rgba(0,0,0,.5);}
 </style>
@@ -52873,12 +52877,12 @@ document.addEventListener('DOMContentLoaded', () => {
     padding:3px 12px !important; border-radius:999px !important; font-family:Arial,sans-serif !important; font-size:12px !important; font-weight:700 !important; letter-spacing:.4px; }
 </style>
 <!-- 🥬 سبزی منڈی — پہلی بار: دکان کی رجسٹریشن -->
-<div id="smRegOverlay" dir="rtl" style="display:none; position:fixed; inset:0; z-index:2147483000; background:linear-gradient(160deg,#065f46,#022c22); overflow:auto; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;">
+<div id="smRegOverlay" dir="rtl" style="display:none; position:fixed; inset:0; z-index:2147483000; background:linear-gradient(160deg,#1e88e5,#0d47a1); overflow:auto; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;">
   <style>
     #smRegOverlay .smWrap{ min-height:100dvh; box-sizing:border-box; padding:14px; display:flex; align-items:center; justify-content:center; }
     #smRegOverlay .smCard{ box-sizing:border-box; width:100%; max-width:420px; background:#fff; border-radius:18px; padding:14px 16px; box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; flex-direction:column; gap:10px; }
     #smRegOverlay label.smL{ display:block; font-weight:800; color:#0f172a; font-size:14px; margin:2px 0 2px; }
-    #smRegOverlay input.smI{ width:100%; box-sizing:border-box; padding:9px 10px; margin:0; border:2px solid #86efac; border-radius:10px; font-family:inherit; font-size:16px; }
+    #smRegOverlay input.smI{ width:100%; box-sizing:border-box; padding:9px 10px; margin:0; border:2px solid #93c5fd; border-radius:10px; font-family:inherit; font-size:16px; }
     #smRegOverlay .smPics{ display:flex; gap:8px; }
     #smRegOverlay .smPic{ flex:1; display:flex; align-items:center; gap:8px; background:#f8fafc; border:1.5px dashed #cbd5e1; border-radius:12px; padding:6px 8px; cursor:pointer; }
     #smRegOverlay .smPic img{ width:40px; height:40px; object-fit:cover; background:#e2e8f0; flex:0 0 auto; }
