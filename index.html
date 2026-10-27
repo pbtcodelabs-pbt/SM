@@ -3310,8 +3310,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
 
     <!-- ---------- 🎉 خوش آمدید بینر — بیٹا ٹیسٹنگ کی صاف وضاحت، پہلی نظر میں ---------- -->
     <div class="welcomeTrialBanner" style="display:none;">
-      <div class="wtbHeadline">🎉 بہترین بلنگ ایپ — 3 دن مفت آزمائیں</div>
-      <div class="wtbSubline">آپ کا 3 دن کا مفت ٹرائل شروع ہو گیا ہے</div>
+      <div class="wtbHeadline">🎉 بہترین بلنگ ایپ — 7 دن مفت آزمائیں</div>
+      <div class="wtbSubline">آپ کا 7 دن کا مفت ٹرائل شروع ہو گیا ہے</div>
     </div>
 
     <!-- ---------- ہمیشہ نظر آنے والی سبسکرپشن/ٹرائل کی حیثیت — لاگ ان سے پہلے ہی صاف پتا چل جائے ---------- -->
@@ -7929,8 +7929,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <input type="hidden" id="giftCodeMobileInput">
       <input type="text" id="giftCodeNameInput" placeholder="کسٹمر کا نام (مثلاً: احمد فروٹ شاپ)" style="width:100%; padding:9px; margin-bottom:8px; border:1px solid #dbe1ea; border-radius:8px; font-size:13px;">
       <select id="giftCodeDaysInput" onchange="toggleCustomGiftDaysInput()" style="width:100%; padding:9px; margin-bottom:8px; border:1px solid #dbe1ea; border-radius:8px; font-size:13px;">
-        <option value="3">3 دن (Free Trial جتنا)</option>
-        <option value="7">7 دن</option>
+        <option value="7">7 دن (Free Trial جتنا)</option>
         <option value="30" selected>30 دن (1 مہینہ)</option>
         <option value="90">90 دن (3 مہینے)</option>
         <option value="180">180 دن (6 مہینے)</option>
@@ -9872,8 +9871,9 @@ function getDeveloperContact(){
 // 🆕 SM2510SU185: لین دین میں گاہک کی وصولی بدلیں/حذف کریں (صرف ایڈمن، تنبیہ + PIN)
 // 🆕 SM2710TU186: ڈویلپر پینل میں کیپسول بٹن + ڈویلپر ان لاک
 // 🆕 SM2710TU189: اوپر کی پٹی میں ایپ شیئر کا بٹن
-const APP_BUILD_VERSION = 'SM2710TU189'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'اوپر ایپ شیئر کرنے کا بٹن'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+// 🆕 SM2710TU190: مفت ٹرائل 3 کی جگہ 7 دن — ہر پیغام میں بھی؛ پرانا جاری ٹرائل بھی 7 دن تک
+const APP_BUILD_VERSION = 'SM2710TU190'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'مفت ٹرائل اب 7 دن کا'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -10138,9 +10138,24 @@ async function renderFbUsageBox(){
 // ---------- ہر انسٹالیشن کی منفرد شناخت — ڈیوائس کے fingerprint سے بنتی ہے (بالکل بے ترتیب نہیں) —
 // اسی لیے Data Clear/Uninstall کے بعد بھی وہی ID دوبارہ بنتی ہے (اسی فون پر)، تاکہ کوئی ٹرائل بار بار
 // ری سیٹ کر کے دوبارہ مفت استعمال نہ کر سکے۔ ٹرائل کا اصل تالا Firestore میں لگتا ہے (نیچے دیکھیں) ----------
-// نوٹ: بالکل پہلی بار (نیا ڈیوائس) پر خودکار 3 دن کا مفت (Beta) ٹرائل بھی شروع ہو جاتا ہے — تاکہ
+// نوٹ: بالکل پہلی بار (نیا ڈیوائس) پر خودکار 7 دن کا مفت (Beta) ٹرائل بھی شروع ہو جاتا ہے — تاکہ
 // کسی نئے صارف کو فائل کھولتے ہی PIN/Activation کے چکر میں نہ الجھنا پڑے، وہ فوراً ایپ آزما سکے۔
+// 🎁 SM2710TU190 (صدام بھائی): مفت ٹرائل 7 دن۔ جو دکان پہلے کے 3 دن والے ٹرائل پر ہے، اس کا ٹرائل بھی 7 دن تک بڑھ جاتا ہے
+const SM_TRIAL_DAYS = 7;
+function smExtendOldTrial(){
+  try{
+    const st = AppState.settings;
+    if(!st.isOnFreeTrial || !st.freeTrialGranted || !st.subscriptionActivatedOn || !st.subscriptionExpiry) return;
+    const on = new Date(st.subscriptionActivatedOn + 'T00:00:00'); if(isNaN(on)) return;
+    const d3 = new Date(on); d3.setDate(d3.getDate() + 3);
+    if(st.subscriptionExpiry !== _smYMD(d3)) return; // صرف بالکل وہی پرانا 3 دن والا ٹرائل
+    const d7 = new Date(on); d7.setDate(d7.getDate() + SM_TRIAL_DAYS);
+    st.subscriptionExpiry = _smYMD(d7);
+    saveToStorage('settings', st);
+  }catch(e){}
+}
 function getOrCreateDeviceUID(){
+  smExtendOldTrial(); // 🎁 SM2710TU190
   if(AppState.settings.deviceUID) return AppState.settings.deviceUID;
   const fp = [
     navigator.userAgent.length,
@@ -10156,7 +10171,7 @@ function getOrCreateDeviceUID(){
   AppState.settings.deviceUID = uid;
   if(!AppState.settings.subscriptionExpiry && !AppState.settings.freeTrialGranted){
     const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 3); // 🎁 SM1610FR122: فری ٹرائل 3 دن
+    trialEnd.setDate(trialEnd.getDate() + SM_TRIAL_DAYS); // 🎁 SM2710TU190: فری ٹرائل 7 دن (پہلے 3)
     AppState.settings.subscriptionExpiry = _smYMD(trialEnd);
     AppState.settings.subscriptionActivatedOn = _smYMD(new Date());
     AppState.settings.freeTrialGranted = true;
@@ -11365,7 +11380,7 @@ async function _origSetupLoginScreen(){
   // ---------- کوئی بھی غیر متوقع خرابی ہو (پرانا براؤزر، ڈیٹا کرپشن وغیرہ) تو صارف کبھی بھی خالی/غیر فعال اسکرین پر نہ رہے —
   // ناکامی کی صورت میں محفوظ ترین حالت (Free Trial کا سیدھا بٹن) خودکار دکھائیں ----------
   try{
-    getOrCreateDeviceUID(); // ---------- پہلی بار کھلنے پر یہیں سے 3 دن کا مفت ٹرائل بھی شروع ہو جاتا ہے ----------
+    getOrCreateDeviceUID(); // ---------- پہلی بار کھلنے پر یہیں سے 7 دن کا مفت ٹرائل بھی شروع ہو جاتا ہے ----------
 
     const trialActive = !!AppState.settings.isOnFreeTrial && isSubscriptionActive();
 
@@ -11521,7 +11536,7 @@ function finishLogin(user, rememberOverride){
   if(empPinEl) empPinEl.value = '';
 
   // ---------- سبسکرپشن فعال نہ ہو تو ایپ نہیں کھلے گی، فعال سازی صفحہ دکھایا جائے گا ----------
-  // (getOrCreateDeviceUID یہاں پہلے چلانا ضروری ہے — بالکل نئے ڈیوائس پر یہی 3 دن کا مفت ٹرائل شروع کرتا ہے)
+  // (getOrCreateDeviceUID یہاں پہلے چلانا ضروری ہے — بالکل نئے ڈیوائس پر یہی 7 دن کا مفت ٹرائل شروع کرتا ہے)
   getOrCreateDeviceUID();
   if(!isSubscriptionActive()){
     showSubscriptionGate();
@@ -12525,7 +12540,7 @@ function _origShowSubscriptionGate(){
   const exp = AppState.settings.subscriptionExpiry;
   document.getElementById('subGateStatus').textContent = exp
     ? (AppState.settings.isOnFreeTrial
-        ? `آپ کا 3 دن کا مفت ٹرائل ${formatDateDMY(exp)} کو ختم ہو گیا۔ آگے چلانے کے لیے ڈویلپر سے رابطہ کریں۔`
+        ? `آپ کا 7 دن کا مفت ٹرائل ${formatDateDMY(exp)} کو ختم ہو گیا۔ آگے چلانے کے لیے ڈویلپر سے رابطہ کریں۔`
         : `Your subscription expired on ${formatDateDMY(exp)}.`)
     : `This app is not yet activated.`;
   document.getElementById('subscriptionGateScreen').style.display = 'flex';
@@ -53425,11 +53440,11 @@ document.addEventListener('DOMContentLoaded', () => {
     <div>
       <!-- 📦 SM1610FR123: پیکج کی سادہ تفصیل + تین راستے: مفت ٹرائل / ایکٹیویشن کوڈ / کوڈ منگوائیں -->
       <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:6px 10px; font-size:13.5px; color:#14532d; line-height:2;">
-        <b>📦 پیکج:</b> مفت ٹرائل = 3 دن، صرف مالک<br>
+        <b>📦 پیکج:</b> مفت ٹرائل = 7 دن، صرف مالک<br>
         پورا پیکج کوڈ سے: <b>1+1</b> (مالک + 1 ملازم)، <b>1+2</b>، <b>1+3</b> …<br>
         <span style="color:#1d4ed8;">🔄 ایپ دوبارہ انسٹال کی ہے؟ اسی فون پر پرانی سبسکرپشن خود بحال ہو جائے گی — نیا کوڈ نہیں چاہیے</span>
       </div>
-      <button type="button" onclick="smRegSave()" style="width:100%; margin-top:8px; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); line-height:1.9;">🎁 3 دن کا مفت ٹرائل شروع کریں</button>
+      <button type="button" onclick="smRegSave()" style="width:100%; margin-top:8px; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); line-height:1.9;">🎁 7 دن کا مفت ٹرائل شروع کریں</button>
       <div style="display:flex; gap:8px; margin-top:8px;">
         <button type="button" onclick="smRegToggleCode()" style="flex:1; padding:8px 4px; border:2px solid #1d4ed8; border-radius:12px; background:#eff6ff; color:#1e3a8a; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">🔑 ایکٹیویشن کوڈ لگائیں</button>
         <button type="button" onclick="smOpenCodeRequest(true)" style="flex:1; padding:8px 4px; border:2px solid #16a34a; border-radius:12px; background:#f0fdf4; color:#14532d; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">📲 کوڈ منگوائیں</button>
