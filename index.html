@@ -2880,6 +2880,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       white-space:nowrap; display:flex; align-items:center; justify-content:center;
     }
     #quickLogoutBtn{background:var(--danger,#dc2626);}
+    #topbarShareBtn{flex:0 0 auto; width:28px; height:28px; padding:0; border:none; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; background:linear-gradient(145deg,#22c55e,#15803d); box-shadow:0 0 8px rgba(74,222,128,.7), inset 0 1px 1px rgba(255,255,255,.5);}
 
     /* --- 🔎 App Search — ہمیشہ نظر آنے والی پٹی، Topbar کے بالکل نیچے، ہر سکرین پر ایک جیسی —
          روشن نیلا پس منظر + سفید، صاف نظر آنے والی چمکتی لکھائی (صارف کی پسند کے مطابق،
@@ -3658,6 +3659,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
     <!-- ---------- ☰ مینیو / 🚪 لاگ آؤٹ / 🎨 فونٹ / ⚙️ سیٹنگز — ہدایت (FM20SEPSU0759AM): اب زرد لکیر کے
          نیچے الگ پٹی نہیں — یہیں اوپر، ٹاپ بار کے اندر ہی ایک کمپیکٹ لائن میں؛ زرد لکیر سے نیچے کچھ نہیں ---------- -->
     <div id="utilityBar">
+      <!-- 📤 SM2710TU189: ایپ کا لنک شیئر (واٹس ایپ وغیرہ؛ کمپیوٹر پر Chrome میں کھلے) -->
+      <button id="topbarShareBtn" onclick="shareAppLink()" title="ایپ شیئر کریں"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="18" cy="5" r="3" fill="#fff"/><circle cx="6" cy="12" r="3" fill="#fff"/><circle cx="18" cy="19" r="3" fill="#fff"/><line x1="8.6" y1="10.5" x2="15.4" y2="6.5"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/></svg></button>
       <button id="hotlineBtn" onclick="toggleQuickContactPanel(event)" title="ہاٹ لائن">☎️</button>
       <button id="topbarPaintBtn" onclick="openFontPaintPanel(event)" title="Font / اردو فونٹ">🎨</button>
       <button id="topbarSettingsBtn" onclick="toggleHomeSettingsPanel(event)" title="Settings">⚙️</button>
@@ -9868,8 +9871,9 @@ function getDeveloperContact(){
 // 🆕 SM2510SU183: بچے ہوئے چالان کی اطلاع اب اپنی دکان کی جگہ پر — ایڈمن تک پہنچتی ہے
 // 🆕 SM2510SU185: لین دین میں گاہک کی وصولی بدلیں/حذف کریں (صرف ایڈمن، تنبیہ + PIN)
 // 🆕 SM2710TU186: ڈویلپر پینل میں کیپسول بٹن + ڈویلپر ان لاک
-const APP_BUILD_VERSION = 'SM2710TU188'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'ہر PIN اور پاس ورڈ کے خانے میں آنکھ کا بٹن — دبائیں تو دکھے، دوبارہ دبائیں تو چھپے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+// 🆕 SM2710TU189: اوپر کی پٹی میں ایپ شیئر کا بٹن
+const APP_BUILD_VERSION = 'SM2710TU189'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'اوپر ایپ شیئر کرنے کا بٹن'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -11282,19 +11286,20 @@ function _removedResetDeviceUID_unused(){
 // Web Share API سپورٹ ہو تو یوزر اپنی مرضی کی ایپ (WhatsApp, SMS, Email وغیرہ) چن سکتا ہے،
 // ورنہ سیدھا WhatsApp پر کھل جائے گا۔ لنک Settings > Admin Control > App Share Link سے بدلا جا سکتا ہے۔ ----------
 async function shareAppLink(){
-  const link = AppState.settings.appShareLink;
-  if(!link){
-    alert('Share link not set yet. Go to Home → Settings → Admin Control → "App Share Link" and paste your GitHub Pages link there first.');
-    return;
-  }
+  // 📤 SM2710TU189: لنک سیٹنگ میں نہ ہو تو اسی ایپ کا اپنا پتہ
+  const link = (AppState.settings.appShareLink || '').trim() || (location.origin + location.pathname.replace(/index\.html$/i, ''));
   const customMsg = (AppState.settings.appShareMessage || '').trim();
-  const text = customMsg ? `${customMsg}\n${link}` : `Try our Sabzi Mandi POS App — free trial included:\n${link}`;
+  const text = customMsg ? `${customMsg}\n${link}` : `🥬 سبزی منڈی سافٹ وئیر — موبائل یا کمپیوٹر (Chrome) میں یہ لنک کھولیں:\n${link}`;
   if(navigator.share){
-    try{ await navigator.share({ title: 'Sabzi Mandi POS App', text: text }); }
-    catch(err){ /* یوزر نے شیئر Cancel کر دیا — کوئی ایکشن درکار نہیں */ }
-  } else {
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    try{ await navigator.share({ title: 'سبزی منڈی سافٹ وئیر', text: text }); return; }
+    catch(err){ if(err && err.name === 'AbortError') return; }
   }
+  try{ await navigator.clipboard.writeText(text); }catch(e){}
+  const wa = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  if(typeof uDialog === 'function'){
+    const go = await uDialog({ title: '📤 ایپ شیئر کریں', message: `لنک کاپی ہو گیا ✅<div dir="ltr" style="margin-top:6px; padding:8px; border-radius:10px; background:#f1f5f9; font:700 14px Arial,sans-serif; word-break:break-all; user-select:all;">${link}</div>`, okText: '💬 واٹس ایپ پر بھیجیں', cancelText: '✖ بند', tone: 'green' });
+    if(go) window.open(wa, '_blank');
+  } else window.open(wa, '_blank');
 }
 
 
