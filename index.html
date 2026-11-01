@@ -207,6 +207,8 @@ function smRenderShopCodeRow(){
     <div style="display:flex; gap:8px; margin-top:8px;">
       <button type="button" onclick="smCopyShopCode()" style="flex:1; width:auto !important; margin:0 !important; padding:9px 8px !important; border-radius:10px !important; background:#e0f2fe !important; color:#075985 !important; border:none !important; font-weight:800; cursor:pointer;">📋 نمبر + کوڈ کاپی</button>
       <button type="button" onclick="smShareShopCode()" style="flex:1; width:auto !important; margin:0 !important; padding:9px 8px !important; border-radius:10px !important; background:#dcfce7 !important; color:#166534 !important; border:none !important; font-weight:800; cursor:pointer;">📤 واٹس ایپ پر بھیجیں</button>
+    </div>
+    <div style="margin-top:8px;"><button type="button" onclick="smOwnerRestoreShop()" style="width:100% !important; margin:0 !important; padding:9px 8px !important; border-radius:10px !important; background:#fef3c7 !important; color:#92400e !important; border:1.5px solid #fcd34d !important; font-weight:800; cursor:pointer;">🔁 ایپ دوبارہ لگائی؟ اپنی پرانی دکان واپس لائیں</button>
     </div></div>`;
   el.innerHTML = bar + (_smCodeOpen ? box : '');
 }
@@ -10378,8 +10380,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM0111SU226'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'سٹاک، آرڈر اور گلے کا کیش اب کئی فونوں پر بھی بالکل برابر — ایک وقت میں ایک ملاپ'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM0111SU227'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'ایپ دوبارہ لگانے کے بعد مالک اپنی پرانی دکان (موبائل + کوڈ) سے واپس لا سکتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -55271,6 +55273,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; flex-wrap:wrap;">
         <span style="font-size:12px; color:#64748b;">ابتدائی پن: <b dir="ltr">1234</b></span>
         <a href="javascript:void(0)" onclick="smJoinAsStaff()" style="font-size:12.5px; color:#1d4ed8; font-weight:800;">📲 ملازم ہیں؟ دکان سے جڑیں</a>
+        <a href="javascript:void(0)" onclick="smRegRestoreOwner()" style="font-size:12.5px; color:#92400e; font-weight:800;">🔁 مالک ہیں، ایپ دوبارہ لگائی؟ پرانی دکان واپس لائیں</a>
         <span id="smRegVersion" dir="ltr" style="display:inline-block; background:#15803d; color:#fff; font-family:Arial,sans-serif; font-size:12px; font-weight:700; letter-spacing:.4px; padding:3px 12px; border-radius:999px;"></span>
       </div>
     </div>
@@ -55409,6 +55412,39 @@ function smRegCollect(){
   }catch(e){}
   smApplyBranding();
   return true;
+}
+// ---------- 🔁 SM0111SU227 (بلال: «ایپ دوبارہ لگائی تو کچھ نہیں آ رہا»): دکان کا خفیہ کوڈ صرف مالک کے فون میں تھا — دوبارہ انسٹال پر
+//   مٹ گیا اور نئی رجسٹریشن نے نیا کوڈ بنا دیا، ایپ نئے خالی پتے پر دیکھنے لگی (پرانا ڈیٹا کلاؤڈ میں اپنی جگہ محفوظ)۔
+//   مالک وہی پیغام (موبائل + کوڈ) جو ملازمین کو بھیجا تھا، یہاں ڈالے — دکان پہلے کلاؤڈ میں جانچی جاتی ہے، پھر یہ فون اسی کا مالک
+function smRegRestoreOwner(){ return smOwnerRestoreShop(); }
+async function smOwnerRestoreShop(pasted){
+  const raw = (typeof pasted === 'string' && pasted.trim()) ? pasted : prompt('🔁 پرانی دکان واپس لائیں\n\nوہ پیغام (موبائل نمبر + کوڈ) جو آپ نے پہلے ملازمین کو واٹس ایپ پر بھیجا تھا، کاپی کر کے یہاں پیسٹ کریں۔\n(یا منشی کے فون پر "دکان سے جڑیں" والا پیغام)');
+  if(raw === null) return;
+  let { mobile: m, code: c } = smParseJoinText(raw);
+  if(!m){ m = (prompt('📱 دکان کا رجسٹر موبائل نمبر (03XXXXXXXXX):') || '').replace(/[^0-9]/g, ''); }
+  if(!/^03\d{9}$/.test(m)){ if(m) alert('درست موبائل نمبر نہیں ملا'); return; }
+  if(!c || c.length !== 8){ c = (prompt('🔐 دکان کا کوڈ (مثلاً K7M2-9QXP):') || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+  if(c.length !== 8){ if(c) alert('کوڈ درست نہیں — 8 حروف/ہندسے ہونے چاہییں'); return; }
+  if(m === smShopMobile() && c === smShopCode()){ alert('✅ یہ فون پہلے سے اسی دکان پر ہے۔'); return; }
+  const base = 'shops/' + m + '-' + c + '/data/';
+  let found = 0;
+  for(const d of ['license', 'customers', 'products', 'suppliers', 'invoicesIndex']){
+    try{ const r = await authFirestoreFetch(`${base}${d}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' }); if(r && r.ok) found++; }catch(e){}
+  }
+  if(!found){ alert('❌ اس نمبر اور کوڈ کی کوئی دکان کلاؤڈ میں نہیں ملی (یا انٹرنیٹ نہیں)۔\n\nنمبر اور کوڈ دوبارہ دیکھیں — منشی کے فون والا پیغام سب سے درست ہے۔'); return; }
+  if(!confirm('✅ دکان کلاؤڈ میں مل گئی۔\n\nیہ فون اب اسی پرانی دکان کا مالک بنے گا اور سارا ریکارڈ (کسٹمر، بیوپاری، بل، سٹاک) کلاؤڈ سے واپس آئے گا۔\n\n⚠️ دوبارہ انسٹال کے بعد اس فون پر جو نئی چیزیں ڈالی تھیں وہ اس فون سے ہٹ جائیں گی (کلاؤڈ میں الگ محفوظ رہیں گی)۔\n\nجاری رکھیں؟')) return;
+  if(!(await _askAdminPinForSerialMaster('پرانی دکان واپس لانے کے لیے'))) return;
+  try{ if(typeof pauseCloudPolling === 'function') pauseCloudPolling(60000); }catch(e){}
+  // اس فون کا نیا (غلط پتے والا) ڈیٹا اور ملاپ کی بنیادیں صاف — ورنہ خالی فہرستیں پرانی دکان سے ملائی جاتیں
+  const keep = new Set(['settings', 'users']);
+  try{ (typeof smLsKeys === 'function' ? smLsKeys() : Object.keys(localStorage)).filter(k => k.indexOf(STORAGE_PREFIX) === 0 && !keep.has(k.slice(STORAGE_PREFIX.length))).forEach(k => { try{ localStorage.removeItem(k); }catch(e){} }); }catch(e){}
+  Object.keys(AppState.settings).forEach(k => { if(/PendingSync$/.test(k)) AppState.settings[k] = false; });
+  AppState.settings.smPrevShop = { mobile: smShopMobile(), code: smShopCode(), at: new Date().toISOString() }; // یاد رہے کہ بیچ والی نئی دکان کہاں ہے
+  AppState.settings.businessPhone = m; AppState.settings.smShopCode = c; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = false;
+  saveToStorage('settings', AppState.settings);
+  try{ await smPullLicenseMirror(); }catch(e){}
+  alert('✅ پرانی دکان واپس آ گئی۔ ایپ دوبارہ کھل رہی ہے — ریکارڈ آنے میں ایک دو منٹ لگ سکتے ہیں۔');
+  location.reload();
 }
 // ---------- 📲 ملازم کا فون: پہلے سے رجسٹر دکان سے جڑیں (مالک کا موبائل نمبر) ----------
 async function smJoinAsStaff(pasted){
