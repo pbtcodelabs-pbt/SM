@@ -6646,7 +6646,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
           <strong>🖨️ Bill Ready To Print</strong>
           <div style="display:flex; align-items:center; gap:10px;">
             <span style="cursor:pointer; font-size:13px; font-weight:700; color:var(--primary-dark); background:#eef2ff; padding:5px 10px; border-radius:8px;" onclick="openEditBillCustomerModal()">✏️ Edit Customer</span>
-            <span class="adminOnlyShort" style="cursor:pointer; font-size:13px; font-weight:700; color:#b91c1c; background:#fee2e2; padding:5px 10px; border-radius:8px; white-space:nowrap;" onclick="editBillShort()" title="بل کے لال ڈبے (ٹوٹل کم وصولی) کی رقم درست کریں">✏️ لال ڈبہ</span>
+            <span class="adminOnlyShort" style="cursor:pointer; font-size:13px; font-weight:700; color:#b91c1c; background:#fee2e2; padding:5px 10px; border-radius:8px; white-space:nowrap;" onclick="editBillShort()" title="بل کے لال ڈبے (ٹوٹل کم وصولی) کی رقم درست کریں">✏️ لال ڈبہ لکھیں</span>
             <span style="cursor:pointer;" onclick="closeInvoicePreview()">✖</span>
           </div>
         </div>
@@ -9855,12 +9855,22 @@ function renderGDriveFileList(files){
 async function selectGDriveBackupFile(fileId, fileName){
   document.getElementById('gdriveRestoreModal').classList.remove('show');
   showGDriveProgress('⏳ Downloading backup...'); // ---------- ہدایت (FM3SEPTH10): ریسٹور کے دوران بھی واضح پراگرس ----------
+  rsProg(3, '☁️ گوگل ڈرائیو سے بیک اپ آ رہا ہے…');
   try{
     const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
       headers: { 'Authorization': 'Bearer ' + gDriveAccessToken }
     });
     if(!res.ok) throw new Error('Download failed: ' + res.status);
-    const backup = await res.json();
+    // ⏳ SM0311TU238: ڈاؤن لوڈ کی اصل پیش رفت (حجم معلوم ہو تو فیصد، ورنہ آہستہ آگے)
+    let backup;
+    try{
+      const total = +res.headers.get('content-length') || 0, rd = res.body.getReader(), parts = []; let got = 0;
+      for(;;){ const {done, value} = await rd.read(); if(done) break; parts.push(value); got += value.length;
+        rsProg(total ? 3 + got / total * 27 : Math.min(28, 3 + got / 200000), '☁️ ڈاؤن لوڈ — ' + (got / 1048576).toFixed(1) + ' MB'); }
+      const all = new Uint8Array(got); let o = 0; parts.forEach(p => { all.set(p, o); o += p.length; });
+      rsProg(32, '🔍 فائل جانچی جا رہی ہے…'); await rsTick();
+      backup = JSON.parse(new TextDecoder().decode(all));
+    }catch(e){ if(e instanceof SyntaxError) throw e; backup = await (await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers: { 'Authorization': 'Bearer ' + gDriveAccessToken } })).json(); }
     if(!backup.products || !backup.customers){
       hideGDriveProgress();
       showBackupConfirmModal('error', fileName, {message:'This does not look like a valid Sabzi Mandi POS backup file.'});
@@ -9872,9 +9882,10 @@ async function selectGDriveBackupFile(fileId, fileName){
     pendingImportFileName = fileName + ' (Google Drive)';
     document.getElementById('importConfirmFileChip').textContent = '📄 ' + pendingImportFileName;
     finishGDriveProgress('✅ Downloaded — please confirm');
+    rsProg(35, '✅ بیک اپ آ گیا — «Yes, Restore» دبائیں');
     document.getElementById('importConfirmModal').classList.add('show');
   }catch(err){
-    hideGDriveProgress();
+    hideGDriveProgress(); rsProgEnd(false, '❌ ڈاؤن لوڈ نہیں ہو سکا');
     alert('Could not download the file: ' + err.message);
   }
 }
@@ -9922,14 +9933,43 @@ function proceedToRestoreFilePicker(){
   if(inputId) document.getElementById(inputId)?.click();
 }
 
+// ---------- ⏳ SM0311TU238 (ہیلپ ڈیسک #40، صدام): بیک اپ واپس لاتے وقت صاف پیش رفت — ہر اسکرین پر اوپر چھوٹی پٹی
+//   (پہلے صرف مارکیوی کیپسول تھا جو بیک اپ / سیٹنگ کے صفحے پر نظر نہیں آتا تھا، اور فائل سے بحالی میں کچھ بھی نہیں)۔ بڑا پاپ اپ نہیں ----------
+let rsProgHideT = null;
+function rsProg(pct, label){
+  clearTimeout(rsProgHideT);
+  let el = document.getElementById('rsProgBar');
+  if(!el){
+    el = document.createElement('div'); el.id = 'rsProgBar'; el.dir = 'rtl';
+    el.style.cssText = 'position:fixed; top:10px; left:50%; transform:translateX(-50%); z-index:2147483600; width:min(92vw,420px); background:#0f172a; color:#fff; border:2px solid #eab308; border-radius:14px; padding:8px 12px 10px; box-shadow:0 8px 24px rgba(0,0,0,.35); font-family:inherit;';
+    el.innerHTML = '<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:14px; font-weight:800;"><span id="rsProgLbl"></span><b id="rsProgPct" style="font-family:Arial,sans-serif; color:#fde047;"></b></div><div style="height:10px; background:#334155; border-radius:6px; margin-top:6px; overflow:hidden;"><div id="rsProgFill" style="height:100%; width:0; background:linear-gradient(90deg,#22c55e,#eab308); border-radius:6px; transition:width .3s;"></div></div>';
+    document.body.appendChild(el);
+  }
+  el.style.display = 'block';
+  pct = Math.max(0, Math.min(100, Math.round(pct)));
+  document.getElementById('rsProgLbl').textContent = label || '';
+  document.getElementById('rsProgPct').textContent = pct + '%';
+  document.getElementById('rsProgFill').style.width = pct + '%';
+}
+function rsProgEnd(ok, label){
+  rsProg(100, label || (ok ? '✅ ڈیٹا بحال ہو گیا' : '❌ بحالی نہیں ہو سکی'));
+  if(!ok){ const f = document.getElementById('rsProgFill'); if(f) f.style.background = '#ef4444'; }
+  rsProgHideT = setTimeout(() => { const el = document.getElementById('rsProgBar'); if(el) el.remove(); }, ok ? 2500 : 4000);
+}
+const rsTick = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 30)));
 function importBackupData(event){
   const file = event.target.files[0];
   if(!file) return;
   const reader = new FileReader();
+  rsProg(3, '📂 فائل پڑھی جا رہی ہے…');
+  reader.onprogress = (ev) => { if(ev.lengthComputable) rsProg(3 + ev.loaded / ev.total * 27, '📂 فائل پڑھی جا رہی ہے…'); };
+  reader.onerror = () => rsProgEnd(false, '❌ فائل نہیں پڑھی جا سکی');
   reader.onload = (e) => {
     try{
+      rsProg(32, '🔍 فائل جانچی جا رہی ہے…');
       const backup = JSON.parse(e.target.result);
       if(!backup.products || !backup.customers){
+        rsProgEnd(false, '❌ درست بیک اپ فائل نہیں');
         showBackupConfirmModal('error', file.name, {message:'This does not look like a valid Sabzi Mandi POS backup file.'});
         return;
       }
@@ -9937,9 +9977,11 @@ function importBackupData(event){
       if(backupKindErrorMsg(backup)){ showBackupConfirmModal('error', file.name, {message: backupKindErrorMsg(backup)}); return; } // 🔐 FM410SU304
       pendingImportBackup = backup;
       pendingImportFileName = file.name;
+      rsProg(35, '✅ فائل تیار — «Yes, Restore» دبائیں');
       document.getElementById('importConfirmFileChip').textContent = '📄 ' + file.name;
       document.getElementById('importConfirmModal').classList.add('show');
     } catch(err){
+      rsProgEnd(false, '❌ فائل خراب ہے');
       showBackupConfirmModal('error', file.name, {message: err.message});
     }
   };
@@ -9954,22 +9996,26 @@ function cancelImportConfirm(){
   pendingImportFileName = '';
   gdriveOpActive = false; // ---------- 🔒 اگر یہ Google Drive ری سٹور تھا اور صارف نے منسوخ کر دیا ----------
   document.getElementById('importConfirmModal').classList.remove('show');
+  const pb = document.getElementById('rsProgBar'); if(pb) pb.remove();
 }
 
 // ---------- "Yes, Restore" دبانے پر ہی اصل بحالی — پہلے موجود native confirm() کی جگہ خوبصورت، برانڈڈ پاپ اپ ----------
-function proceedWithImport(){
+async function proceedWithImport(){
   const backup = pendingImportBackup;
   const fileName = pendingImportFileName;
   document.getElementById('importConfirmModal').classList.remove('show');
   if(!backup) return;
   // 🔐 FM410SU304: آخری پہرہ — ہر بحالی (فائل، گوگل ڈرائیو، نیا ڈرائیو بیک اپ) یہیں سے گزرتی ہے
   const _kindErr = backupKindErrorMsg(backup);
-  if(_kindErr){ pendingImportBackup = null; pendingImportFileName = ''; try{ gdriveOpActive = false; }catch(e){} showBackupConfirmModal('error', fileName, {message: _kindErr}); return; }
+  if(_kindErr){ pendingImportBackup = null; pendingImportFileName = ''; try{ gdriveOpActive = false; }catch(e){} rsProgEnd(false); showBackupConfirmModal('error', fileName, {message: _kindErr}); return; }
 
   try{
+      rsProg(40, '🥬 پراڈکٹس بحال ہو رہے ہیں…'); await rsTick();
       productsData.length = 0; productsData.push(...backup.products);
+      rsProg(50, '👥 گاہک اور سپلائر…'); await rsTick();
       customersData.length = 0; customersData.push(...backup.customers);
       suppliersData.length = 0; suppliersData.push(...(backup.suppliers || []));
+      rsProg(60, '🧾 بل (' + (backup.invoices || []).length + ')…'); await rsTick();
       invoicesData.length = 0; invoicesData.push(...(backup.invoices || []));
       usersData.length = 0; usersData.push(...(backup.users || []));
       approvalRequests.length = 0; approvalRequests.push(...(backup.approvalRequests || []));
@@ -9988,6 +10034,7 @@ function proceedWithImport(){
       nextUserId = backup.nextUserId || nextUserId;
       nextRequestId = backup.nextRequestId || nextRequestId;
       nextBatchId = backup.nextBatchId || nextBatchId;
+      rsProg(70, '💵 خرچے، ادائیگیاں، وصولیاں…'); await rsTick();
       if(backup.settings) Object.assign(AppState.settings, backup.settings);
       if(typeof expenseData !== 'undefined'){ expenseData.length = 0; expenseData.push(...(backup.expenses || [])); }
       nextExpenseId = backup.nextExpenseId || nextExpenseId;
@@ -10006,12 +10053,16 @@ function proceedWithImport(){
       if(backup.expiryAlertDays != null) expiryAlertDays = backup.expiryAlertDays;
       if(typeof quickDockItems !== 'undefined' && backup.quickDockItems){ quickDockItems.length = 0; quickDockItems.push(...backup.quickDockItems); }
 
+      rsProg(85, '💾 فون میں محفوظ ہو رہا ہے…'); await rsTick();
       persistAllData(); // localStorage میں بھی محفوظ کر دیں (اگر یہاں کام کر رہا ہو تو فائدہ ہوگا)
+      rsProg(95, '🔄 اسکرینیں تازہ ہو رہی ہیں…'); await rsTick();
 
       showBackupConfirmModal('import', fileName, {
         products: productsData.length, customers: customersData.length, invoices: invoicesData.length
       });
+      rsProgEnd(true, '✅ ڈیٹا بحال ہو گیا — ' + customersData.length + ' گاہک، ' + invoicesData.length + ' بل');
   } catch(err){
+    rsProgEnd(false);
     showBackupConfirmModal('error', fileName, {message: err.message});
   } finally {
     pendingImportBackup = null;
@@ -10387,8 +10438,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM0311TU236'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'ایک دن کی ہر وصولی بل پر الگ لائن میں — وقت اور نقد، جاز کیش، ایزی پیسہ، بینک کی تفصیل کے ساتھ'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM0311TU240'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'فروٹ منڈی کے برابر: دوبارہ وصولی کا بڑا بٹن، لال ڈبہ پکی رقم، کل کی خریداری پوری رقم + مال دیکھیں، بیک اپ کی پیش رفت'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -36118,7 +36169,10 @@ function rlHistRows(c){
   const entryD = rlEntryDate();
   const gDay = {}, rDay = {};
   const add = (o, d, v) => { if(!d) return; o[d] = (o[d] || 0) + (Number(v) || 0); };
-  invoicesData.forEach(inv => { if(inv.customer_id === c.customer_id) add(gDay, invDay(inv), _drGoodsOrig(inv)); });
+  // 🛒 SM0311TU239 (ہیلپ ڈیسک #41، صدام): «خریداری» = اس دن کے بلوں کی پوری رقم (پہلے صرف ادھار والا حصہ — بل پر نقد دیا ہو تو 0 دکھتا)؛
+  //   بل پر ادا رقم «وصولی» میں — اس لیے «کم وصولی» وہی رہتی ہے
+  let _inv = invoicesData; try{ _inv = _withArch(invoicesData, 'inv'); }catch(e){}
+  _inv.forEach(inv => { if(inv && inv.customer_id === c.customer_id && inv.status !== 'voided'){ const g = Number(inv.grand_total) || 0; add(gDay, invDay(inv), g); add(rDay, invDay(inv), g - _drGoodsOrig(inv)); } });
   (c.walletHistory || []).forEach(h => { if(!h) return; if(h.type === 'cash_given') add(gDay, h.date, h.amount); else if(h.type === 'receivable_collected') add(rDay, h.date, h.amount); });
   recoveryListData.forEach(e => { if(e.customer_id === c.customer_id && e.status === 'pending') add(rDay, recDay(e), e.amount); });
   const dt = new Date(entryD + 'T12:00:00'); dt.setDate(dt.getDate() - 1);
@@ -36148,6 +36202,35 @@ function rlHistBodyHtml(c, sel, z, numF){
   const todayLbl = '🛒 ' + (isAaj ? 'آج' : bizFmt(T.d)) + ' کی خریداری (' + bizFmt(T.d) + ')';
   const todayVals = cell('خریداری', T.g, '#fff7ed', '#c2410c', '#fdba74') + cell('وصولی', T.r, '#f0fdf4', '#15803d', '#86efac') + cell('کم وصولی', T.s, T.s > 0 ? '#fef2f2' : '#f8fafc', T.s > 0 ? '#b91c1c' : '#64748b', T.s > 0 ? '#fca5a5' : '#e2e8f0');
   return { todayLbl, todayVals, lbl, vals: cell('خریداری', row.g, '#fff7ed', '#c2410c', '#fdba74') + cell('وصولی', row.r, '#f0fdf4', '#15803d', '#86efac') + cell('کم وصولی', row.s, row.s > 0 ? '#fef2f2' : '#f8fafc', row.s > 0 ? '#b91c1c' : '#64748b', row.s > 0 ? '#fca5a5' : '#e2e8f0'), rows: H.rows, sel: row.d };
+}
+// ---------- 🥬 SM0311TU239 (ہیلپ ڈیسک #41، صدام): وصولی والا گاہک کے سامنے اس دن کا مال (کون سی سبزی / فروٹ، نگ، ریٹ، رقم) دیکھ سکے —
+//   پہلے صرف ادھار رقم کے خانے تھے (نقد بل ہو تو «خریداری 0»)۔ صرف دیکھنے کے لیے، کسی حساب میں نہیں ----------
+function rlShowGoods(cid, day){
+  const c = customersData.find(x => x.customer_id === cid); if(!c) return;
+  let all = invoicesData; try{ all = _withArch(invoicesData, 'inv'); }catch(e){}
+  const bills = (all || []).filter(inv => inv && inv.customer_id === cid && inv.status !== 'voided' && invDay(inv) === day);
+  const esc = t => String(t == null ? '' : t).replace(/[<>&"]/g, ch => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[ch]));
+  const n = v => (Math.round((Number(v) || 0) * 100) / 100).toLocaleString();
+  let tot = 0, due = 0;
+  const body = bills.length ? bills.map(inv => {
+    const g = Number(inv.grand_total) || 0, d = _drGoodsOrig(inv); tot += g; due += d;
+    const rows = (inv.items || []).map(it => `<tr><td style="text-align:right; padding:3px 4px;">${esc(it.name)}${it.label ? ' <small style="color:#64748b;">' + esc(it.label) + '</small>' : ''}</td><td style="padding:3px 4px; direction:ltr;">${n(it.qty)}</td><td style="padding:3px 4px; direction:ltr;">${n(it.unitPrice)}</td><td style="padding:3px 4px; direction:ltr; font-weight:800;">${n((Number(it.qty) || 0) * (Number(it.unitPrice) || 0))}</td></tr>`).join('');
+    return `<div style="border:1px solid #e2e8f0; border-radius:10px; margin-bottom:8px; overflow:hidden;">
+      <div style="background:#f1f5f9; padding:4px 8px; font-weight:800; font-size:13px; display:flex; justify-content:space-between;"><span>🧾 ${esc(inv.invoice_no || '')}</span><span style="direction:ltr;">Rs. ${n(g)}</span></div>
+      <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:center;"><tr style="color:#64748b; font-size:11.5px;"><th style="text-align:right; padding:2px 4px;">مال</th><th>نگ</th><th>ریٹ</th><th>رقم</th></tr>${rows}</table>
+      ${d > 0 ? `<div style="padding:2px 8px 5px; font-size:12px; color:#b91c1c; font-weight:800;">ادھار: Rs. ${n(d)}</div>` : `<div style="padding:2px 8px 5px; font-size:12px; color:#15803d; font-weight:800;">نقد ادا</div>`}
+    </div>`; }).join('') : `<div style="text-align:center; color:#64748b; padding:18px 0;">اس دن ${esc(c.name)} کا کوئی بل نہیں<br><small>(دوسری تاریخ اوپر والی فہرست سے چنیں)</small></div>`;
+  document.getElementById('rlGoodsPop')?.remove();
+  const d = document.createElement('div'); d.id = 'rlGoodsPop'; d.dir = 'rtl';
+  d.style.cssText = 'position:fixed; inset:0; z-index:2147483500; background:rgba(15,23,42,.6); display:flex; align-items:center; justify-content:center; padding:14px;';
+  d.innerHTML = `<div style="background:#fff; border-radius:16px; width:100%; max-width:440px; max-height:86vh; display:flex; flex-direction:column; overflow:hidden;">
+      <div style="background:#92400e; color:#fff; padding:8px 12px; font-weight:900; font-size:15px;">🥬 ${esc(c.name)} — ${bizFmt(day)} کا مال</div>
+      <div style="overflow:auto; padding:10px;">${body}</div>
+      ${bills.length ? `<div style="padding:6px 12px; border-top:1px solid #e2e8f0; font-weight:900; font-size:14px; display:flex; justify-content:space-between;"><span>کل ${bills.length} بل</span><span style="direction:ltr;">Rs. ${n(tot)}${due > 0 ? ' · ادھار ' + n(due) : ''}</span></div>` : ''}
+      <button type="button" onclick="document.getElementById('rlGoodsPop').remove()" style="margin:8px 12px 12px; padding:10px; border:none; border-radius:12px; background:#e2e8f0; font-family:inherit; font-size:16px; font-weight:800; cursor:pointer;">✖ بند کریں</button>
+    </div>`;
+  d.addEventListener('click', ev => { if(ev.target === d) d.remove(); });
+  document.body.appendChild(d);
 }
 function rlHistPick(cid, val){
   rlHistSel[cid] = val;
@@ -36191,11 +36274,13 @@ function buildRlEmployeeCard(c, dr){
           </select>
         </div>
         <div id="rlHistVals-${cid}" style="display:flex; gap:3px;">${_hb.vals}</div>
+        <button type="button" onclick="rlShowGoods(${cid}, rlHistSel[${cid}] || '${_hb.sel}')" style="width:100%; margin-top:3px; padding:3px; border:1px dashed #d97706; border-radius:7px; background:#fff; color:#92400e; font-family:inherit; font-size:${z(11)}px; font-weight:800; cursor:pointer;">🥬 اس دن کا مال (سبزی / فروٹ) دیکھیں</button>
       </div>
       <!-- 🛒 SM1410WE119: ترتیب — اوپر کل کی خریداری، نیچے (رقم والے خانے کے بالکل سامنے) آج کی خریداری -->
       <div dir="rtl" style="background:#ecfdf5; border:1.5px solid #6ee7b7; border-radius:9px; padding:4px 6px; margin-bottom:5px;">
         <div style="font-size:${z(11.5)}px; font-weight:800; color:#065f46; margin-bottom:3px;">${_hb.todayLbl}</div>
         <div style="display:flex; gap:3px;">${_hb.todayVals}</div>
+        <button type="button" onclick="rlShowGoods(${cid}, rlEntryDate())" style="width:100%; margin-top:3px; padding:3px; border:1px dashed #059669; border-radius:7px; background:#fff; color:#065f46; font-family:inherit; font-size:${z(11)}px; font-weight:800; cursor:pointer;">🥬 آج کا مال دیکھیں</button>
       </div>`;
   const splitRowsHtml = isDone ? '' : rows.map((m, i) => `
       <div style="display:flex; gap:3px; align-items:center; margin-bottom:4px;">
@@ -36240,7 +36325,7 @@ function buildRlEmployeeCard(c, dr){
       ${doneSummaryHtml}
       ${splitRowsHtml}
       ${isDone ? `
-        <button type="button" onclick="reopenRlCard(${cid})" style="width:100%; padding:5px; margin-bottom:5px; background:#fff; color:#15803d; border:1.5px dashed #86efac; border-radius:7px; font-size:${z(10.5)}px; font-weight:800; cursor:pointer; font-family:inherit;">➕ اسی گاہک سے مزید وصولی</button>` : `
+        <button type="button" onclick="reopenRlCard(${cid})" style="width:100%; padding:9px 6px; margin-bottom:5px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:2px solid #fff; border-radius:10px; font-size:${z(13.5)}px; font-weight:900; cursor:pointer; font-family:inherit; box-shadow:0 3px 0 #92400e;">➕ دوبارہ وصولی درج کریں — ${todayEntries.length + 1}ویں بار (نقد / جاز کیش / ایزی پیسہ / بینک)</button>` : `
         <div style="display:flex; gap:4px; margin-bottom:5px;">
           <button type="button" onclick="addRlSplitRow(${cid})" style="flex:1; padding:6px; background:#eef2ff; color:var(--primary-dark); border:1.5px dashed #a5b4fc; border-radius:7px; font-size:${z(10.5)}px; font-weight:800; cursor:pointer; font-family:inherit;">➕ دوسرا طریقہ (نقد + جاز کیش…)</button>
           <button type="button" onclick="submitSingleRecovery(${cid})" style="flex:0 0 auto; padding:6px 14px; background:var(--primary); color:#fff; border:none; border-radius:7px; font-size:${z(12)}px; font-weight:800; cursor:pointer; white-space:nowrap;">✅ OK</button>
@@ -36384,7 +36469,21 @@ function updateRlAmount(customerId, val){ updateRlSplit(customerId, 0, 'amount',
 
 function submitRecoveryList(_dateOk){
   const ids = Object.keys(rlSplitMap).map(Number).filter(id => rlTypedTotal(id) > 0 && !rlIsDone(id));
-  if(ids.length === 0){ alert('کم از کم ایک کسٹمر کی وصولی کی رقم لکھیں'); return; }
+  if(ids.length === 0){
+    // ✅ SM0311TU237 (ہیلپ ڈیسک #42): ہر گاہک کا OK دبانے سے وصولی اسی وقت جمع ہو جاتی ہے — پھر نیچے والا بٹن دبانے پر
+    //   «کم از کم ایک کسٹمر…» والا غلطی جیسا پیغام آتا تھا۔ اب بتائیں کہ آج کی وصولی پہلے ہی جمع ہو چکی ہے۔
+    const t = rlEntryDate();
+    const done = recoveryListData.filter(r => recDay(r) === t && r.status !== 'deleted');
+    if(done.length){
+      const custN = new Set(done.map(r => r.customer_id)).size;
+      const sum = done.reduce((a, r) => a + (Number(r.amount) || 0), 0);
+      alert('✅ آج کی وصولی پہلے ہی جمع ہو چکی ہے\n\n' + custN + ' گاہک — کل Rs. ' + sum.toLocaleString() + '\n\nہر گاہک کا ✅ OK دبانے سے وصولی اسی وقت ایڈمن تک پہنچ جاتی ہے۔ نئی وصولی ہو تو گاہک کے ڈبے میں رقم لکھ کر OK دبائیں۔');
+      goTo('home');
+      return;
+    }
+    alert('ابھی کسی گاہک کی وصولی نہیں لکھی گئی — گاہک کے ڈبے میں رقم لکھ کر ✅ OK دبائیں');
+    return;
+  }
   if(_dateOk !== true){ rlAskEntryDate(() => submitRecoveryList(true)); return; } // 📅 FM910FR350
   ids.forEach(id => {
     const c = customersData.find(x => x.customer_id === id);
@@ -36618,34 +36717,37 @@ function _drGoodsOrig(inv){
 // ---------- ✏️ SM0311TU235 (ہیلپ ڈیسک #36، صدام بھائی): بل کے لال ڈبے («… تک ٹوٹل کم وصولی») کی رقم ہاتھ سے درست — صرف ایڈمن + PIN
 // گاہک کا اصل بقایا / کھاتہ نہیں بدلتا؛ گاہک پر `shortAdj` [{date, delta, before, after, at, by, note}] — اسی تاریخ سے آگے کی کم وصولی (بل کا ڈبہ + ریکوری لسٹ) اتنی بدلتی ہے
 async function editBillShort(){
-  if(AppState.currentRole !== 'admin'){ await uAlert('🔒 صرف ایڈمن', 'لال ڈبے کی رقم صرف ایڈمن درست کر سکتا ہے۔'); return; }
+  // 🔓 SM0311TU240 (ہیلپ ڈیسک #46): ملازم کے فون پر بھی کھلے — اجازت نیچے ایڈمن PIN سے (پہلے غیر ایڈمن کو سیدھا «صرف ایڈمن»)
   const inv = (invoicesData || []).find(i => i && i.invoice_id === currentPreviewInvoiceId); if(!inv) return;
   const c = inv.customer_id != null ? (customersData || []).find(x => x && x.customer_id === inv.customer_id) : null;
   if(!c){ await uAlert('گاہک نہیں', 'یہ بل کسی کھاتے والے گاہک کا نہیں (واک اِن) — لال ڈبہ صرف کھاتے والے گاہک کا ہوتا ہے۔'); return; }
   const D = invDay(inv); if(!D) return;
   const cur = custShortThrough(c, D, D);
   const f = n => 'Rs. ' + Math.round(n).toLocaleString('en-US');
-  const v = await uDialog({ title: '✏️ لال ڈبہ — <bdi dir="auto">' + escRlHtml(c.name) + '</bdi>', message: `ابھی «${bizFmt(D)} تک ٹوٹل کم وصولی»: <b dir="ltr" style="display:inline-block;padding:1px 10px;border-radius:999px;background:#fee2e2;color:#b91c1c;">${f(cur)}</b><br>صحیح رقم لکھیں (صفر لکھیں تو ڈبہ نہیں چھپے گا):<div style="font-size:13px;color:#64748b;line-height:1.7;">صرف لال ڈبہ اور ریکوری لسٹ کی کم وصولی بدلے گی — گاہک کا بقایا (کھاتہ) نہیں بدلے گا</div>`, input: 'number', okText: 'آگے ←', cancelText: '✖ واپس' });
+  const v = await uDialog({ title: '✏️ لال ڈبہ — <bdi dir="auto">' + escRlHtml(c.name) + '</bdi>', message: `ابھی «${bizFmt(D)} تک ٹوٹل کم وصولی»: <b dir="ltr" style="display:inline-block;padding:1px 10px;border-radius:999px;background:#fee2e2;color:#b91c1c;">${f(cur)}</b><br>صحیح رقم لکھیں (صفر لکھیں تو ڈبہ نہیں چھپے گا):<div style="font-size:13px;color:#64748b;line-height:1.7;">صرف لال ڈبہ اور ریکوری لسٹ کی کم وصولی بدلے گی — گاہک کا بقایا (کھاتہ) نہیں بدلے گا</div>`, input: 'text', okText: 'آگے ←', cancelText: '✖ واپس' });
   if(v === null || v === false || String(v).trim() === '') return;
-  const target = Math.round(Number(v));
+  const target = Math.round(Number(String(v).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[,\s]/g, '')));
   if(!isFinite(target) || target < 0){ await uAlert('غلط رقم', 'صحیح رقم لکھیں (صفر یا اس سے زیادہ)۔'); return; }
   if(target === cur){ await uAlert('کوئی فرق نہیں', 'لال ڈبے میں پہلے ہی یہی رقم ہے۔'); return; }
   if(!(await uDialog({ title: '⚠️ تصدیق', tone: 'amber', okText: '✅ درست کریں', cancelText: '✖ واپس', rows: [
       { label: 'ابھی لال ڈبہ', value: f(cur) }, { label: 'صحیح رقم', value: f(target), big: true },
       { label: 'تاریخ', value: bizFmt(D) }] }))) return;
-  if(!(await _askAdminPinForSerialMaster(`${c.name} کا لال ڈبہ ${f(cur)} سے ${f(target)} کرنے کے لیے`))) return;
-  // ہر دن 0 سے کم نہیں ہوتا، اس لیے بار بار ناپ کر فرق لگائیں (زیادہ سے زیادہ 3 بار)
+  if(AppState.currentRole !== 'admin' || (usersData || []).some(u => u && u.role === 'admin' && u.is_active && u.pin)){ if(!(await _askAdminPinForSerialMaster(`${c.name} کا لال ڈبہ ${f(cur)} سے ${f(target)} کرنے کے لیے`))) return; }
+  // ✏️ SM0311TU240: ایک ہی اندراج — اس تاریخ کی پکی رقم (`after`)؛ آگے کا حساب اسی سے
   c.shortAdj = Array.isArray(c.shortAdj) ? c.shortAdj : [];
-  for(let t = 0; t < 3; t++){
-    const now = custShortThrough(c, D, D); const delta = target - now; if(!delta) break;
-    c.shortAdj.push({ date: D, delta, before: now, after: target, at: new Date().toISOString(), by: (AppState.currentUser && AppState.currentUser.name) || 'admin', note: 'بل ' + (inv.invoice_no || '') });
-  }
+  c.shortAdj.push({ date: D, delta: target - cur, before: cur, after: target, at: new Date().toISOString(), by: (AppState.currentUser && AppState.currentUser.name) || 'admin', note: 'بل ' + (inv.invoice_no || '') });
   c.shortAdjAt = new Date().toISOString();
   persistAllData();
   try{ pauseCloudPolling(15000); }catch(e){}
   try{ await pushCustomersToCloud(); }catch(e){}
   try{ rerenderInvoicePreview(); }catch(e){}
   uAlert('✅ لال ڈبہ درست', `<bdi dir="auto">${escRlHtml(c.name)}</bdi> — ${bizFmt(D)} تک ٹوٹل کم وصولی اب ${f(custShortThrough(c, D, D))}`, 'green');
+}
+function _custGoodsOn(c, d){ // اس دن کا ادھار مال (بل + نقد دیا) — لال ڈبے کی پکی رقم کے بعد اسی دن کا مال
+  let g = 0;
+  (invoicesData || []).forEach(inv => { if(inv && inv.customer_id === c.customer_id && inv.status !== 'voided' && invDay(inv) === d) g += _drGoodsOrig(inv); });
+  (c.walletHistory || []).forEach(h => { if(h && h.type === 'cash_given' && h.date === d) g += Number(h.amount) || 0; });
+  return g;
 }
 function custShortThrough(c, D, noGoodsDay){ // noGoodsDay: اس دن کا مال شامل نہیں (آج کا مال کل ادا ہوتا ہے) — صرف اس دن کی وصولی
   if(!c) return 0;
@@ -36665,10 +36767,15 @@ function custShortThrough(c, D, noGoodsDay){ // noGoodsDay: اس دن کا ما�
     else if(h.type === 'receivable_collected' && !(h.via === 'wallet' && /^Auto-applied/.test(String(h.note || '')))) ad(rD, h.date, h.amount);
   });
   (recoveryListData || []).forEach(e => { if(e && e.customer_id === c.customer_id && e.status === 'pending') ad(rD, recDay(e), e.amount); });
-  const aD = {}; (c.shortAdj || []).forEach(a => { if(a && a.date) ad(aD, a.date, a.delta); }); // ✏️ SM0311TU235: لال ڈبے کی ہاتھ سے درستی (صرف کم وصولی، بقایا نہیں)
-  const days = Array.from(new Set(Object.keys(gD).concat(Object.keys(rD), Object.keys(aD)))).filter(d => d && d <= D && (!zLast || d >= zLast)).sort();
+  // ✏️ SM0311TU240 (SM0311TU240، ہیلپ ڈیسک #46): لال ڈبے کی ہاتھ سے لکھی رقم = اس دن (اس دن کے مال کے بغیر، اس دن کی وصولی کے بعد) کی پکی کم وصولی —
+  //   پہلے «فرق» جمع ہوتا تھا اور اسی دن کی وصولی اسے صفر کر دیتی تو ترمیم ٹکتی نہیں تھی اور بار بار دبانے سے تین تین گنا جمع ہوتا
+  const aSet = {}; (c.shortAdj || []).filter(a => a && a.date && isFinite(Number(a.after))).sort((x, y) => String(x.at || '').localeCompare(String(y.at || ''))).forEach(a => { aSet[a.date] = Number(a.after); });
+  const days = Array.from(new Set(Object.keys(gD).concat(Object.keys(rD), Object.keys(aSet)))).filter(d => d && d <= D && (!zLast || d >= zLast)).sort();
   let short = 0;
-  days.forEach(d => { short = Math.max(0, short + (gD[d] || 0) - (rD[d] || 0) + (aD[d] || 0)); });
+  days.forEach(d => {
+    if(aSet[d] !== undefined){ short = Math.max(0, aSet[d]) + (d === noGoodsDay ? 0 : _custGoodsOn(c, d)); return; }
+    short = Math.max(0, short + (gD[d] || 0) - (rD[d] || 0));
+  });
   return Math.round(short);
 }
 function drCustomerDay(c, D){
@@ -43550,7 +43657,7 @@ let customersSyncBase = loadFromStorage('customersSyncBase', null);
 let suppliersSyncBase = loadFromStorage('suppliersSyncBase', null);
 let invoicesSyncBase = loadFromStorage('invoicesSyncBase', null);
 function _custCfg(){
-  return { path: CUSTOMERS_DOC_PATH, id: 'customer_id', label: 'کسٹمر', counters: ['total_receivable','wallet_balance'], hists: ['walletHistory'], seed: CUSTOMERS_SEED_DATA,
+  return { path: CUSTOMERS_DOC_PATH, id: 'customer_id', label: 'کسٹمر', counters: ['total_receivable','wallet_balance'], hists: ['walletHistory', 'shortAdj'], seed: CUSTOMERS_SEED_DATA,
     get: () => customersData, set: v => { customersData = v; },
     getBase: () => customersSyncBase, setBase: v => { customersSyncBase = _syncClone(v); try{ saveToStorage('customersSyncBase', customersSyncBase); }catch(e){} },
     dg: 'customers', extra: () => ({ nextCustomerId: { integerValue: String(nextCustomerId) }, delGuard: _dgField('customers') }),
