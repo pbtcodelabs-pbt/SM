@@ -10438,8 +10438,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM0311TU240'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'فروٹ منڈی کے برابر: دوبارہ وصولی کا بڑا بٹن، لال ڈبہ پکی رقم، کل کی خریداری پوری رقم + مال دیکھیں، بیک اپ کی پیش رفت'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM0311TU241'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'کسی فون میں گاہکوں / بیوپاریوں کی فہرست خالی ہو جائے تو کلاؤڈ سے پوری فہرست خود واپس آ جاتی ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -43643,7 +43643,9 @@ async function _fetchMergedRaw(cfg){
   const remote = JSON.parse(str);
   if(!Array.isArray(remote)) return false;
   if(cfg.dg) _dgMergeRemote(cfg.dg, doc); // 🛡️ FM610TU320
-  let merged = _mergeRecordsThreeWay(_baseWithSent(cfg, remote), cfg.get(), remote, cfg.id, cfg.counters, cfg.hists, cfg.seed);
+  // 🛟 SM0311TU241 (FM0311TU499، ہیلپ ڈیسک #48): اس فون کی فہرست خالی ہو اور کلاؤڈ میں ریکارڈ ہوں تو ملاپ اسے «سب حذف» سمجھ کر ہمیشہ خالی رکھتا تھا — اب کلاؤڈ والی پوری فہرست واپس
+  const _locNow = (cfg.get() || []).filter(x => !(typeof isLegacyDemoCustomer === 'function' && cfg.id === 'customer_id' && isLegacyDemoCustomer(x)));
+  let merged = (!_locNow.length && remote.length) ? _syncClone(remote) : _mergeRecordsThreeWay(_baseWithSent(cfg, remote), cfg.get(), remote, cfg.id, cfg.counters, cfg.hists, cfg.seed);
   if(cfg.dg) merged = _dgFilter(cfg.dg, merged);
   const hadLocal = !_syncEq(merged, remote);
   cfg.set(merged);
