@@ -10438,8 +10438,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM0311TU242'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'دوبارہ انسٹال کے بعد «پرانی دکان واپس لائیں» اب PIN کے بغیر — نمبر اور دکان کا کوڈ کافی'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM0311TU243'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'پرانی دکان واپس لانے کے بعد ایپ دوبارہ کھلنے پر رجسٹریشن صفحہ نہیں آتا — دکان جڑی رہتی ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -55742,6 +55742,9 @@ async function smOwnerRestoreShop(pasted){
   AppState.settings.businessPhone = m; AppState.settings.smShopCode = c; AppState.settings.smRegistered = true; AppState.settings.smJoinedAsStaff = false;
   saveToStorage('settings', AppState.settings);
   try{ await smPullLicenseMirror(); }catch(e){}
+  // 🛟 SM0311TU243 (ہیلپ ڈیسک #57): دوبارہ کھلنے پر کسی وجہ سے رجسٹریشن ضائع ہو تو یہی دوبارہ لگے (رجسٹریشن صفحہ نہ آئے)
+  try{ localStorage.setItem('smRestorePending', JSON.stringify({ m, c, shop: AppState.settings.businessName || '', owner: AppState.settings.ownerName || '', at: Date.now() })); }catch(e){}
+  try{ saveToStorage('settings', AppState.settings); if(typeof persistAllData === 'function') persistAllData(); }catch(e){}
   alert('✅ پرانی دکان واپس آ گئی۔ ایپ دوبارہ کھل رہی ہے — ریکارڈ آنے میں ایک دو منٹ لگ سکتے ہیں۔');
   location.reload();
 }
@@ -55820,6 +55823,20 @@ window.addEventListener('load', () => {
 });
 window.addEventListener('DOMContentLoaded', () => {
   smApplyBranding();
+  // 🛟 SM0311TU243 (ہیلپ ڈیسک #57): ابھی ابھی «پرانی دکان واپس لائیں» ہوا ہو تو رجسٹریشن دوبارہ لگائیں
+  try{
+    const rp = JSON.parse(localStorage.getItem('smRestorePending') || 'null');
+    if(rp && rp.m && rp.c && Date.now() - (rp.at || 0) < 3 * 864e5){
+      const st = AppState.settings;
+      if(!st.smRegistered || st.businessPhone !== rp.m || st.smShopCode !== rp.c){
+        st.businessPhone = rp.m; st.smShopCode = rp.c; st.smRegistered = true; st.smJoinedAsStaff = false;
+        if(!st.businessName && rp.shop) st.businessName = rp.shop; if(!st.ownerName && rp.owner) st.ownerName = rp.owner;
+        if(!st.smRegisteredAt) st.smRegisteredAt = new Date().toISOString();
+        saveToStorage('settings', st); smApplyBranding();
+        console.warn('SM restore: registration re-applied');
+      } else localStorage.removeItem('smRestorePending'); // دوسری بار ٹھیک ملا — نشان ہٹا دیں
+    }
+  }catch(e){}
   if(!AppState.settings.smRegistered) document.getElementById('smRegOverlay').style.display = 'block';
 });
 </script>
