@@ -4923,7 +4923,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
             <div class="categoryDropdownItem" onclick="event.stopPropagation();">
               <label title="📦 انوینٹری ٹریک کریں (سٹاک ختم ہونے پر بکری روک دیں)" style="display:flex; align-items:center; gap:8px; cursor:pointer; width:100%;">
                 <input type="checkbox" id="stockAdjTrackInventoryChk" onchange="toggleTrackInventory(this.checked)" style="width:16px; height:16px; margin:0; accent-color:#1e88e5;">
-                <span class="cdiName">📦 انوینٹری ٹریک کریں</span>
+                <span class="cdiName">📦 سٹاک کی نگرانی <b class="stkGuardState" style="font-size:12px;padding:1px 8px;border-radius:9px;color:#fff;background:#16a34a;">آن</b><br><small style="opacity:.75;">آن = سٹاک ختم تو بل بند · آف = مائنس میں بل</small></span>
               </label>
             </div>
             <!-- ---------- 🆕🔒 ہدایت (FM21SEPMO0N): سٹاک زیرو کرنے کے دو بٹن — منشی کا رپورٹ چیک کرنے کے
@@ -10464,8 +10464,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM0811SU256'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'اپڈیٹ کے دوران ہی پرانا → نیا ورژن اور کیا بدلا نظر آتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM0911MO257'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '«سٹاک کی نگرانی» اب آن / آف ہوتی ہے — آف کریں تو سٹاک مائنس میں بل بنتے رہیں'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -27517,7 +27517,7 @@ function renderStockAdjustmentScreen(query){
   const wrap = document.getElementById('stockAdjustmentListWrap');
   if(!wrap) return;
   const trackChk = document.getElementById('stockAdjTrackInventoryChk');
-  if(trackChk) trackChk.checked = !!AppState.settings.trackInventory;
+  if(trackChk) trackChk.checked = stockGuardOn(); try{ stkGuardStateSync(); }catch(e){}
 
   // ---------- 🟢🔴 حاضر/غیر حاضر بٹن کی نمایاں حالت + کل تعداد ---------- -->
   const presentBtn = document.getElementById('saProdPresenceBtnPresent');
@@ -34403,7 +34403,8 @@ async function shareOtOrderSheet(){
      (پورا بٹ گیا ہو تو "تقسیم شدہ")۔ ٹوٹل = موجودہ سٹاک + آج کے بن چکے بلوں میں گئی مقدار۔
    • روک: سٹاک سے زیادہ نہ آرڈر بن سکتا ہے نہ بل — "آپ کا سٹاک ختم ہے" کا ایرر آتا ہے
    ===================================================================== */
-function stockGuardOn(){ return true; }
+/* ہیلپ ڈیسک #161 / #163 (Ali And Company): «سٹاک کی نگرانی» اب سچ مچ آن / آف — آن (ڈیفالٹ) = سٹاک ختم تو بل بند، آف = مائنس میں */
+function stockGuardOn(){ return !(AppState.settings && AppState.settings.stockGuardOff === true); }
 function smAvailForVariant(vid, mineQty){
   const fp = findProductAndVariant(Number(vid));
   if(!fp.v) return 0;
@@ -49207,7 +49208,7 @@ function renderSettingsScreen(){
   document.getElementById('taxPercentRow').style.display = AppState.settings.taxEnabled ? 'block' : 'none';
   document.getElementById('taxPercentInput').value = AppState.settings.taxPercent || '';
 
-  document.getElementById('trackInventoryChk').checked = !!AppState.settings.trackInventory;
+  document.getElementById('trackInventoryChk').checked = stockGuardOn();
 }
 
 /* =====================================================================
@@ -55267,14 +55268,19 @@ function setTaxPercent(val){
 
 // ---------- Track Inventory آن/آف — آن ہو تو بلنگ سٹاک ختم ہونے پر رک جائے گی، آف ہو تو مائنس میں جاتی رہے گی ----------
 function toggleTrackInventory(checked){
-  checked = true; AppState.settings.trackInventory = true; // 🔒 سٹاک کی روک اب ہمیشہ آن
+  checked = !!checked;
+  if(!checked && !confirm('📦 سٹاک کی نگرانی بند کریں؟\n\nبند ہونے پر سٹاک ختم ہو جائے تب بھی بل بنتا رہے گا اور سٹاک مائنس (−) میں چلا جائے گا۔')){ checked = true; }
+  AppState.settings.stockGuardOff = !checked; AppState.settings.trackInventory = checked;
   persistAllData();
+  try{ const t = document.createElement('div'); t.textContent = checked ? '✅ سٹاک کی نگرانی آن — سٹاک ختم ہو تو بل نہیں بنے گا' : '⚠️ سٹاک کی نگرانی بند — سٹاک مائنس میں جا سکتا ہے'; t.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:999999;max-width:92vw;padding:10px 16px;border-radius:12px;color:#fff;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.3);background:' + (checked ? '#065f46' : '#b45309'); document.body.appendChild(t); setTimeout(() => t.remove(), 3500); }catch(e){}
   // ---------- Settings اور Stock Adjustment دونوں جگہ یہی ٹوگل نظر آتا ہے — دونوں ہمیشہ ایک ساتھ اپڈیٹ رہیں ----------
   const chkA = document.getElementById('trackInventoryChk');
   const chkB = document.getElementById('stockAdjTrackInventoryChk');
   if(chkA) chkA.checked = checked;
   if(chkB) chkB.checked = checked;
+  stkGuardStateSync();
 }
+function stkGuardStateSync(){ const on = stockGuardOn(); document.querySelectorAll('.stkGuardState').forEach(b => { b.textContent = on ? 'آن' : 'آف'; b.style.background = on ? '#16a34a' : '#dc2626'; }); }
 
 // ---------- ٹیسٹ پرنٹ بھیجیں — اصل پرنٹ ڈائیلاگ کھلے گا (کسی بھی منسلک/جوڑے گئے پرنٹر پر ٹیسٹ صفحہ جائے گا) ----------
 function testPrint(){
