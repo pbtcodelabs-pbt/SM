@@ -10464,8 +10464,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM0911MO257'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '«سٹاک کی نگرانی» اب آن / آف ہوتی ہے — آف کریں تو سٹاک مائنس میں بل بنتے رہیں'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM0911MO258'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'بل نمبر اب سادہ 1، 2، 3 — کبھی نہیں دہراتا؛ پرانا نمبر تلاش میں ملتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -17525,14 +17525,39 @@ function generateBillNumbers(){
   const daily_bill_no = String(dailyCount);
   const monthly_bill_no = String(monthlyCount);
 
-  // 🔢 FM910FR353: ہر بل کا اپنا مسلسل نمبر — 0001 سے شروع، کبھی دوبارہ صفر سے نہیں
-  const bill_seq = (invoicesData || []).reduce((m, inv) => Math.max(m, Number(inv.bill_seq) || 0), (invoicesData || []).length) + 1;
+  // 🔢 SM0911MO258 (ہیلپ ڈیسک #159، Ali And Company): بل نمبر صرف سادہ 1، 2، 3… — کبھی نہیں دہراتا:
+  //   سب بلوں (پرانے محفوظ / آرکائیو بھی) کا سب سے بڑا نمبر اور `settings.lastBillSeq` (مٹائے گئے بل کا نمبر بھی دوبارہ نہیں) + 1
+  const bill_seq = smBillSeqMax() + 1;
   return {
     daily_bill_no,
     monthly_bill_no,
     bill_seq,
-    invoice_no: `Bill#${daily_bill_no}/${monthly_bill_no}`
+    invoice_no: `Bill#${bill_seq}`
   };
+}
+function smBillSeqMax(){
+  let all = invoicesData || []; try{ if(typeof _withArch === 'function') all = _withArch(invoicesData, 'inv') || all; }catch(e){}
+  return all.reduce((m, inv) => Math.max(m, Number(inv && inv.bill_seq) || 0), Number(AppState.settings && AppState.settings.lastBillSeq) || 0);
+}
+/* SM0911MO258: پرانے «Bill#دن/مہینہ» بل ایک بار تاریخ کی ترتیب سے سادہ نمبر (پرانا `old_invoice_no` میں — تلاش میں ملتا ہے)؛
+   دو بلوں کا ایک ہی نمبر ہو (دو فون / پرانا ڈیٹا) تو بعد والا بل اگلا نیا نمبر؛ `lastBillSeq` ہمیشہ سب سے بڑا — صرف ایڈمن کے فون پر */
+function smBillSerialFix(){
+  try{
+    const cu = AppState.currentUser; if(!cu || cu.role !== 'admin' || !Array.isArray(invoicesData) || !invoicesData.length) return false;
+    const ts = v => new Date(v || 0).getTime() || 0;
+    const list = invoicesData.slice().sort((a, b) => ts(a.created_at) - ts(b.created_at) || (Number(a.invoice_id) || 0) - (Number(b.invoice_id) || 0));
+    let changed = false;
+    list.forEach((inv, i) => { if(inv && !(Number(inv.bill_seq) > 0)){ inv.bill_seq = i + 1; changed = true; } });
+    let mx = smBillSeqMax(); const used = new Set();
+    let arch = []; try{ if(typeof _withArch === 'function'){ const have = new Set(invoicesData.map(x => x && x.invoice_id)); arch = (_withArch(invoicesData, 'inv') || []).filter(x => x && !have.has(x.invoice_id)); } }catch(e){}
+    arch.forEach(x => { const n = Number(x.bill_seq) || 0; if(n) used.add(n); });
+    list.forEach(inv => { if(!inv) return; let n = Number(inv.bill_seq) || 0; if(used.has(n)){ n = ++mx; inv.bill_seq = n; changed = true; } used.add(n); if(n > mx) mx = n;
+      const want = 'Bill#' + n;
+      if(inv.invoice_no !== want && /^Bill#\d+(\/\d+)?$/.test(String(inv.invoice_no || ''))){ if(!inv.old_invoice_no && /\//.test(inv.invoice_no)) inv.old_invoice_no = inv.invoice_no; inv.invoice_no = want; changed = true; } });
+    if((Number(AppState.settings.lastBillSeq) || 0) < mx){ AppState.settings.lastBillSeq = mx; changed = true; }
+    if(changed){ saveToStorage('invoices', invoicesData); try{ persistAllData(); }catch(e){} }
+    return changed;
+  }catch(e){ console.warn('smBillSerialFix', e); return false; }
 }
 // پرانے بلوں (جن پر نمبر نہیں لگا تھا) کا نمبر تاریخ کی ترتیب سے نکالیں
 function fmBillSeqOf(inv){
@@ -45600,7 +45625,7 @@ function billSearchMatch(inv, q){
   const toks = String(q || '').toLowerCase().replace(/[,،]/g, '').split(/\s+/).filter(Boolean);
   if(!toks.length) return true;
   const name = String(inv.customer_name || '').toLowerCase();
-  const nos = [inv.invoice_no, inv.daily_bill_no, inv.monthly_bill_no, inv.cust_bill_no].filter(v => v != null && v !== '').map(v => String(v).toLowerCase());
+  const nos = [inv.invoice_no, inv.old_invoice_no, inv.bill_seq, inv.daily_bill_no, inv.monthly_bill_no, inv.cust_bill_no].filter(v => v != null && v !== '').map(v => String(v).toLowerCase());
   const amts = [inv.grand_total, inv.amount_due, inv.paid_now].map(v => Math.round(Number(v) || 0)).filter(v => v > 0);
   return toks.every(t => {
     if(name.includes(t)) return true;
@@ -45681,7 +45706,8 @@ function renderBillHistory(){
     filtered = base.filter(inv =>
       (inv.invoice_no || '').toLowerCase().includes(billNumberQuery) ||
       String(inv.daily_bill_no || '').toLowerCase().includes(billNumberQuery) ||
-      String(inv.monthly_bill_no || '').toLowerCase().includes(billNumberQuery)
+      String(inv.monthly_bill_no || '').toLowerCase().includes(billNumberQuery) ||
+      String(inv.old_invoice_no || '').toLowerCase().includes(billNumberQuery)
     );
   } else {
     // ---------- عام حالت: Status Tab + Date + Day + Party Name سب آپس میں مل کر (AND) کام کریں ----------
@@ -47362,7 +47388,7 @@ async function renderInvoiceToA4Canvas(invoice, highlightMatchKey = null){
   ctx.fillStyle = '#1a1a1a';
   ctx.textAlign = 'left';
   ctx.font = F('bold 16px');
-  ctx.fillText(`Invoice #${invoice.daily_bill_no || '—'}/${invoice.monthly_bill_no || '—'}`, tableLeft + 16, y + Math.round(detailsBoxH*0.4));
+  ctx.fillText(`Invoice ${String(invoice.invoice_no || '—').replace('Bill#', '#')}`, tableLeft + 16, y + Math.round(detailsBoxH*0.4));
   ctx.font = F('13px');
   ctx.fillText(`${dd}/${mm}/${yy} ${getDayAbbrev(invoice.created_at)}`, tableLeft + 16, y + Math.round(detailsBoxH*0.71));
 
@@ -48220,7 +48246,7 @@ function buildInvoicePlainText(invoice){
   if(AppState.settings.businessPhone) lines.push(centerMono(AppState.settings.businessPhone, cols));
   const d = new Date(invoice.created_at);
   const dd = String(d.getDate()).padStart(2,'0'), mm = String(d.getMonth()+1).padStart(2,'0'), yy = String(d.getFullYear()).slice(-2);
-  lines.push(centerMono(`Bill#${invoice.daily_bill_no || '—'}/${invoice.monthly_bill_no || '—'} ${dd}/${mm}/${yy}`, cols));
+  lines.push(centerMono(`${invoice.invoice_no || '—'} ${dd}/${mm}/${yy}`, cols));
   lines.push(centerMono('Customer: ' + (invoice.customer_name || 'Walk-in'), cols));
   lines.push('-'.repeat(cols));
   const qtyW = 4, totalW = 9, nameW = cols - qtyW - totalW;
@@ -57033,6 +57059,11 @@ window.openHelpDesk = openHelpDesk;
   var p = window.__fmStoreReady;
   if(p && p.then) p.then(run, run); else run();
 })();
+</script>
+<script type="text/fm-boot">
+/* SM0911MO258 (ہیلپ ڈیسک #159): بل نمبر کی مرمت — کھلنے پر اور ہر 2 منٹ (کلاؤڈ سے آئے بل کے بعد بھی) */
+setTimeout(function(){ try{ if(smBillSerialFix() && typeof renderBillHistory === 'function') renderBillHistory(); }catch(e){} }, 5000);
+setInterval(function(){ try{ if(document.visibilityState === 'visible') smBillSerialFix(); }catch(e){} }, 120000);
 </script>
 </body>
 </html>
