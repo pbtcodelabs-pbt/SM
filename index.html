@@ -6688,6 +6688,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
               <button onclick="adjustPreviewStyle('priceDecimals', 1, 0, 4)">+</button>
             </div>
             <button type="button" id="pscWishBtn" onclick="toggleBillWish(AppState.settings.printShowWish === false)" title="بل کے نیچے گاہک کے نام والا درخواست کا پیغام" style="padding:6px 10px; border-radius:10px; border:2px solid #16a34a; background:#dcfce7; color:#14532d; font-weight:900; font-size:13px; cursor:pointer; font-family:'JameelNooriNastaleeq',sans-serif; line-height:1.6;">💌 پیغام: آن</button>
+            <button type="button" id="pscFooterBtn" onclick="editBillFooter()" title="بل کے نیچے اپنا پیغام (فوٹر)" style="padding:6px 10px; border-radius:10px; border:2px solid #0f766e; background:#ecfeff; color:#134e4a; font-weight:900; font-size:13px; cursor:pointer; font-family:'JameelNooriNastaleeq',sans-serif;">🧾 فوٹر</button>
             <button type="button" class="pscMoreToggleBtn" id="pscMoreToggleBtn" onclick="togglePscMoreOptions('pscMoreWrap','pscMoreToggleBtn')">⚙️ More ▾</button>
           </div>
           <div class="pscMoreWrap" id="pscMoreWrap">
@@ -10464,8 +10465,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM0911MO259'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'مزدوری فروخت 0 ہو تب بھی بل بنتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM0911MO261'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'بل کے نیچے اپنا پیغام — 🧾 فوٹر'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -46795,6 +46796,7 @@ async function _renderInvoiceToCanvasInner(invoice, paperWidthMM = 80, highlight
   if(AppState.settings.printShowSalesman && invoice.sold_by) estimatedHeight += 16;
   if(AppState.settings.printShowBranding) estimatedHeight += 20;
   estimatedHeight += 40; // فوٹر + مارجن
+  { const _fl = smFooterLines(); if(_fl.length) estimatedHeight += _fl.length * 22 + 6; }   /* SM0911MO261 (#176): اپنا فوٹر */
 
   canvas.width = pxWidth;
   canvas.height = estimatedHeight;
@@ -47244,6 +47246,8 @@ async function _renderInvoiceToCanvasInner(invoice, paperWidthMM = 80, highlight
   ctx.textAlign = 'center';
   ctx.font = F('13px');
   ctx.fillText('خریداری کا شکریہ!', pxWidth/2, y);
+  /* SM0911MO261 (ہیلپ ڈیسک #176، Ali And Company): بل کے نیچے دکان کا اپنا پیغام — 4 لائنیں تک (🧾 فوٹر) */
+  { const _fl = smFooterLines(); if(_fl.length){ ctx.fillStyle = '#000'; _fl.forEach(t => { y += 22; let fs = 15; ctx.font = F('bold ' + fs + 'px'); while(fs > 9 && ctx.measureText(t).width > pxWidth - 20){ fs--; ctx.font = F('bold ' + fs + 'px'); } ctx.fillText(t, pxWidth/2, y); }); } }
 
   if(AppState.settings.printShowBranding){
     y += 18;
@@ -55251,6 +55255,28 @@ function syncPreviewPaperWidthButtons(){
 // ---------- Receipt Content ٹوگلز — سادہ آن/آف، فوری محفوظ ----------
 // 💌 SM1910MO152 (صدام بھائی): بل کے نیچے والا درخواست کا ڈبہ — جب چاہیں پرنٹ میں، جب چاہیں نہیں
 // 💌 SM1910MO158: بل پریویو میں سامنے نظر آنے والا بٹن — "💌 پیغام: آن / آف"
+/* SM0911MO261 (ہیلپ ڈیسک #176، Ali And Company کا مشورہ، مالک کا ⚡): بل کے نیچے اپنا پیغام (فوٹر) — 4 لائنیں تک، settings.billFooterText */
+function smFooterLines(){ return String((AppState.settings && AppState.settings.billFooterText) || '').replace(/\r/g, '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 4); }
+function editBillFooter(){
+  let m = document.getElementById('smFooterModal');
+  if(!m){ m = document.createElement('div'); m.id = 'smFooterModal'; m.className = 'modalOverlay'; m.style.zIndex = '100080'; m.onclick = e => { if(e.target === m) m.classList.remove('show'); }; document.body.appendChild(m); }
+  m.innerHTML = `<div class="modalBox" style="max-width:420px;" dir="rtl">
+    <h3 style="margin:0 0 6px;">🧾 بل کے نیچے اپنا پیغام</h3>
+    <div style="font-size:13px;color:#475569;margin-bottom:8px;">ہر بل کے آخر میں «خریداری کا شکریہ» کے نیچے یہ لکھا آئے گا — زیادہ سے زیادہ 4 لائنیں (مثلاً دکان کا پتہ، اوقات، اکاؤنٹ نمبر، دعا)۔ خالی چھوڑیں تو کچھ نہیں۔</div>
+    <textarea id="smFooterTxt" rows="4" style="width:100%;box-sizing:border-box;padding:10px;border:1.5px solid #cbd5e1;border-radius:12px;font-size:16px;line-height:1.7;font-family:inherit;" placeholder="مثلاً: دکان نمبر 12، سبزی منڈی&#10;صبح 5 سے دوپہر 2 بجے تک">${escRlHtml(String(AppState.settings.billFooterText || ''))}</textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;"><button type="button" class="saveBtn" style="flex:1" onclick="saveBillFooter()">✅ محفوظ کریں</button><button type="button" class="cancelBtn" style="flex:1" onclick="document.getElementById('smFooterTxt').value='';saveBillFooter()">🗑️ ہٹا دیں</button></div>
+  </div>`;
+  m.classList.add('show');
+  setTimeout(() => { const t = document.getElementById('smFooterTxt'); if(t) t.focus(); }, 200);
+}
+function saveBillFooter(){
+  const t = document.getElementById('smFooterTxt');
+  AppState.settings.billFooterText = String(t ? t.value : '').replace(/\r/g, '').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 4).join('\n');
+  persistAllData();
+  document.getElementById('smFooterModal').classList.remove('show');
+  try{ if(document.getElementById('invoicePreviewModal')?.classList.contains('show')) rerenderInvoicePreview(); }catch(e){}
+  try{ if(typeof showToast==='function') showToast(AppState.settings.billFooterText ? '✅ فوٹر محفوظ — ہر بل کے نیچے' : '✅ فوٹر ہٹا دیا'); }catch(e){}
+}
 function billWishBtnSync(){
   const b = document.getElementById('pscWishBtn'); if(!b) return;
   const on = AppState.settings.printShowWish !== false;
