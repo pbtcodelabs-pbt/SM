@@ -10464,8 +10464,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM0911MO260'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'گاہک کا سابقہ بقایا بدلنے پر اس کے پرانے بلوں کی «سابقہ رقم» بھی درست'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM0911MO259'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'مزدوری فروخت 0 ہو تب بھی بل بنتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -40466,12 +40466,6 @@ function saveNewParty(){
         if(serialNum !== null) c.serial_no = serialNum;
         c.openingBalance = openingBalance;
         c.total_receivable = (c.total_receivable || 0) + diff;
-        /* SM0911MO260 (ہیلپ ڈیسک #175، Ali And Company): سابقہ بقایا = ایپ سے پہلے کا — کھاتہ اسے شروع سے مانتا ہے، اس لیے
-           اس گاہک کے پہلے سے بنے بلوں کی «سابقہ رقم» (previous_balance) اور نیا بقایا بھی اسی فرق سے درست (پہلے بل پر 0 ہی رہتا) */
-        if(diff){ try{ (invoicesData || []).forEach(b => { if(!b || b.customer_id !== c.customer_id || b.status === 'voided') return;
-          b.previous_balance = Math.round(((Number(b.previous_balance) || 0) + diff) * 100) / 100;
-          if(b.new_balance != null) b.new_balance = Math.round(((Number(b.new_balance) || 0) + diff) * 100) / 100; });
-          window._obBillsChanged = true; }catch(e){} }
         if(npPhotoDataUrl !== null) c.photo = npPhotoDataUrl; // ✅ Firestore Sync (قدم 1) — saveNewParty کے آخر میں pushCustomersToCloud() سے کلاؤڈ میں
       }
     } else {
@@ -40500,7 +40494,6 @@ function saveNewParty(){
 
   persistAllData();
   if(currentPartyTab === 'customers') pushCustomersToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 1): نیا/ترمیم شدہ کسٹمر فوراً کلاؤڈ میں ----------
-  if(window._obBillsChanged){ window._obBillsChanged = false; try{ pushInvoicesToCloud(); }catch(e){} }   /* SM0911MO260 (#175) */
   else pushSuppliersToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 2): نیا/ترمیم شدہ سپلائر فوراً کلاؤڈ میں ----------
   closeNewPartyModal();
   renderPartyList();
