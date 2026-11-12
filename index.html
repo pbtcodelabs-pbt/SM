@@ -357,6 +357,8 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
         c.onsuccess = function(e){ var cur = e.target.result; if(cur){ out.set(cur.key, cur.value); cur.continue(); } }; t.oncomplete = function(){ res(out); }; t.onerror = function(){ rej(t.error); }; });
       var ks = keys(), stale = [];
       ks.forEach(function(k){ if(g.call(LS, k) === STUB && all.has(k)) cache.set(k, all.get(k)); });
+      // 🛟 FM1211TH523: چھوٹا خانہ (localStorage) مٹ گیا ہو مگر الماری میں ڈیٹا ہو تو اسے مٹانا نہیں — واپس لانا ہے
+      all.forEach(function(v, k){ if(!cache.has(k) && typeof k === 'string' && k.indexOf(PFX) === 0 && k !== PFX + 'settings' && g.call(LS, k) === null){ cache.set(k, v); try{ st.call(LS, k, STUB); }catch(e){} } });
       all.forEach(function(v, k){ if(!cache.has(k)) stale.push(k); });   // چھوٹے خانے میں نیا (اصل) ڈیٹا ہے تو الماری والی پرانی کاپی بیکار
       // پرانا بڑا ڈیٹا: پہلے الماری میں پکا، پھر چھوٹے خانے میں صرف نشان
       var move = ks.filter(function(k){ var v = g.call(LS, k); return v && v !== STUB && v.length >= MIN; });
@@ -7828,6 +7830,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
           <h3>📱 روزانہ خودکار بیک اپ (فون میں)</h3>
           <div class="settingsHint">ہر دن کا بیک اپ خود بنتا ہے — پچھلے 7 دن محفوظ۔ ⬇️ سے فائل لیں (واٹس ایپ/ڈرائیو پر بھیج دیں)، ↩️ سے اسی دن کا ریکارڈ واپس لائیں۔</div>
           <div id="autoLocalBackupList" style="margin-top:8px;"></div>
+          <button type="button" onclick="fmRecoverRun(true)" style="width:100%; margin-top:8px; padding:12px; border:none; border-radius:12px; background:linear-gradient(155deg,#f59e0b,#b45309); color:#fff; font-weight:900; font-size:14px; font-family:inherit; cursor:pointer;">🛟 غائب بل / وصولیاں خودکار بیک اپ سے واپس لائیں</button>
         </div>
 
         <!-- --- 🔒 Account Security — PIN سے محفوظ، صرف اسی دکان کے Admin کی اپنی سیکیورٹی سیٹنگز
@@ -10465,8 +10468,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1111WE264'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'گاہک کے بل اور بیوپاری کی خریداری کے اوپر «▶ پچھلی تاریخ / اگلی تاریخ ◀» — اسی گاہک / بیوپاری کے پچھلے اگلے بل'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1211TH265'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'پکا پہرہ: کوئی فون بل / وصولیاں / چالان خالی نہیں کر سکتا؛ غائب بل خود واپس (بیک اپ + پرانی کلاؤڈ کاپی + سیف الماری)؛ تاریخ کا فلٹر آج / کل / ہفتہ + پچھلا / اگلا دن'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -21011,6 +21014,7 @@ function ensureChalanRateModal(){
       <button type="button" onclick="closeChalanRateModal(); openPurchaseChalanReport();" style="width:100%; margin-bottom:8px; padding:9px; border:none; border-radius:10px; background:#1e3a8a; color:#fff; font-weight:900; cursor:pointer;">📊 خرید اور چالان رپورٹ</button>
       <button type="button" id="chalanRateCashOnly" onclick="chalanCashOnly=!chalanCashOnly; if(chalanCashOnly) chalanRateModalTab='all'; renderChalanRateModal();" style="width:100%; margin-bottom:8px; padding:9px; border:2px solid #059669; border-radius:10px; background:#ecfdf5; color:#065f46; font-weight:900; cursor:pointer;">🔁 نقد خریداری کو ادھار میں بدلیں</button>
       <input type="text" id="chalanRateSearch" placeholder="🔍 سبزی کا نام یا سیریل نمبر" oninput="renderChalanRateModal()" style="width:100%; box-sizing:border-box; padding:9px; border:2px solid var(--primary); border-radius:10px; font-size:13px; text-align:center; margin-bottom:8px;">
+      <div id="chRateDBar"></div>
       <div id="chalanRateList"></div>
       <button type="button" onclick="closeChalanRateModal()" style="width:100%; margin-top:8px; padding:12px; border:none; border-radius:10px; background:#f1f5f9; color:#334155; font-weight:800; cursor:pointer;">✖ بند کریں</button>
     </div>`;
@@ -21078,6 +21082,7 @@ function renderChalanRateModal(){
     }));
   }
   if(q) rows = rows.filter(r => r.p.name.toLowerCase().includes(q) || String(r.p.serial_no ?? '') === q);
+  try{ if(typeof _chRateIn === 'function') rows = rows.filter(r => _chRateIn(r.c)); }catch(e){} // 📅 FM1211TH522
   let cashHead = '';
   { const cb = document.getElementById('chalanRateCashOnly');
     if(cb){ cb.style.background = chalanCashOnly ? '#059669' : '#ecfdf5'; cb.style.color = chalanCashOnly ? '#fff' : '#065f46'; cb.textContent = chalanCashOnly ? '✖ سب چالان دکھائیں' : '🔁 نقد خریداری کو ادھار میں بدلیں'; } }
@@ -21344,6 +21349,7 @@ function renderChalanRateModal(){
     }));
   }
   if(q) rows = rows.filter(r => r.p.name.toLowerCase().includes(q) || String(r.p.serial_no ?? '') === q);
+  try{ if(typeof _chRateIn === 'function') rows = rows.filter(r => _chRateIn(r.c)); }catch(e){} // 📅 FM1211TH522
   let cashHead = '';
   { const cb = document.getElementById('chalanRateCashOnly');
     if(cb){ cb.style.background = chalanCashOnly ? '#059669' : '#ecfdf5'; cb.style.color = chalanCashOnly ? '#fff' : '#065f46'; cb.textContent = chalanCashOnly ? '✖ سب چالان دکھائیں' : '🔁 نقد خریداری کو ادھار میں بدلیں'; } }
@@ -23187,6 +23193,31 @@ function _xReattach(cloudItem, localItem){
   return o;
 }
 function _xBaseKey(def){ return 'xsyncBase_' + def.key; }
+// 🛡️ FM1211TH521 (صدام، 11 نومبر: 27 اکتوبر – 7 نومبر کے بل اور 28 اکتوبر – 4 نومبر کی وصولیاں کلاؤڈ میں خالی ہو گئیں):
+//   جس فون میں کسی ٹکڑے کی «بنیاد» میں بل تھے مگر اپنی فہرست میں نہیں (الماری سے دیر سے آئے / مقامی ڈیٹا ادھورا)، تین طرفہ ملاپ
+//   انہیں «حذف» سمجھ کر کلاؤڈ میں خالی فہرست لکھ دیتا تھا۔ اب کلاؤڈ سے کوئی بل / ادائیگی صرف تب ہٹتی ہے جب اسی فون پر واقعی
+//   حذف کی گئی ہو (fmDelLog میں درج) — ورنہ ملاپ کے بعد بھی واپس فہرست میں رہتی ہے۔ مٹانا ہمیشہ fmDelMark سے۔
+function fmDelMark(kind, ids){
+  try{
+    const L = loadFromStorage('fmDelLog', {}) || {}, now = Date.now(), m = L[kind] = L[kind] || {};
+    (ids || []).forEach(id => { if(id != null) m[String(id)] = now; });
+    Object.keys(L).forEach(k => Object.keys(L[k] || {}).forEach(i => { if(now - L[k][i] > 90 * 86400000) delete L[k][i]; }));
+    saveToStorage('fmDelLog', L); try{ _chDelCache = null; }catch(e){}
+  }catch(e){}
+}
+function fmDelGuard(kind, merged, remote, idOf){
+  try{
+    if(!Array.isArray(remote) || !remote.length) return merged;
+    const L = (loadFromStorage('fmDelLog', {}) || {})[kind] || {};
+    const have = new Set((merged || []).map(x => String(idOf(x))));
+    try{ const all = kind === 'inv' ? invoicesData : kind === 'pay' ? paymentsData : null; (all || []).forEach(x => have.add(String(idOf(x)))); }catch(e){} // دوسرے ٹکڑے میں چلا گیا (تاریخ بدلی) تو دوہرا نہیں
+    const back = remote.filter(x => { const id = idOf(x); return id != null && !have.has(String(id)) && !L[String(id)]; });
+    if(!back.length) return merged;
+    window._fmGuardHits = (window._fmGuardHits || 0) + back.length;
+    console.warn('🛡️ FM guard kept', kind, back.length);
+    return (merged || []).concat(back);
+  }catch(e){ return merged; }
+}
 function _xMerge(def, local, cloud){
   const base = loadFromStorage(_xBaseKey(def), null); // {id: str}
   const lm = new Map(), cm = new Map(), order = [];
@@ -23461,7 +23492,7 @@ async function _paySyncShard(sk){
     for(let a = 0; a < 3; a++){
       const cloud = await _xReadCloud(def);
       if(!cloud.ok){ if(cloud.status === 403) _payShardOff = true; break; }
-      const merged = _xMerge(def, (paymentsData || []).filter(p => _payShard(p) === sk), cloud.list);
+      const merged = fmDelGuard('pay', _xMerge(def, (paymentsData || []).filter(p => _payShard(p) === sk), cloud.list), cloud.list, x => x && x.payment_id); // 🛡️ FM1211TH521
       paymentsData = _paySort([...(paymentsData || []).filter(p => _payShard(p) !== sk), ...merged]);
       const strip = _xHeavyStrip(merged);
       if(_stableStr(strip) === _stableStr(cloud.list)){ _xSetBase(def, merged); ok = true; ut = cloud.updateTime; syn = merged; break; }
@@ -27950,6 +27981,7 @@ async function zeroAllStock(){
   AppState.settings.productsPendingSync = true;
   pauseCloudPolling(20000); // ---------- 🔒 خودکار کلاؤڈ pull تھوڑی دیر روکیں، ورنہ 12-سیکنڈ پولنگ یہ تازہ تبدیلی پلٹ سکتی ہے ---------- -->
   try{ await pushProductsToCloud(); }catch(e){}
+  try{ fmDelMark('ch', [].concat(...(productsData || []).map(p => [].concat(...((p && p.variants) || []).map(v => ((v && v.chalans) || []).map(c => _chalanKey(c))))))); }catch(e){} // 🛡️ FM1211TH522
   uAlert('✅ سٹاک زیرو ہو گیا', 'تمام سبزیوں کا سٹاک زیرو کر دیا گیا — باقی فونز پر بھی چند سیکنڈ میں زیرو نظر آئے گا۔', 'green');
   // ---------- جو بھی سکرین اس وقت کھلی ہو وہیں فوراً نظر آئے — سٹاک مینجمنٹ، پراڈکٹس، اور آرڈر ٹیکنگ (منشی) ---------- -->
   if(document.getElementById('stockAdjustmentListWrap')) renderStockAdjustmentScreen(document.getElementById('stockAdjSearchInput')?.value || '');
@@ -30571,7 +30603,7 @@ async function pmDeleteCollection(pid){
   if(!(await _askAdminPinForSerialMaster('وصولی حذف کرنا'))) return;
   pauseCloudPolling && pauseCloudPolling(10000);
   const P = _pmUndo(c, pm);
-  paymentsData = paymentsData.filter(x => x !== pm);
+  fmDelMark('pay', [pm.payment_id]); paymentsData = paymentsData.filter(x => x !== pm);
   c.walletHistory = c.walletHistory || [];
   c.walletHistory.unshift({ type: 'collection_deleted', amount: P.amt, date: bizDateKey(), at: new Date().toISOString(), by: (AppState.currentUser && AppState.currentUser.name) || 'admin', note: `وصولی حذف — ${bsPayDay(pm)} — ${pm.method || ''}` });
   _pmAfterChange(c);
@@ -37201,7 +37233,9 @@ async function fmMasterResetAll(){
     const _day = bizDateKey();
     customersData.forEach(c => { c.total_receivable = 0; c.wallet_balance = 0; c.walletHistory = []; c.openingBalance = 0; c.zeroResetAt = _at; });
     suppliersData.forEach(s => { s.total_payable = 0; s.wallet_balance = 0; s.openingBalance = 0; s.purchaseHistory = []; s.ledgerHistory = []; });
+    try{ fmDelMark('ch', [].concat(...(productsData || []).map(p => [].concat(...((p && p.variants) || []).map(v => ((v && v.chalans) || []).map(c => _chalanKey(c))))))); }catch(e){} // 🛡️ FM1211TH522
     (productsData || []).forEach(p => (p.variants || []).forEach(v => { v.stock = 0; v.chalans = []; v.reserved = 0; v.purchase = 0; v.salesCount = 0; if(v.batches) v.batches = []; }));
+    try{ fmDelMark('inv', (invoicesData || []).map(x => x && x.invoice_id)); fmDelMark('pay', (paymentsData || []).map(x => x && x.payment_id)); }catch(e){} // 🛡️ FM1211TH522
     invoicesData = [];
     pendingBillsData = [];
     try{ (advanceOrdersData || []).forEach(o => _advRememberDeleted(o.id)); }catch(e){}
@@ -37248,7 +37282,7 @@ async function fmMasterResetAll(){
         badC.forEach(c => { c.total_receivable = 0; c.wallet_balance = 0; });
         badS.forEach(s => { s.total_payable = 0; s.wallet_balance = 0; });
         badV.forEach(v => { v.stock = 0; });
-        if(oldInv.length) invoicesData = invoicesData.filter(x => !(x && oldInvIds.has(x.invoice_id)));
+        if(oldInv.length){ fmDelMark('inv', oldInv.map(x => x.invoice_id)); } if(oldInv.length) invoicesData = invoicesData.filter(x => !(x && oldInvIds.has(x.invoice_id)));
         persistAllData();
         try{ await pushCustomersToCloud(); await pushSuppliersToCloud(); await pushProductsToCloud(); await pushInvoicesToCloud(); }catch(e){}
       }
@@ -43171,6 +43205,8 @@ function stripImagesForSync(arr){
 const _SYNC_COUNTER_FIELDS = ['stock', 'salesCount'];
 const _SYNC_SKIP_FIELDS = ['reserved', 'image', 'chalans', 'nextChalanNo'];
 function _chalanKey(c){ return c.cid || (c.chalanNo + '_' + (c.ts || 0)); }
+let _chDelCache = null, _chDelAt = 0;
+function _chDelLogged(k){ try{ if(!_chDelCache || Date.now() - _chDelAt > 3000){ _chDelCache = (loadFromStorage('fmDelLog', {}) || {}).ch || {}; _chDelAt = Date.now(); } return !!_chDelCache[String(k)]; }catch(e){ return false; } }
 
 // ---------- ایک ورائنٹ کے چالان: مقدار = فرق سے، باقی خانے = جس طرف بدلا وہ؛ نئے چالان دونوں طرف سے شامل ---------- -->
 function _mergeChalans(bCh, lCh, rCh){
@@ -43182,7 +43218,7 @@ function _mergeChalans(bCh, lCh, rCh){
   rCh.forEach(r => {
     const k = _chalanKey(r); seen.add(k);
     const l = lm.get(k), b = bm.get(k);
-    if(!l){ if(b && _syncEq(b, r)) return; out.push(_syncClone(r)); return; } // مقامی طور پر حذف
+    if(!l){ if(b && _syncEq(b, r) && _chDelLogged(k)) return; out.push(_syncClone(r)); return; } // مقامی طور پر حذف — 🛡️ FM1211TH522: صرف جب واقعی حذف (سٹاک زیرو) درج ہو
     if(!b){ out.push(_syncClone(r)); return; }
     const m = {};
     new Set([...Object.keys(r), ...Object.keys(l)]).forEach(f => {
@@ -43741,6 +43777,7 @@ async function _pushMergedRaw(cfg){
         const remote = JSON.parse(str);
         if(Array.isArray(remote)){
           let merged = _mergeRecordsThreeWay(_baseWithSent(cfg, remote), cfg.get(), remote, cfg.id, cfg.counters, cfg.hists, cfg.seed);
+          if(cfg.guard) merged = fmDelGuard(cfg.guard, merged, remote, x => x && x[cfg.id]); // 🛡️ FM1211TH521
           if(cfg.label) merged = await _shrinkLockCheck((cfg.dg ? _dgFilter(cfg.dg, remote) : remote).filter(x => !(cfg.id === 'customer_id' && isLegacyDemoCustomer(x))), merged, cfg.id, cfg.label); // 🔒 FM309WE#270
           if(cfg.dg) merged = _dgFilter(cfg.dg, merged); // 🛡️ FM610TU320: حذف شدہ کبھی واپس نہیں
           cfg.set(merged);
@@ -43817,7 +43854,7 @@ function _supCfg(){
     push: () => pushSuppliersToCloud() };
 }
 function _invCfg(){
-  return { path: INVOICES_DOC_PATH, id: 'invoice_id', counters: ['amount_due'], hists: [], seed: null,
+  return { path: INVOICES_DOC_PATH, id: 'invoice_id', counters: ['amount_due'], hists: [], seed: null, guard: 'inv',
     get: () => invoicesData, set: v => { invoicesData = v; },
     getBase: () => invoicesSyncBase, setBase: v => { invoicesSyncBase = _syncClone(v); try{ saveToStorage('invoicesSyncBase', invoicesSyncBase); }catch(e){} },
     save: () => { saveToStorage('invoices', invoicesData); },
@@ -44465,7 +44502,7 @@ function _invShard(i){
 }
 function _invSort(a){ return a.sort((x, y) => String(y.created_at || '').localeCompare(String(x.created_at || '')) || ((Number(y.invoice_id) || 0) - (Number(x.invoice_id) || 0))); }
 function _invShardCfg(sk){
-  return { path: _invB() + 'invoices_' + sk, id: 'invoice_id', counters: ['amount_due'], hists: [], seed: null, createOnly: true,
+  return { path: _invB() + 'invoices_' + sk, id: 'invoice_id', counters: ['amount_due'], hists: [], seed: null, createOnly: true, guard: 'inv',
     get: () => (invoicesData || []).filter(i => _invShard(i) === sk),
     set: v => { invoicesData = _invSort([...(invoicesData || []).filter(i => _invShard(i) !== sk), ...(v || [])]); },
     getBase: () => loadFromStorage('invSyncBase_' + sk, null),
@@ -44524,7 +44561,7 @@ async function _invFetchShard(cfg){
   if(!res || !res.ok) return { ok: false };
   const doc = await res.json(); let remote = [];
   try{ const st = doc.fields?.json?.stringValue; if(st){ const a = JSON.parse(st); if(Array.isArray(a)) remote = a; } }catch(e){ return { ok: false }; }
-  const merged = _mergeRecordsThreeWay(_baseWithSent(cfg, remote), cfg.get(), remote, 'invoice_id', ['amount_due'], [], null);
+  const merged = fmDelGuard('inv', _mergeRecordsThreeWay(_baseWithSent(cfg, remote), cfg.get(), remote, 'invoice_id', ['amount_due'], [], null), remote, x => x && x.invoice_id); // 🛡️ FM1211TH521
   cfg.set(merged); cfg.setBase(remote); cfg.save(); cfg.lastUT = doc.updateTime;
   const _same = _syncEq(merged, remote); cfg.synced = _same ? merged : null; // 🛠️ SM0111SU228
   return { ok: true, same: _same };
@@ -45493,7 +45530,7 @@ async function confirmBulkDeleteWithPin(){
     return;
   }
   const countDeleted = selectedBillIds.size;
-  invoicesData = invoicesData.filter(inv => !selectedBillIds.has(inv.invoice_id));
+  fmDelMark('inv', [...selectedBillIds]); invoicesData = invoicesData.filter(inv => !selectedBillIds.has(inv.invoice_id));
   pushInvoicesToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 4): بلک ڈیلیٹ بھی فوراً کلاؤڈ میں (اندر ہی saveToStorage + persistAllData بھی ہو جاتا ہے) ----------
   document.getElementById('bulkDeletePinModal').classList.remove('show');
   alert(`✅ ${countDeleted} bill(s) permanently deleted.`);
@@ -45843,7 +45880,7 @@ function permanentlyDeleteBill(invoiceId){
   const inv = invoicesData.find(i => i.invoice_id === invoiceId);
   if(!inv) return;
   if(!confirm(`Permanently delete voided bill ${inv.invoice_no}? This cannot be undone.`)) return;
-  invoicesData = invoicesData.filter(i => i.invoice_id !== invoiceId);
+  fmDelMark('inv', [invoiceId]); invoicesData = invoicesData.filter(i => i.invoice_id !== invoiceId);
   persistAllData();
   renderBillHistory();
   pushInvoicesToCloud(); // ---------- ☁️ ہدایت (6 ستمبر، قدم 4): مستقل ڈیلیٹ ہونا فوراً کلاؤڈ میں — دوسرے فون پر بھی غائب ہو ----------
@@ -55994,6 +56031,272 @@ document.addEventListener('DOMContentLoaded', () => {
         <a href="javascript:void(0)" onclick="smRegRestoreOwner()" style="font-size:12.5px; color:#92400e; font-weight:800;">🔁 مالک ہیں، ایپ دوبارہ لگائی؟ پرانی دکان واپس لائیں</a>
         <span id="smRegVersion" dir="ltr" style="display:inline-block; background:#15803d; color:#fff; font-family:Arial,sans-serif; font-size:12px; font-weight:700; letter-spacing:.4px; padding:3px 12px; border-radius:999px;"></span>
       </div>
+<script type="text/fm-boot">
+/* 🛟 FM1211TH521 → FM1211TH523 (صدام، 12 نومبر — «ایک ہی فون پر بھی پچھلے دنوں کا ریکارڈ غائب، سیف الماری سے واپس لاؤ»):
+   11 نومبر شام کلاؤڈ کے بل ٹکڑے (13 – 31 اکتوبر) اور وصولی ٹکڑا (21 – 31 اکتوبر) خالی لکھے گئے تھے (اب fmDelGuard کا پہرہ)۔
+   ایپ کھلتے ہی خود (بغیر بٹن) ہر فون پر — کچھ مٹتا یا بدلتا نہیں، صرف غائب واپس:
+   (1) فون کا 7 دن والا خودکار بیک اپ (fmAutoBackup_v1) — اصل بل / ادائیگیاں ہوبہو
+   (2) پرانی کلاؤڈ دستاویز shopData/invoices + payments (13 – 27 اکتوبر) — ہوبہو
+   (3) سیف الماری (کلاؤڈ sv_o_*) کے «مکمل ہوئے آرڈر» جن سے بل بنے (fulfilledInvoiceId) — اسی بل نمبر / گاہک / سبزی / مقدار سے بل دوبارہ؛
+       ریٹ آرڈر والے (بل بناتے وقت بدلا ریٹ معلوم نہیں)، اس لیے بل پر نشان _rec='vault' + «🗄️ سیف الماری سے»؛ بقایا (amount_due) صفر —
+       گاہک کا اصل بقایا / کھاتہ کبھی نہیں بدلتا
+   حذف شدہ (fmDelLog)، سب ریکارڈ صفر کرنے (zeroResetAt) سے پہلے کے، اور فون / کلاؤڈ میں موجود — کبھی نہیں۔ «بیک اپ» میں 🛟 بٹن سے دوبارہ بھی۔ */
+(function(){
+  async function allBackups(){
+    try{ const db = await _albOpen(); return ((await _albReq(db, 'readonly', st => st.getAll())) || []).sort((a, b) => String(b.day).localeCompare(String(a.day))); }catch(e){ return []; }
+  }
+  function resetAt(){ let m = ''; (customersData || []).forEach(c => { const z = c && c.zeroResetAt ? String(c.zeroResetAt) : ''; if(z > m) m = z; }); return m; }
+  function monthsFrom(iso){
+    const out = [], now = new Date(); let y = +String(iso || '').slice(0, 4) || now.getFullYear(), mo = +String(iso || '').slice(5, 7) || (now.getMonth() + 1);
+    if(!iso){ const d = new Date(Date.now() - 62 * 86400000); y = d.getFullYear(); mo = d.getMonth() + 1; }
+    while(y * 100 + mo <= now.getFullYear() * 100 + now.getMonth() + 1){ out.push(y * 100 + mo); mo++; if(mo > 12){ mo = 1; y++; } }
+    return out;
+  }
+  function vaultInvoice(snaps, soldBy){
+    const s0 = snaps.slice().sort((a, b) => String(b.fulfilledAt || '').localeCompare(String(a.fulfilledAt || '')))[0];
+    const items = [];
+    snaps.forEach(s => (s.items || []).forEach(it => items.push(Object.assign({}, it, { priceManual: false, autoRate: !!it.autoRate }))));
+    const sub = items.reduce((a, it) => a + (Number(it.qty) || 0) * (Number(it.unitPrice) || 0), 0);
+    const lab = items.reduce((a, it) => a + (Number(it.qty) || 0) * (Number(it.laborPerUnit) || 0), 0);
+    const ext = snaps.reduce((a, s) => a + (s.extraCharges || []).reduce((b, c) => b + (Number(c.amount) || 0), 0), 0);
+    const at = s0.fulfilledAt || s0.createdAt;
+    let bd = ''; try{ bd = toLocalDateStr(new Date(at)); }catch(e){ bd = String(at).slice(0, 10); }
+    return { invoice_id: s0.fulfilledInvoiceId, customer_id: s0.customer_id, customer_name: s0.customerName || '', customer_phone: s0.customerPhone || '',
+      sold_by: soldBy, sale_mode: 'retail', payment_method: 'credit', items, discount: ext, discount_type: ext ? 'دیگر' : '', tax_percent: 0, tax_amount: 0,
+      grand_total: Math.round((sub + lab + ext) * 100) / 100, previous_balance: null, status: 'completed', created_at: at, biz_date: bd,
+      wallet_applied: 0, cash_received_now: 0, change_given: 0, change_credited_to_wallet: 0, amount_due: 0, paid_now: 0,
+      _rec: 'vault', _recOrders: snaps.map(s => s.id), admin_note: '🗄️ سیف الماری سے دوبارہ بنا — سبزی / مقدار اصل، ریٹ آرڈر والے' };
+  }
+  function renumber(list){ // دوبارہ بنے بلوں کا دن / مہینے کا نمبر — اسی دن / مہینے کے سب بلوں کی وقت والی ترتیب سے
+    const all = (invoicesData || []).filter(i => i && i.status !== 'voided');
+    const day = i => String(i.biz_date || i.created_at || '').slice(0, 10), mon = i => day(i).slice(0, 7), t = i => String(i.created_at || '');
+    list.forEach(r => {
+      const d = all.filter(i => day(i) === day(r)).sort((a, b) => t(a).localeCompare(t(b))).indexOf(r) + 1;
+      const m = all.filter(i => mon(i) === mon(r)).sort((a, b) => t(a).localeCompare(t(b))).indexOf(r) + 1;
+      r.daily_bill_no = String(d || ''); r.monthly_bill_no = String(m || ''); r.bill_seq = m || null; r.invoice_no = `Bill#${d}/${m}`;
+    });
+  }
+  async function run(manual){
+    if(window._fmRecBusy) return; window._fmRecBusy = true;
+    const cnt = { bk: 0, leg: 0, vault: 0, pay: 0 }, days = new Set();
+    try{
+      try{ await invSyncAll(); }catch(e){}
+      try{ await paySyncAll(); }catch(e){}
+      const log = loadFromStorage('fmDelLog', {}) || {}, dI = log.inv || {}, dP = log.pay || {};
+      const RST = resetAt();
+      const haveI = new Set(), haveP = new Set();
+      (invoicesData || []).forEach(x => x && haveI.add(String(x.invoice_id)));
+      (paymentsData || []).forEach(x => x && haveP.add(String(x.payment_id)));
+      try{ if(_archHas()) await _archLoad(); }catch(e){}
+      try{ (_archMem.inv || []).forEach(x => x && haveI.add(String(x.invoice_id))); (_archMem.pay || []).forEach(x => x && haveP.add(String(x.payment_id))); }catch(e){}
+      const addI = [], addP = [];
+      const okI = (x, src) => { const id = x && x.invoice_id; if(id == null) return false; const k = String(id); if(haveI.has(k) || dI[k]) return false; if(RST && String(x.created_at || '') <= RST) return false; haveI.add(k); days.add(String(x.biz_date || x.created_at || '').slice(0, 10)); cnt[src]++; return true; };
+      const okP = x => { const id = x && x.payment_id; if(id == null) return false; const k = String(id); if(haveP.has(k) || dP[k]) return false; if(RST && String(x.created_at || x.date || '') <= RST) return false; haveP.add(k); cnt.pay++; return true; };
+      // (1) فون کا خودکار بیک اپ
+      for(const r of await allBackups()){
+        let b = null; try{ b = JSON.parse(r.json); }catch(e){} if(!b) continue;
+        (Array.isArray(b.invoices) ? b.invoices : []).forEach(x => { if(okI(x, 'bk')) addI.push(Object.assign({}, x, { _rec: 'backup' })); });
+        (Array.isArray(b.payments) ? b.payments : []).forEach(x => { if(okP(x)) addP.push(Object.assign({}, x, { _rec: 'backup' })); });
+      }
+      // (2) پرانی کلاؤڈ دستاویز (صرف پڑھنا)
+      try{ const r = await _xReadCloud({ key: 'invoices', idOf: x => x && x.invoice_id }); if(r.ok) r.list.forEach(x => { if(okI(x, 'leg')) addI.push(Object.assign({}, x)); }); }catch(e){}
+      try{ const r = await _xReadCloud({ key: 'payments', idOf: x => x && x.payment_id }); if(r.ok) r.list.forEach(x => { if(okP(x)) addP.push(Object.assign({}, x)); }); }catch(e){}
+      // (3) سیف الماری کے مکمل آرڈر → بل
+      const best = new Map();
+      for(const ym of monthsFrom(RST)) for(let n = 0; n <= 5; n++){
+        try{ const r = await _xReadCloud({ key: 'sv_o_' + ym + '_' + n, idOf: x => x && x.vid }); if(!r.ok) continue;
+          r.list.forEach(e => { const s = e && e.snap; if(!s || e.st !== 'fulfilled' || s.status !== 'fulfilled' || s.fulfilledInvoiceId == null) return; const p = best.get(s.id); if(!p || (Number(e.u) || 0) > (Number(p.u) || 0)) best.set(s.id, { u: e.u, s }); });
+        }catch(e){}
+      }
+      const grp = new Map(); best.forEach(({ s }) => { const k = String(s.fulfilledInvoiceId); if(!grp.has(k)) grp.set(k, []); grp.get(k).push(s); });
+      const sb = (() => { const c = {}; (invoicesData || []).forEach(i => { if(i && i.sold_by) c[i.sold_by] = (c[i.sold_by] || 0) + 1; }); return Object.keys(c).sort((a, b) => c[b] - c[a])[0] || 'Admin'; })();
+      const vaultAdded = [];
+      grp.forEach(snaps => { const inv = vaultInvoice(snaps, sb); if(okI(inv, 'vault')){ addI.push(inv); vaultAdded.push(inv); } });
+      if(addI.length) invoicesData = _invSort([...(invoicesData || []), ...addI]);
+      if(addP.length) paymentsData = _paySort([...(paymentsData || []), ...addP]);
+      if(vaultAdded.length) renumber(vaultAdded);
+      if(addI.length || addP.length){
+        saveToStorage('invoices', invoicesData); saveToStorage('payments', paymentsData);
+        try{ persistAllData(); }catch(e){}
+        try{ await pushInvoicesToCloud(); }catch(e){}
+        try{ await paySyncAll(); }catch(e){}
+        try{ if(typeof currentScreenName !== 'undefined' && currentScreenName === 'billhistory') renderBillHistory(); }catch(e){}
+        try{ if(typeof renderHomeMoneySummary === 'function') renderHomeMoneySummary(); }catch(e){}
+      }
+      saveToStorage('fmRec523', { at: Date.now(), ...cnt });
+      const nI = cnt.bk + cnt.leg + cnt.vault;
+      if(nI || cnt.pay){
+        const dl = [...days].filter(Boolean).sort();
+        await uAlert('🛟 ریکارڈ واپس آ گیا', `<b>${nI}</b> بل اور <b>${cnt.pay}</b> وصولیاں / ادائیگیاں واپس فہرست اور کلاؤڈ میں آ گئیں۔`
+          + `<br><small>📱 فون کے بیک اپ سے ${cnt.bk} • ☁️ پرانی کلاؤڈ کاپی سے ${cnt.leg} • 🗄️ سیف الماری کے آرڈروں سے ${cnt.vault}</small>`
+          + (cnt.vault ? '<br><small>🗄️ والے بلوں میں سبزی اور مقدار اصل ہیں، ریٹ آرڈر والے — بقایا / کھاتہ نہیں بدلا۔</small>' : '')
+          + (dl.length ? `<br><small>تاریخیں: ${bizFmt(dl[0])} سے ${bizFmt(dl[dl.length - 1])}</small>` : '') + '<br><small>دوسرے فونوں پر بھی چند منٹ میں خود آ جائیں گے۔</small>', 'green');
+      } else if(manual){
+        await uAlert('🛟 ریکارڈ', 'کوئی غائب بل یا وصولی نہیں ملی — سب کچھ پہلے سے موجود ہے۔', 'green');
+      }
+    }catch(e){ console.warn('fm recover', e); if(manual) try{ await uAlert('🛟 ریکارڈ', 'ابھی واپس نہیں لایا جا سکا — انٹرنیٹ چیک کر کے دوبارہ دبائیں۔'); }catch(_){} }
+    finally{ window._fmRecBusy = false; }
+  }
+  window.fmRecoverRun = run;
+  window._fmVaultInvoice = vaultInvoice;
+  setTimeout(() => { try{ if(!loadFromStorage('fmRec523', null)) run(false); }catch(e){} }, 25000);
+})();
+</script>
+<script type="text/fm-boot">
+/* 📅 FM1211TH522 (صدام، 12 نومبر — «ہر جگہ تاریخ کا فلٹر: آج، کل، یہ ہفتہ، پچھلا ہفتہ، تاریخ چنیں + پچھلا / اگلا دن»):
+   مشترکہ پٹی fmDBar — آج کی سبزی / سابقہ ریکارڈ (ایک دن)، چالانوں کا ریکارڈ (دن یا ہفتہ)، چالانوں کا حساب (سب / دن / ہفتہ)،
+   تاریخوں کی فہرست (چپس + کیلنڈر)۔ چالانوں کے ریکارڈ میں فون کے خودکار بیک اپ والے پرانے چالان بھی (صرف دیکھنے کو، 🗄️)۔ حساب کچھ نہیں بدلا۔ */
+(function(){
+  const DAY = 86400000;
+  const k2d = k => new Date(k + 'T12:00:00');
+  const d2k = d => { const p = n => String(n).padStart(2, '0'); return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); };
+  const addD = (k, n) => d2k(new Date(k2d(k).getTime() + n * DAY));
+  const today = () => bizDateKey();
+  const wkStart = k => { const d = k2d(k), w = (d.getDay() + 6) % 7; return addD(k, -w); }; // پیر سے
+  const UD = ['اتوار','پیر','منگل','بدھ','جمعرات','جمعہ','ہفتہ'];
+  function preset(id){
+    const t = today();
+    if(id === 'today') return { from: t, to: t };
+    if(id === 'yday'){ const y = addD(t, -1); return { from: y, to: y }; }
+    if(id === 'week') return { from: wkStart(t), to: t };
+    if(id === 'lweek'){ const s = addD(wkStart(t), -7); return { from: s, to: addD(s, 6) }; }
+    return null;
+  }
+  function label(r){
+    if(!r) return 'تاریخ چنیں';
+    if(r.from === r.to){ const t = today(); return (r.from === t ? 'آج — ' : r.from === addD(t, -1) ? 'کل — ' : '') + UD[k2d(r.from).getDay()] + ' ' + bizFmt(r.from); }
+    return bizFmt(r.from) + ' سے ' + bizFmt(r.to);
+  }
+  const same = (a, b) => !!a && !!b && a.from === b.from && a.to === b.to;
+  const chipCss = on => `flex:1 1 0; min-width:0; padding:6px 2px; border-radius:999px; border:1.5px solid ${on ? '#0f766e' : '#cbd5e1'}; background:${on ? '#0f766e' : '#fff'}; color:${on ? '#fff' : '#334155'}; font-weight:900; font-size:12.5px; cursor:pointer; font-family:inherit; white-space:nowrap;`;
+  // fn: عالمی فنکشن کا نام — fn(from, to)، «سب» پر fn(null)؛ opts: {week, all}
+  window.fmDBar = function(fn, r, opts){
+    opts = opts || {};
+    const ch = (id, t) => { const pr = preset(id); return `<button type="button" onclick="${fn}('${pr.from}','${pr.to}')" style="${chipCss(same(pr, r))}">${t}</button>`; };
+    const span = r ? (Math.round((k2d(r.to) - k2d(r.from)) / DAY) + 1) : 1;
+    const isWk = !!r && span > 1 && span <= 7 && wkStart(r.from) === r.from; // یہ ہفتہ / پچھلا ہفتہ — پورا ہفتہ آگے پیچھے
+    const step = isWk ? 7 : span, unit = isWk ? 'ہفتہ' : (step > 1 ? step + ' دن' : 'دن');
+    const nav = dir => {
+      if(!r) return '';
+      let f = addD(r.from, dir * step), t2 = isWk ? addD(f, 6) : addD(r.to, dir * step); if(t2 > today()) t2 = today();
+      const dis = dir > 0 && f > today();
+      return `<button type="button" ${dis ? 'disabled' : ''} onclick="${fn}('${f}','${t2}')" style="flex:0 0 auto; padding:7px 9px; border:none; border-radius:10px; background:${dis ? '#e2e8f0' : '#1e3a8a'}; color:${dis ? '#94a3b8' : '#fff'}; font-weight:900; font-size:12.5px; cursor:${dis ? 'default' : 'pointer'}; font-family:inherit; white-space:nowrap;">${dir < 0 ? '▶ پچھلا ' + unit : 'اگلا ' + unit + ' ◀'}</button>`;
+    };
+    const pick = `<label style="position:relative; flex:1 1 auto; min-width:0; display:flex; align-items:center; justify-content:center; padding:7px 6px; border-radius:10px; background:#fef3c7; border:1.5px solid #f59e0b; color:#92400e; font-weight:900; font-size:13px; cursor:pointer; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">📅 ${label(r)}<input type="date" value="${r ? r.to : today()}" max="${today()}" onchange="if(this.value) ${fn}(this.value, this.value)" style="position:absolute; inset:0; opacity:0; width:100%; height:100%; cursor:pointer;"></label>`;
+    return `<div class="fmDBar" dir="rtl" style="padding:6px 8px; background:#f8fafc; border-bottom:1.5px solid #e2e8f0; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;">
+      <div style="display:flex; gap:5px; align-items:center;">${nav(-1)}${pick}${nav(1)}</div>
+      <div style="display:flex; gap:4px; margin-top:5px;">${opts.all ? `<button type="button" onclick="${fn}(null)" style="${chipCss(!r)}">سب</button>` : ''}${ch('today', 'آج')}${ch('yday', 'کل')}${opts.week ? ch('week', 'یہ ہفتہ') + ch('lweek', 'پچھلا ہفتہ') : ''}</div></div>`;
+  };
+
+  // ---------- 1) آج کی سبزی کس کس کو دی گئی / سابقہ ریکارڈ (ایک دن) ----------
+  window.fmDistGo = function(f){ openDistReport(f || today()); };
+  const _rdr = renderDistReport;
+  window.renderDistReport = renderDistReport = function(){
+    _rdr.apply(this, arguments);
+    try{
+      const wrap = document.getElementById('smDistWrap'); if(!wrap) return;
+      let bar = document.getElementById('fmDBarDist');
+      if(!bar){ bar = document.createElement('div'); bar.id = 'fmDBarDist'; wrap.parentNode.insertBefore(bar, wrap); }
+      const d = smDistViewDay || today();
+      bar.innerHTML = fmDBar('fmDistGo', { from: d, to: d }, {});
+    }catch(e){}
+  };
+
+  // ---------- 2) چالانوں کا ریکارڈ — دن یا ہفتہ؛ فون کے خودکار بیک اپ والے پرانے چالان بھی ----------
+  const BK = { map: null, busy: null };
+  function bkLoad(){
+    if(BK.map) return Promise.resolve(BK.map);
+    if(BK.busy) return BK.busy;
+    BK.busy = (async () => {
+      const m = new Map();
+      try{
+        const db = await _albOpen(); const rows = (await _albReq(db, 'readonly', st => st.getAll())) || [];
+        rows.sort((a, b) => String(b.day).localeCompare(String(a.day))).forEach(r => {
+          let b = null; try{ b = JSON.parse(r.json); }catch(e){} if(!b || !Array.isArray(b.products)) return;
+          b.products.forEach(p => p && (p.variants || []).forEach(v => v && (v.chalans || []).forEach(c => {
+            if(!c || !c.ts || isLegacyChalan(c)) return; const k = v.variant_id + '|' + _chalanKey(c);
+            if(!m.has(k)) m.set(k, { vid: v.variant_id, c });
+          })));
+        });
+      }catch(e){}
+      BK.map = m; BK.busy = null; return m;
+    })();
+    return BK.busy;
+  }
+  function bkExtra(){ // جو چالان اب فون میں نہیں (صرف دیکھنے کو)
+    const out = []; if(!BK.map) return out;
+    const have = new Set();
+    (productsData || []).forEach(p => p && (p.variants || []).forEach(v => v && (v.chalans || []).forEach(c => c && have.add(v.variant_id + '|' + _chalanKey(c)))));
+    BK.map.forEach((x, k) => { if(!have.has(k)) out.push(x); });
+    return out;
+  }
+  let RNG = null;
+  window.chalanDayRows = chalanDayRows = function(D){
+    const r = (RNG && RNG.from) ? RNG : { from: D, to: D }, multi = r.from !== r.to;
+    const inR = c => { const k = _chTodayKey(c.ts); return k >= r.from && k <= r.to; };
+    const rows = [];
+    const vMap = new Map(); (productsData || []).forEach(p => p && (p.variants || []).forEach(v => v && vMap.set(v.variant_id, { p, v })));
+    const push = (p, v, c, old) => {
+      const qty = Number(c.origQty ?? c.qty) || 0, rate = c.ratePending ? 0 : (Number(c.rate) || 0);
+      const src = c.isCash ? 'نقد خریداری' : (c.supplierName || (c.supplierId != null ? ((suppliersData || []).find(s => s && s.supplier_id === c.supplierId) || {}).name : '') || c.source || '—');
+      rows.push({ serial: p.serial_no, name: p.name + (old ? ' 🗄️' : ''), pack: (v.label || '') + (multi ? ' • ' + bizFmt(_chTodayKey(c.ts)).slice(0, 5) : ''), no: c.chalanNo, qty, left: Number(c.qty) || 0, rate, labor: Number(c.sellLabor) || 0, sale: Number(c.retail) || 0, src, amt: Math.round(qty * rate), pending: !!c.ratePending, by: c.by || '', _ts: c.ts || 0, _sn: Number(p.serial_no) || 1e9 });
+    };
+    (productsData || []).forEach(p => p && (p.variants || []).forEach(v => v && (v.chalans || []).forEach(c => { if(c && c.ts && !isLegacyChalan(c) && inR(c)) push(p, v, c, false); })));
+    bkExtra().forEach(x => { if(!inR(x.c)) return; const pv = vMap.get(x.vid); if(pv) push(pv.p, pv.v, x.c, true); });
+    rows.sort((a, b) => multi ? (a._ts - b._ts) : (a._sn - b._sn || a._ts - b._ts));
+    return rows;
+  };
+  window.fmChDayGo = function(f, t){ RNG = { from: f || today(), to: t || f || today() }; openChalanDayReport(RNG.from, true); };
+  const _ocd = openChalanDayReport;
+  window.openChalanDayReport = openChalanDayReport = function(D, keep){
+    if(!keep || !RNG) RNG = { from: D, to: D };
+    _ocd.call(this, D);
+    try{
+      const ov = document.getElementById('chDayOverlay'), head = ov && ov.firstElementChild; if(!head) return;
+      const bar = document.createElement('div'); bar.innerHTML = fmDBar('fmChDayGo', RNG, { week: true });
+      head.parentNode.insertBefore(bar.firstElementChild, head.nextSibling);
+      if(RNG.from !== RNG.to){ const t = head.querySelector('div'); if(t) t.textContent = '🧾 ' + bizFmt(RNG.from) + ' سے ' + bizFmt(RNG.to) + ' تک کے چالان'; }
+      if(!BK.map) bkLoad().then(m => { if(m.size && document.getElementById('chDayOverlay')?.style.display === 'flex') openChalanDayReport(D, true); });
+    }catch(e){}
+  };
+  window.openChalanHistory = openChalanHistory = function(){
+    bkLoad().then(() => {
+      const set = new Set();
+      (productsData || []).forEach(p => p && (p.variants || []).forEach(v => v && (v.chalans || []).forEach(c => { if(c && c.ts && !isLegacyChalan(c)) set.add(_chTodayKey(c.ts)); })));
+      bkExtra().forEach(x => set.add(_chTodayKey(x.c.ts)));
+      openDatePickList('📅 چالانوں کا ریکارڈ — تاریخ چنیں', Array.from(set).sort().reverse().slice(0, 120), d => openChalanDayReport(d), 'fmChDayGo');
+    });
+  };
+
+  // ---------- 3) تاریخوں کی فہرست: اوپر چپس + کیلنڈر ----------
+  const _odp = openDatePickList;
+  window.openDatePickList = openDatePickList = function(title, dates, onPick, rangeFn){
+    _odp.call(this, title, dates, onPick);
+    try{
+      window._fmDPPick = onPick; window._fmDPRange = rangeFn || null;
+      const ov = document.getElementById('smDatePickOv'), box = ov && ov.firstElementChild, head = box && box.firstElementChild; if(!head) return;
+      const b = document.createElement('div'); b.innerHTML = fmDBar('fmDPGo', null, { week: !!rangeFn });
+      head.parentNode.insertBefore(b.firstElementChild, head.nextSibling);
+    }catch(e){}
+  };
+  window.fmDPGo = function(f, t){
+    const ov = document.getElementById('smDatePickOv'); if(ov) ov.style.display = 'none';
+    if(!f) return;
+    if(f !== t && window._fmDPRange && typeof window[window._fmDPRange] === 'function'){ window[window._fmDPRange](f, t); return; }
+    if(typeof window._fmDPPick === 'function') window._fmDPPick(t || f);
+  };
+
+  // ---------- 4) چالانوں کا حساب — سب / دن / ہفتہ ----------
+  let CR = null;
+  window._chRateIn = function(c){ if(!CR) return true; const k = _chTodayKey(c && c.ts); return k >= CR.from && k <= CR.to; };
+  window.fmChRateGo = function(f, t){ CR = f ? { from: f, to: t || f } : null; try{ renderChalanRateModal(); }catch(e){} };
+  const _rcr = renderChalanRateModal;
+  window.renderChalanRateModal = renderChalanRateModal = function(){
+    _rcr.apply(this, arguments);
+    try{ const el = document.getElementById('chRateDBar'); if(el) el.innerHTML = fmDBar('fmChRateGo', CR, { week: true, all: true }); }catch(e){}
+  };
+})();
+</script>
     </div>
   </div></div>
 </div>
