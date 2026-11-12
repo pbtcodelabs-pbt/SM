@@ -10468,8 +10468,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1211TH266'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'فول پروف: بلوں اور وصولیوں کی دوسری کلاؤڈ نقل جو کبھی نہیں گھٹتی + روز خود غائب ریکارڈ کی جانچ'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1211TH267'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'گاہک کے صفحے پر لین دین بٹن اوپر وصولی کے بعد تیسرے نمبر پر'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -29932,13 +29932,13 @@ function openCustomerProfile(customerId){
   sideEl.innerHTML = `
     <button style="background:linear-gradient(155deg,#1e88e5,#1565c0);" onclick="startNewBillForCustomer(${c.customer_id})"><span class="sideIcon">🧾</span><span class="sideLabel">نیا بل</span></button>
     <button style="background:linear-gradient(155deg,#ef4444,#b91c1c);" onclick="closeProfileModal(); openCollectModal(${c.customer_id});"><span class="sideIcon">📥</span><span class="sideLabel">وصولی</span></button>
+    <button style="background:linear-gradient(155deg,#2563eb,#1e3a8a);" onclick="openPartyLedger('customers', ${c.customer_id})"><span class="sideIcon">📒</span><span class="sideLabel">لین دین</span></button>
     <button style="background:linear-gradient(155deg,#fb923c,#c2410c);" onclick="openCustLoanModal(${c.customer_id});"><span class="sideIcon">💸</span><span class="sideLabel">ادھار دیا</span></button>
     ${AppState.currentRole === 'admin' ? `<button style="background:linear-gradient(155deg,${c.isDormant ? '#22c55e,#15803d' : '#a16207,#78350f'});" onclick="closeProfileModal(); toggleCustomerActiveStatus(${c.customer_id}, ${c.isDormant ? 'true' : 'false'});"><span class="sideIcon">${c.isDormant ? '✅' : '🪦'}</span><span class="sideLabel">${c.isDormant ? 'حاضر کریں' : 'کھوہ کھاتے'}</span></button>` : ''}
     <button style="background:linear-gradient(155deg,#22c55e,#15803d);" onclick="closeProfileModal(); openWalletModal(${c.customer_id});"><span class="sideIcon">➕</span><span class="sideLabel">والٹ</span></button>
     <button style="background:linear-gradient(155deg,#f59e0b,#c2410c);" onclick="closeProfileModal(); openOpeningBalanceModal(${c.customer_id});"><span class="sideIcon">⚖️</span><span class="sideLabel">سابقہ بقایا</span></button>
     ${c.total_receivable > 0 ? `<button style="background:linear-gradient(155deg,#fb923c,#c2410c);" onclick="openCustomerReminderModal(${c.customer_id})"><span class="sideIcon">📢</span><span class="sideLabel">یاد دہانی</span></button>` : ''}
     <button style="background:linear-gradient(155deg,#8b5cf6,#5b21b6);" onclick="shareCustomerProfile(${c.customer_id})"><span class="sideIcon">🪪</span><span class="sideLabel">پروفائل</span></button>
-    <button style="background:linear-gradient(155deg,#2563eb,#1e3a8a);" onclick="openPartyLedger('customers', ${c.customer_id})"><span class="sideIcon">📒</span><span class="sideLabel">لین دین</span></button>
     <button id="profileModeBtn" style="background:linear-gradient(155deg,#475569,#1e293b);" onclick="toggleProfileMainMode()"><span class="sideIcon">📜</span><span class="sideLabel">والٹ / واپسی</span></button>
     ${AppState.currentRole === 'admin' ? `<button style="background:linear-gradient(155deg,#dc2626,#7f1d1d);" onclick="deleteCustomerFromProfile(${c.customer_id})"><span class="sideIcon">🗑️</span><span class="sideLabel">حذف</span></button>` : ''}
   `;
