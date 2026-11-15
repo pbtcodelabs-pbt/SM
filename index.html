@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1511SU271'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'ہر حذف اور بیک اپ واپسی سے پہلے ایڈمن پاسورڈ؛ AIO کا ڈیٹا اب سبزی منڈی میں نہیں آتا'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1511SU272'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'پینڈنگ آرڈر کا کل اب مزدوری سمیت (بل کے برابر)؛ بل کا پریویو خالی ہو تو سادہ بل نظر آتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -38327,7 +38327,8 @@ function whatsappCustomerOrderReceived(orderId){
 
 // ---------- ہر آرڈر کا اندازاً ٹوٹل نکالنے کا مددگار فنکشن ----------
 function advOrderTotal(order){
-  const itemsTotal = order.items.reduce((s,i) => s + (i.qty * i.unitPrice), 0);
+  // SM1511SU272 / FM1511SU531 (ہیلپ ڈیسک #252، صدام): بل میں مزدوری (`laborPerUnit`) بھی جمع ہوتی ہے — پینڈنگ آرڈر کا کل بھی وہی (پہلے مزدوری کے بغیر، بل سے کم)
+  const itemsTotal = order.items.reduce((s,i) => s + (i.qty * i.unitPrice) + ((Number(i.unitPrice) || 0) > 0 ? (Number(i.qty) || 0) * (Number(i.laborPerUnit) || 0) : 0), 0);
   const chargesTotal = (order.extraCharges || []).reduce((s,c) => s + (Number(c.amount) || 0), 0);
   return itemsTotal + chargesTotal;
 }
@@ -39015,7 +39016,8 @@ async function _renderAdvOrderToCanvasInner(order, canvasEl){
   const FItem = (spec) => spec.replace(/(\d+)px/, (m, n) => Math.round(n * scale) + 'px') + ` ${itemWeight} ${canvasFontFamily}`;
   const fmt = (n) => (Number(n)||0).toFixed(decimals);
   const m = useA4 ? 1.6 : 1; // ---------- A4 پر اضافی مارجن/سپیسنگ ----------
-  const charges = order.extraCharges || [];
+  const _advLabor = (order.items || []).reduce((a, it) => a + ((Number(it.unitPrice) || 0) > 0 ? (Number(it.qty) || 0) * (Number(it.laborPerUnit) || 0) : 0), 0); // #252: مزدوری بھی بل جیسی
+  const charges = (_advLabor > 0 ? [{ label: 'مزدوری (Labour)', amount: Math.round(_advLabor * 100) / 100 }] : []).concat(order.extraCharges || []);
 
   // ---------- 🔄 ہدایت (FM4SEPFR25): لمبے نام کاٹنے کی بجائے دوسری لائن میں نیچے شفٹ — اسی لیے
   // تعداد ٹیبل کی اونچائی (tableH) ہر آئٹم کی اصل ضرورت کے مطابق پہلے سے حساب کی جاتی ہے ---------- -->
@@ -47782,8 +47784,27 @@ function openInvoicePreview(invoiceId, highlightMatchKey){
   // اس لیے تھوڑی زیادہ تاخیر (setTimeout) دی ہے تاکہ لے آؤٹ مکمل ہو چکا ہو۔
   document.getElementById('invoicePreviewModal').classList.add('show');
   const doRender = () => {
-    if(AppState.settings.invoiceStyle === 'a4') renderInvoiceToA4Canvas(inv, currentPreviewHighlightKey);
-    else renderInvoiceToCanvas(inv, AppState.settings.paperWidth, currentPreviewHighlightKey);
+    // SM1511SU272 / FM1511SU531 (ہیلپ ڈیسک #253): تصویر بنانے میں کوئی خرابی ہو تو پریویو خالی سفید رہ جاتا تھا —
+    // اب خرابی پکڑ کر اسی جگہ سادہ بل (مال، نگ، ریٹ، رقم، کل) + «بل دوبارہ بنائیں» دکھاتے ہیں
+    const fb = document.getElementById('invPrevFallback'); if(fb) fb.remove();
+    try{
+      if(AppState.settings.invoiceStyle === 'a4') renderInvoiceToA4Canvas(inv, currentPreviewHighlightKey);
+      else renderInvoiceToCanvas(inv, AppState.settings.paperWidth, currentPreviewHighlightKey);
+    }catch(err){
+      try{ console.error('invoice render failed', err); }catch(e){}
+      const cv = document.querySelector('#invoicePreviewModal canvas'); if(!cv || !cv.parentNode) return;
+      const E = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+      const n = v => (Math.round((Number(v) || 0) * 100) / 100).toLocaleString('en-US');
+      const d = document.createElement('div'); d.id = 'invPrevFallback'; d.dir = 'rtl';
+      d.style.cssText = 'background:#fff; border:2px dashed #f59e0b; border-radius:12px; padding:10px; margin:6px 0; font-size:14px;';
+      d.innerHTML = `<div style="font-weight:900; color:#b45309; margin-bottom:6px;">⚠️ بل کی تصویر نہیں بن سکی — بل کا ریکارڈ محفوظ ہے</div>
+        <div style="font-weight:800;">${E(inv.invoice_no || '')} — ${E(inv.customer_name || '')}</div>
+        <table style="width:100%; border-collapse:collapse; margin-top:6px; text-align:center;"><tr style="background:#f1f5f9;"><th style="text-align:right;">مال</th><th>نگ</th><th>ریٹ</th><th>رقم</th></tr>
+        ${(inv.items || []).map(it => `<tr><td style="text-align:right;">${E(it.name)}</td><td style="direction:ltr;">${n(it.qty)}</td><td style="direction:ltr;">${n(it.unitPrice)}</td><td style="direction:ltr;">${n((Number(it.qty) || 0) * (Number(it.unitPrice) || 0))}</td></tr>`).join('')}</table>
+        <div style="font-weight:900; margin-top:6px;">کل: Rs. ${n(inv.grand_total)}</div>
+        <div style="font-size:11px; color:#94a3b8; margin-top:4px; direction:ltr;">${E((err && err.message) || err)}</div>`;
+      cv.parentNode.insertBefore(d, cv);
+    }
   };
   setTimeout(doRender, 220);
   setTimeout(doRender, 500); // ---------- حفاظتی دوسری کوشش — کچھ Android WebViews پر پہلی کوشش کے وقت لے آؤٹ ابھی مکمل نہیں ہوتا (صرف ہیڈر نظر آتا، نیچے خالی رہ جاتا) ----------
