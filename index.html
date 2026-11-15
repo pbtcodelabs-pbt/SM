@@ -8900,6 +8900,9 @@ const OLD_STORAGE_PREFIX = 'aioPos_'; // ---------- 🍇 ہدایت (FM4SEPTF01)
 // تاکہ صارف کا پہلے سے محفوظ شدہ ڈیٹا (پراڈکٹس، کسٹمرز، بلز) ضائع نہ ہو ---------- -->
 (function migrateOldStoragePrefix(){
   try{
+    // SM1511SU271 (ہیلپ ڈیسک #248، Ali And Company): pbtcodelabs-pbt.github.io پر AIO POS بھی اسی براؤزر کے اسی خانے میں `aioPos_` سے چلتی ہے —
+    // یہاں سے کاپی کرنے پر نئی سبزی منڈی میں AIO کا سٹاک / ادائیگیاں آ جاتی تھیں۔ اس ویب سائٹ پر یہ پرانی منتقلی کبھی نہیں۔
+    if(/\.github\.io$/i.test(location.hostname)) return;
     const hasNew = smLsKeys().some(k => k.startsWith(STORAGE_PREFIX));
     if(hasNew) return; // نیا ڈیٹا پہلے سے موجود ہے، کچھ کرنے کی ضرورت نہیں
     const oldKeys = smLsKeys().filter(k => k.startsWith(OLD_STORAGE_PREFIX));
@@ -10483,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1511SU270'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'گاہک کے صفحے کے بٹن چھوٹے، Card کی سیٹنگ (سائز، موٹائی، رنگ) اب بل کے جدول میں لاگو'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1511SU271'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'ہر حذف اور بیک اپ واپسی سے پہلے ایڈمن پاسورڈ؛ AIO کا ڈیٹا اب سبزی منڈی میں نہیں آتا'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -57891,6 +57894,47 @@ window.openHelpDesk = openHelpDesk;
 })();
 </script>
 <script src="https://pbtcodelabs-pbt.github.io/help/widget.js" data-app="SM" defer></script>
+<script type="text/fm-boot">
+/* SM1511SU271 (ہیلپ ڈیسک #243 / #247، Ali And Company — AIO کے برابر):
+   #243 — ہر حذف سے پہلے ایڈمن PIN (`confirmAdminPinForDelete`): بل مٹانا / مستقل حذف، ایڈوانس آرڈر، پرچیز آرڈر، پیکنگ، بیچ، خرچ، ڈائری،
+          گاہک، گاہک / بیوپاری کے اکاؤنٹ، جواب کا سانچہ، یوزر، پیکنگ کی قسم (پراڈکٹ / وصولی / بیوپاری / سیف الماری پہلے سے PIN مانگتے ہیں)۔
+   #247 — بیک اپ واپسی (`proceedWithImport` — فائل، گوگل ڈرائیو، سیف الماری) سے پہلے اسی بیک اپ کے ایڈمن کا PIN؛ بیک اپ میں نہ ہو تو اس فون کا۔ */
+(function(){
+  const DEL = [['adminVoidBill', 'بل'], ['permanentlyDeleteBill', 'بل'], ['deleteAdvanceOrder', 'ایڈوانس آرڈر'], ['deletePendingPurchaseOrder', 'پرچیز آرڈر'],
+    ['deleteVariantBatch', 'بیچ'], ['deleteExpenseEntry', 'خرچ'], ['deleteDiaryEntry', 'ڈائری'], ['deleteDiaryHistoryLine', 'ڈائری کی لائن'],
+    ['deleteCustomerFromProfile', 'گاہک'], ['deleteCustomerPaymentAccount', 'اکاؤنٹ'], ['deleteSupplierBankAccount', 'اکاؤنٹ'], ['deleteReplyTemplate', 'جواب کا سانچہ'],
+    ['deleteUserAccount', 'یوزر'], ['deleteVariantType', 'پیکنگ کی قسم']];
+  DEL.forEach(([n, label]) => {
+    const orig = window[n]; if(typeof orig !== 'function' || orig._delGate) return;
+    const w = async function(...a){ if(!(await confirmAdminPinForDelete(label))) return; return orig.apply(this, a); };
+    w._delGate = true; window[n] = w;
+  });
+  const _dv = window.deleteVariant;
+  if(typeof _dv === 'function'){
+    window.deleteVariant = async function(productId, variantId){
+      const p = productsData.find(x => x.product_id === productId);
+      if(p && (p.variants || []).length > 1 && !(await confirmAdminPinForDelete('پیکنگ'))) return;
+      return _dv.apply(this, arguments);
+    };
+  }
+  const _imp = window.proceedWithImport;
+  if(typeof _imp === 'function'){
+    window.proceedWithImport = async function(){
+      const b = (typeof pendingImportBackup !== 'undefined') ? pendingImportBackup : null;
+      if(b){
+        const hs = list => (list || []).filter(u => u && u.role === 'admin' && u.is_active !== false && u.pin).map(u => u.pin);
+        let h = hs(b.users); if(!h.length) h = hs(usersData);
+        if(h.length){
+          const pin = prompt('🔐 یہ بیک اپ محفوظ ہے — جس دکان کا یہ بیک اپ ہے اس کا ایڈمن پاسورڈ (PIN) درج کریں:');
+          const ok = pin !== null && h.includes(await hashPin(String(pin).trim().replace(/[۰-۹]/g, c => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c))));
+          if(!ok){ if(pin !== null) alert('❌ غلط پاسورڈ — بیک اپ بحال نہیں ہوا۔'); try{ document.getElementById('importConfirmModal').classList.remove('show'); }catch(e){} pendingImportBackup = null; pendingImportFileName = ''; try{ rsProgEnd(false); }catch(e){} return; }
+        }
+      }
+      return _imp.apply(this, arguments);
+    };
+  }
+})();
+</script>
 <script>
 /* 🗄️ SM2810WE212: بڑی الماری کا ڈیٹا یادداشت میں آنے کے بعد ایپ کا کوڈ چلتا ہے (ترتیب وہی)؛ اگر صفحہ پہلے ہی پورا کھل چکا ہو تو
    DOMContentLoaded / load کے بعد جوڑے گئے کام فوراً چلتے ہیں — کوئی کام رہ نہ جائے */
