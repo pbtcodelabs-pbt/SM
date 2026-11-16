@@ -10948,7 +10948,9 @@ setTimeout(() => { try{ _psReport(false); }catch(e){} }, 30000);
 setInterval(() => { try{ _psReport(false); }catch(e){} }, 30 * 60000);
 function _lsMeterHtml(){
   let tot = 0; const rows = [];
-  try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); const n = (k || '').length + (localStorage.getItem(k) || '').length; tot += n; rows.push([k, n]); } }catch(e){ return ''; }
+  let other = 0; // 🔒 SM1611MO276: اسی ویب سائٹ کی دوسری ایپس (AIO وغیرہ) کی چیزوں کے نام یہاں کبھی نہیں — صرف ان کی کل جگہ
+  try{ for(let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i) || ''; const n = k.length + (localStorage.getItem(k) || '').length; tot += n; if(/^(fmPos_|fm_|fm[A-Z]|sm[A-Z_]|sm_)/.test(k)) rows.push([k, n]); else other += n; } }catch(e){ return ''; }
+  if(other) rows.push(['(دوسری ایپس)', other]);
   rows.sort((a, b) => b[1] - a[1]);
   tot = Math.max(tot, _lsUsed()); // پوری ویب سائٹ
   const pct = Math.min(100, tot / LS_LIMIT * 100), col = pct >= 80 ? '#dc2626' : pct >= 60 ? '#f59e0b' : '#16a34a';
@@ -56711,10 +56713,20 @@ window.addEventListener('DOMContentLoaded', () => {
   const dDays = m => m === 12 ? 365 : m * 30;
   const pLabel = p => p === 'P1' ? 'صرف مالک' : 'مالک + ' + SM_PLAN_STAFF[p] + ' ملازم';
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  async function smc(body){
-    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  async function smc(body, dev){
+    const h = { 'Content-Type': 'application/json' };
+    if(dev){ // 🔐 SM1611MO276: NB / SB صرف ڈویلپر کی فائربیس شناخت سے
+      if(!fbDevSignedIn()){
+        const pw = await uDialog({ title: '🔐 ڈویلپر پاس ورڈ', message: 'دکاندار کا کوڈ کھولنے کے لیے ڈویلپر پاس ورڈ لکھیں:', input: 'password', okText: '✅ ٹھیک ہے', cancelText: '✖', tone: 'green' });
+        if(!pw || !(await fbDevSignIn(String(pw)))) return { ok: false, reason: 'dev_only' };
+      }
+      h.Authorization = 'Bearer ' + _fbDevTok.t;
+    }
+    const r = await fetch(API, { method: 'POST', headers: h, body: JSON.stringify(body) });
     return r.json();
   }
+  // 🔐 SM1611MO276: ہر فون کی اپنی لمبی خفیہ چابی (چھوٹا device UID نہیں) — کوڈ کی حالت / جواب صرف اسی فون کو
+  const tok = () => { let t = ''; try{ t = localStorage.getItem('smReqTok') || ''; if(t.length < 32){ const a = new Uint8Array(16); crypto.getRandomValues(a); t = Array.from(a, x => x.toString(16).padStart(2, '0')).join(''); localStorage.setItem('smReqTok', t); } }catch(e){} return t; };
   window.smcApi = smc;
   const uid = () => { try{ return String(getOrCreateDeviceUID()); }catch(e){ return ''; } };
   function toast(t, bg){
@@ -56780,7 +56792,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if(b){ b.disabled = true; b.textContent = '⏳ بھیجا جا رہا ہے…'; }
     const data = { uid: uid(), shop: st.businessName || '', owner: st.ownerName || '', mobile: st.businessPhone || '', plan: P.plan, m: P.m, days: dDays(P.m), amt, rate: R[P.plan] || 0,
       cur: st.lastActivationCode || '', exp: st.subscriptionExpiry || '', curPlan: smPlan(), trial: !!st.isOnFreeTrial, ver: (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '' };
-    let j = null; try{ j = await smc({ op: 'put', kind: P.kind, uid: uid(), data }); }catch(e){}
+    let j = null; try{ j = await smc({ op: 'put', kind: P.kind, uid: tok(), data }); }catch(e){}
     if(!j || !j.ok){ if(b){ b.disabled = false; b.textContent = '📨 ڈویلپر کو بھیجیں'; } alert('⚠️ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں' + (j && j.reason === 'wait' ? ' (کچھ دیر بعد)' : '')); return; }
     const req = { code: j.code, kind: P.kind, plan: P.plan, m: P.m, amt, at: Date.now() };
     st.smPendReq = req; try{ saveToStorage('settings', st); }catch(e){}
@@ -56829,7 +56841,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const r = AppState.settings.smPendReq, m = document.getElementById('smPayMsg'), tid = (document.getElementById('smPayTid').value || '').trim();
     if(!tid && !_shot){ m.style.color = '#b91c1c'; m.textContent = 'Transaction ID لکھیں یا اسکرین شاٹ لگائیں'; return; }
     m.style.color = '#334155'; m.textContent = '⏳ …';
-    let j = null; try{ j = await smc({ op: 'proof', code: r.code, uid: uid(), tid, shot: _shot }); }catch(e){}
+    let j = null; try{ j = await smc({ op: 'proof', code: r.code, uid: tok(), tid, shot: _shot }); }catch(e){}
     if(j && j.ok){ m.style.color = '#15803d'; m.textContent = '✅ ثبوت ڈویلپر کو پہنچ گیا'; _shot = ''; } else { m.style.color = '#b91c1c'; m.textContent = '⚠️ نہیں گیا — انٹرنیٹ چیک کریں'; }
   };
   // ⏳ «ادائیگی باقی» کی چھوٹی پٹی + ہر منٹ حالت (جاری ہوتے ہی خود چالو)
@@ -56847,7 +56859,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const st = AppState.settings, r = st && st.smPendReq; pendPill();
     if(!r || _pollBusy || navigator.onLine === false) return; _pollBusy = true;
     try{
-      const j = await smc({ op: 'me', code: r.code, uid: uid() });
+      const j = await smc({ op: 'me', code: r.code, uid: tok() });
       if(j && (j.st === 'done' || j.st === 'no' || j.reason === 'expired' || j.reason === 'none')){
         delete st.smPendReq; saveToStorage('settings', st); pendPill();
         if(j.st === 'done'){
@@ -56919,7 +56931,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if(pin.length < 4){ alert('کم از کم 4 ہندسوں کا PIN بنائیں'); return; }
     if(/^(\d)\1+$/.test(pin) || pin === '1234'){ alert('یہ PIN بہت آسان ہے — کوئی اور PIN بنائیں'); return; }
     const b = document.getElementById('smJsGo'); b.disabled = true; b.textContent = '⏳ …';
-    let j = null; try{ j = await smc({ op: 'put', kind: 'JS', uid: uid(), data: { name, mobile: mob, pinH: await hashPin(pin) } }); }catch(e){}
+    let j = null; try{ j = await smc({ op: 'put', kind: 'JS', uid: tok(), data: { name, mobile: mob, pinH: await hashPin(pin) } }); }catch(e){}
     if(!j || !j.ok){ b.disabled = false; b.textContent = '🔢 کوڈ بنائیں'; alert('⚠️ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں'); return; }
     const p = { code: j.code, name, mobile: mob, at: Date.now() };
     try{ localStorage.setItem('smJsPend', JSON.stringify(p)); sessionStorage.setItem('smJoinPin', pin); localStorage.setItem('smJoinName', name); }catch(e){}
@@ -56948,12 +56960,12 @@ window.addEventListener('DOMContentLoaded', () => {
     if(AppState.settings.smJoinedAsStaff && AppState.settings.smRegistered){ localStorage.removeItem('smJsPend'); return; }
     _jsBusy = true;
     try{
-      const j = await smc({ op: 'me', code: p.code, uid: uid() });
+      const j = await smc({ op: 'me', code: p.code, uid: tok() });
       const s = document.getElementById('smJsStat');
       if(j && j.st === 'ok' && j.res){
         const r = JSON.parse(j.res);
         if(s){ s.style.background = '#dcfce7'; s.style.color = '#166534'; s.innerHTML = '✅ مالک نے منظور کر دیا — ' + esc(r.shop || '') + '<br>دکان سے جڑ رہا ہے…'; }
-        try{ await smc({ op: 'set', code: p.code, st: 'joined', uid: uid() }); }catch(e){}
+        try{ await smc({ op: 'set', code: p.code, st: 'joined', uid: tok() }); }catch(e){}
         try{ localStorage.removeItem('smJsPend'); localStorage.setItem('smJoinUser', r.uname || p.name); }catch(e){}
         _jsBusy = false;
         await smJoinAsStaff('موبائل: ' + r.m + '\nکوڈ: ' + r.c);
@@ -57014,6 +57026,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const code = (document.getElementById('smJsOwnerIn').value || '').replace(/\D/g, '').slice(-6);
     if(code.length !== 6){ alert('ملازم کا 6 ہندسوں کا کوڈ لکھیں'); return; }
     let j = null; try{ j = await smc({ op: 'get', code }); }catch(e){}
+    if(j && j.reason === 'dev_only'){ alert('یہ ملازم کا کوڈ نہیں — یہ پیکج والا کوڈ ہے (ڈویلپر کے لیے)'); return; }
     if(!j || !j.ok){ alert(j && j.reason === 'wait' ? '⚠️ بہت زیادہ غلط کوشیشیں — 15 منٹ بعد' : j && j.reason === 'expired' ? '⌛ یہ کوڈ پرانا ہو گیا — ملازم سے نیا کوڈ بنوائیں' : '❌ یہ کوڈ نہیں ملا — دوبارہ دیکھیں (یا انٹرنیٹ چیک کریں)'); return; }
     if(j.kind !== 'JS'){ alert('یہ ملازم کا کوڈ نہیں ہے'); return; }
     if(j.st !== 'new'){ alert('یہ کوڈ پہلے ہی استعمال ہو چکا ہے'); return; }
@@ -57088,8 +57101,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const code = (document.getElementById('smcDevIn').value || '').replace(/\D/g, '').slice(-6), card = document.getElementById('smcDevCard');
     if(code.length !== 6){ alert('6 ہندسوں کا کوڈ لکھیں'); return; }
     card.innerHTML = '<div style="padding:8px;text-align:center">⏳ …</div>';
-    let j = null; try{ j = await smc({ op: 'get', code }); }catch(e){}
-    if(!j || !j.ok){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">❌ ' + (j && j.reason === 'expired' ? 'کوڈ پرانا ہو گیا' : j && j.reason === 'wait' ? 'بہت زیادہ کوشیشیں — 15 منٹ بعد' : 'کوڈ نہیں ملا') + '</div>'; return; }
+    let j = null; try{ j = await smc({ op: 'get', code }, true); }catch(e){}
+    if(!j || !j.ok){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">❌ ' + (j && j.reason === 'expired' ? 'کوڈ پرانا ہو گیا' : j && j.reason === 'wait' ? 'بہت زیادہ کوشیشیں — 15 منٹ بعد' : j && j.reason === 'dev_only' ? 'ڈویلپر پاس ورڈ ضروری ہے' : 'کوڈ نہیں ملا') + '</div>'; return; }
     if(j.kind === 'JS'){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">یہ ملازم کا کوڈ ہے — مالک کے فون پر لکھا جاتا ہے</div>'; return; }
     const d = JSON.parse(j.data || '{}'); DEV = { code, kind: j.kind, d, st: j.st };
     const row = (k, v) => v ? '<div><span style="color:#64748b">' + k + ':</span> <b>' + v + '</b></div>' : '';
@@ -57105,8 +57118,8 @@ window.addEventListener('DOMContentLoaded', () => {
       + (j.st === 'new' ? '<div style="display:flex;gap:6px;margin-top:6px"><button type="button" onclick="smcDevIssue()" style="flex:2;padding:9px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:900;cursor:pointer">✅ پیسے وصول — ' + (j.kind === 'SB' ? 'مدت بڑھائیں' : 'کوڈ جاری کریں') + '</button><button type="button" onclick="smcDevNo()" style="flex:1;padding:9px;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-weight:900;cursor:pointer">❌ رد</button></div>' : '')
       + '</div>';
   };
-  window.smcDevNo = async function(){ if(!DEV || !confirm('یہ درخواست رد کریں؟')) return; try{ await smc({ op: 'set', code: DEV.code, st: 'no' }); }catch(e){} document.getElementById('smcDevCard').innerHTML = '<div style="padding:8px;font-weight:800">❌ رد کر دی</div>'; DEV = null; };
-  async function devDone(res){ try{ await smc({ op: 'set', code: DEV.code, st: 'done', res }); }catch(e){} const c = document.getElementById('smcDevCard'); if(c) c.innerHTML = '<div style="padding:8px;font-weight:900;color:#15803d">✅ ' + DEV.kind + '-' + DEV.code + ' مکمل — دکاندار کی ایپ ایک منٹ میں خود چالو</div>'; DEV = null; }
+  window.smcDevNo = async function(){ if(!DEV || !confirm('یہ درخواست رد کریں؟')) return; try{ await smc({ op: 'set', code: DEV.code, st: 'no' }, true); }catch(e){} document.getElementById('smcDevCard').innerHTML = '<div style="padding:8px;font-weight:800">❌ رد کر دی</div>'; DEV = null; };
+  async function devDone(res){ try{ await smc({ op: 'set', code: DEV.code, st: 'done', res }, true); }catch(e){} const c = document.getElementById('smcDevCard'); if(c) c.innerHTML = '<div style="padding:8px;font-weight:900;color:#15803d">✅ ' + DEV.kind + '-' + DEV.code + ' مکمل — دکاندار کی ایپ ایک منٹ میں خود چالو</div>'; DEV = null; }
   window.smcDevIssue = async function(){
     if(!DEV) return; const d = DEV.d, uidV = String(d.uid || '');
     window._smcPre = { days: Number(d.days) || 30, deal: Number(d.amt) || 0, rate: Number(d.rate) || 0, plan: d.plan };
