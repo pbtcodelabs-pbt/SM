@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO282'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🔑 ڈویلپر کے جاری کرتے ہی دکاندار کی ایپ کوڈ خود لگا لیتی ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO283'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🔑 کوڈ اب «سبسکرپشن کی معلومات» کے کوڈ والے خانے میں — ایک ٹچ سے پیسٹ اور چالو'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -57275,6 +57275,48 @@ window.addEventListener('DOMContentLoaded', () => {
       b.textContent = '🚪 یہ فون اس دکان سے الگ کریں';
       b.setAttribute('style', 'margin-top:8px !important; width:100% !important; padding:6px 10px !important; background:#fef2f2 !important; color:#b91c1c !important; border:1.5px solid #fca5a5 !important; border-radius:12px !important; font-weight:800; font-size:14px !important; font-family:inherit; line-height:1.9; box-shadow:none !important;'); tg.after(b); }
   }catch(e){} }, 1500);
+
+  // 🔑 SM1611MO283 (مالک کا حکم): کوڈ لگانا «آپ کی سبسکرپشن کی معلومات» کے «🔑 کوڈ» والے خانے میں ہی — کوڈ / پورا پیغام کاپی، یہاں ایک ٹچ = خود پیسٹ + لگ جائے؛
+  //   نیچے والا الگ «Have an activation code? Tap here» ختم
+  try{ const cs = document.createElement('style'); cs.textContent = '#loginMoreOptions .loginHint:has(a[onclick="toggleLoginActivationBox()"]), #loginActivationBox{display:none !important}'; document.head.appendChild(cs); }catch(e){}
+  async function codeGo(raw){
+    const msg = document.getElementById('smLicMsg'), m = String(raw || '').toUpperCase().match(/[A-Z2-9]{5}-[A-Z2-9]{5}/);
+    if(!m){ if(msg){ msg.style.color = '#b91c1c'; msg.textContent = 'اس میں کوئی کوڈ نہیں ملا — ڈویلپر والا پیغام کاپی کر کے دوبارہ ٹچ کریں'; } return; }
+    const inp = document.getElementById('smLicIn'); if(inp) inp.value = m[0];
+    if(msg){ msg.style.color = '#334155'; msg.textContent = '⏳ کوڈ لگ رہا ہے…'; }
+    let r = null; try{ r = await activateSubscription(m[0]); }catch(e){ r = { success: false, message: 'انٹرنیٹ چیک کریں' }; }
+    if(r && r.success){
+      if(msg){ msg.style.color = '#15803d'; msg.textContent = smActMsg(r); }
+      toast(smActMsg(r));
+      try{ setupLoginScreen(); }catch(e){} try{ renderSubscriptionBanner(); }catch(e){} try{ smApplyBranding(); }catch(e){}
+      setTimeout(() => { try{ renderLoginLicenseInfo(); }catch(e){} }, 2500);
+      try{ const g = document.getElementById('subscriptionGateScreen'); if(g && getComputedStyle(g).display !== 'none') setTimeout(() => location.reload(), 1500); }catch(e){}
+    } else if(msg){ msg.style.color = '#b91c1c'; msg.textContent = '❌ کوڈ نہیں لگا — ' + ((r && r.message) || ''); }
+  }
+  window.smLicPasteGo = async function(){
+    let t = ''; try{ t = await navigator.clipboard.readText(); }catch(e){}
+    if(t && /[A-Z2-9]{5}-[A-Z2-9]{5}/i.test(t)) return codeGo(t);
+    const inp = document.getElementById('smLicIn'); if(inp){ inp.focus(); }
+    const msg = document.getElementById('smLicMsg'); if(msg){ msg.style.color = '#92400e'; msg.textContent = 'خانے میں دبا کر رکھیں ← Paste (کوڈ یا پورا پیغام)'; }
+  };
+  const _rlli = window.renderLoginLicenseInfo;
+  window.renderLoginLicenseInfo = renderLoginLicenseInfo = function(){
+    const r = _rlli.apply(this, arguments);
+    try{
+      const box = document.getElementById('loginLicenseInfoBox'); if(!box || AppState.settings.smJoinedAsStaff) return r;
+      const rows = [...box.querySelectorAll('span')].filter(x => /🔑 کوڈ/.test(x.textContent));
+      const codeRow = rows[0] && rows[0].closest('div[style*="border:1.5px"]'); if(!codeRow || codeRow.querySelector('#smLicIn')) return r;
+      const d = document.createElement('div'); d.style.cssText = 'margin-top:7px';
+      d.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px"><input id="smLicIn" dir="ltr" autocomplete="off" placeholder="نیا کوڈ یا ڈویلپر کا پورا پیغام" style="width:100%;box-sizing:border-box;padding:8px;border:2px solid #16a34a;border-radius:10px;font-size:16px;text-align:center;font-family:Arial,sans-serif">'
+        + '<button type="button" onclick="smLicPasteGo()" style="width:100% !important;margin:0 !important;padding:7px 12px !important;border:none;border-radius:10px !important;background:#16a34a !important;color:#fff !important;font-weight:800;font-size:15px;' + K + 'line-height:1.8">📋 پیسٹ کر کے لگائیں</button></div>'
+        + '<div id="smLicMsg" style="font-size:13px;font-weight:800;margin-top:4px;line-height:1.8"></div>';
+      codeRow.appendChild(d);
+      const inp = d.querySelector('#smLicIn');
+      inp.addEventListener('paste', e => { const t = (e.clipboardData || window.clipboardData).getData('text'); if(t){ e.preventDefault(); codeGo(t); } });
+      inp.addEventListener('input', () => { if(/[A-Z2-9]{5}-[A-Z2-9]{5}/i.test(inp.value)) codeGo(inp.value); });
+    }catch(e){}
+    return r;
+  };
 
   window.dismissGDriveFirstRunPrompt = dismissGDriveFirstRunPrompt = function(){
     document.getElementById('gdriveFirstRunModal')?.classList.remove('show');
