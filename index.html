@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO280'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🔐 ریٹ اور دکاندار کا کوڈ اب ڈویلپر پینل والے پاس ورڈ سے — حروف والا کی بورڈ، پینل کھلا ہو تو دوبارہ نہیں پوچھتا'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO281'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🚪 دکان سے الگ کرنے پر پرانا ڈیٹا اب مکمل صاف (واپس نہیں آتا)؛ ڈویلپر لاگ اِن نہ ہو تو صاف تنبیہ'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -57138,6 +57138,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const code = (document.getElementById('smcDevIn').value || '').replace(/\D/g, '').slice(-6), card = document.getElementById('smcDevCard');
     if(code.length !== 6){ alert('6 ہندسوں کا کوڈ لکھیں'); return; }
     card.innerHTML = '<div style="padding:8px;text-align:center">⏳ …</div>';
+    if(!fbDevSignedIn() && _devPw){ try{ await fbDevSignIn(_devPw); }catch(e){} }
     let j = null; try{ j = await smc({ op: 'get', code }, true); }catch(e){}
     if(!j || !j.ok){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">❌ ' + (j && j.reason === 'expired' ? 'کوڈ پرانا ہو گیا' : j && j.reason === 'wait' ? 'بہت زیادہ کوشیشیں — 15 منٹ بعد' : j && j.reason === 'dev_only' ? 'ڈویلپر پاس ورڈ ضروری ہے' : 'کوڈ نہیں ملا') + '</div>'; return; }
     if(j.kind === 'JS'){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">یہ ملازم کا کوڈ ہے — مالک کے فون پر لکھا جاتا ہے</div>'; return; }
@@ -57152,6 +57153,7 @@ window.addEventListener('DOMContentLoaded', () => {
       + row('🆔 UID', '<span dir="ltr" style="font-size:11px">' + esc(d.uid || '') + '</span>')
       + (d.tid ? row('🧾 TID', '<span dir="ltr">' + esc(d.tid) + '</span>') : '')
       + (d.shot ? '<img src="' + d.shot + '" style="max-width:100%;border-radius:8px;margin-top:4px">' : (d.tid ? '' : '<div style="color:#b45309">ثبوت ابھی نہیں آیا — رقم خود چیک کریں</div>'))
+      + (fbDevSignedIn() ? '' : '<div style="background:#fee2e2;border:2px solid #dc2626;border-radius:10px;padding:6px;margin-top:6px;color:#991b1b;font-weight:800">⚠️ کلاؤڈ میں ڈویلپر لاگ اِن نہیں ہو سکا — کوڈ جاری نہیں ہوگا۔ ڈویلپر پینل والا پاس ورڈ اور فائربیس (piarybhai) والا پاس ورڈ ایک جیسے ہونے چاہییں۔</div>')
       + (j.st === 'new' ? '<div style="display:flex;gap:6px;margin-top:6px"><button type="button" onclick="smcDevIssue()" style="flex:2;padding:9px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:900;cursor:pointer">✅ پیسے وصول — ' + (j.kind === 'SB' ? 'مدت بڑھائیں' : 'کوڈ جاری کریں') + '</button><button type="button" onclick="smcDevNo()" style="flex:1;padding:9px;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-weight:900;cursor:pointer">❌ رد</button></div>' : '')
       + '</div>';
   };
@@ -57232,14 +57234,27 @@ window.addEventListener('DOMContentLoaded', () => {
   // 🚪 SM1611MO279 (مالک کا حکم): ملازم کا فون خود دکان سے الگ — لاگ اِن ← «مزید آپشنز» ← «🚪 یہ فون اس دکان سے الگ کریں»؛
   //   دکان کا اصل ریکارڈ کلاؤڈ میں ویسا (صرف اس فون کی نقل ہٹتی ہے)؛ صرف سبزی منڈی کی اپنی چیزیں (fmPos_) — AIO وغیرہ کبھی نہیں
   window.smStaffLeave = async function(){
-    const st = AppState.settings; if(!st.smJoinedAsStaff){ alert('یہ فون کسی دکان سے ملازم کے طور پر جڑا ہوا نہیں۔'); return; }
+    const st = AppState.settings, own = !st.smJoinedAsStaff;
+    if(!st.smRegistered || (own && !isDevDevice())){ alert('یہ فون کسی دکان سے ملازم کے طور پر جڑا ہوا نہیں۔'); return; }
     const shop = st.businessName || 'دکان';
     const pend = Object.keys(st).filter(k => /PendingSync$/.test(k) && st[k]);
     const ok1 = await uDialog({ title: '🚪 دکان سے الگ کریں', message: 'یہ فون «' + esc(shop) + '» سے الگ ہو جائے گا۔<br>• دکان کا اصل ریکارڈ کلاؤڈ میں محفوظ رہے گا (مالک کے پاس)<br>• اس فون سے اس دکان کی نقل ہٹ جائے گی<br>• پھر یہ فون نئی دکان یا دوسری دکان کے لیے خالی' + (pend.length ? '<br><br>⚠️ <b>اس فون کا کچھ کام ابھی کلاؤڈ پر نہیں گیا</b> — پہلے انٹرنیٹ چالو کر کے ایپ ایک دو منٹ کھلی رکھیں۔' : ''), okText: 'آگے', cancelText: '✖ نہیں', tone: 'red' });
     if(!ok1) return;
     const ok2 = await uDialog({ title: '⚠️ پکا؟', message: '«' + esc(shop) + '» سے یہ فون الگ کرنا ہے؟', okText: '✅ ہاں، الگ کریں', cancelText: '✖ نہیں', tone: 'red' });
     if(!ok2) return;
+    // 🔒 SM1611MO281: الگ ہوتے ہی یادداشت والا پرانا ڈیٹا دوبارہ نہ لکھا جائے (بند ہوتے وقت persistAllData پرانی دکان واپس لکھ دیتا تھا)
+    window.__smLeaving = true;
+    try{ const _si = Storage.prototype.setItem; Storage.prototype.setItem = function(k, v){ if(window.__smLeaving && typeof k === 'string' && k.indexOf(STORAGE_PREFIX) === 0 && k !== STORAGE_PREFIX + 'settings') return; return _si.apply(this, arguments); }; }catch(e){}
+    try{ ['customersData', 'suppliersData', 'invoicesData', 'productsData', 'usersData', 'paymentsData'].forEach(n => { try{ const a = window[n] || eval(n); if(Array.isArray(a)) a.length = 0; }catch(e){} }); }catch(e){}
+    if(own){ try{ const L = st.smPrevShops || []; L.push({ mobile: st.businessPhone, code: st.smShopCode, shop, at: new Date().toISOString() }); st.smPrevShops = L.slice(-10); }catch(e){} } // واپسی کے لیے: «پرانی دکان واپس لائیں»
     try{ (typeof smLsKeys === 'function' ? smLsKeys() : Object.keys(localStorage)).filter(k => k.indexOf(STORAGE_PREFIX) === 0 && k !== STORAGE_PREFIX + 'settings').forEach(k => { try{ localStorage.removeItem(k); }catch(e){} }); }catch(e){}
+    // 🗄️ SM1611MO281: بڑی الماری (IndexedDB) سے بھی — ورنہ «چھوٹا خانہ مٹا تو الماری سے واپس» (FM1211TH523) پرانی دکان کا ڈیٹا نئی دکان میں لے آتا تھا
+    try{ if(window.__bigStore && __bigStore.flush) await __bigStore.flush(); }catch(e){}
+    try{ await new Promise(res => { const rq = indexedDB.open('smBigStore_v1', 1); rq.onupgradeneeded = () => { try{ rq.result.createObjectStore('kv'); }catch(e){} };
+      rq.onsuccess = () => { try{ const db = rq.result, t = db.transaction('kv', 'readwrite'), os = t.objectStore('kv'), c = os.openCursor();
+        c.onsuccess = e => { const cur = e.target.result; if(cur){ const k = String(cur.key); if(k.indexOf(STORAGE_PREFIX) === 0 && k !== STORAGE_PREFIX + 'settings') cur.delete(); cur.continue(); } };
+        t.oncomplete = () => { db.close(); res(); }; t.onerror = () => { db.close(); res(); }; }catch(e){ res(); } };
+      rq.onerror = () => res(); rq.onblocked = () => res(); setTimeout(res, 4000); }); }catch(e){}
     ['fm_phoneOwner', 'fm_bioCred', 'smJsPend', 'smJoinUser'].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
     ['businessPhone', 'smShopCode', 'businessName', 'ownerName', 'ownerPhoto', 'businessLogo', 'lastActivationCode', 'subscriptionExpiry', 'subscriptionActivatedOn', 'smPendReq', 'smRegisteredAt'].forEach(k => { delete st[k]; });
     Object.keys(st).forEach(k => { if(/PendingSync$/.test(k)) st[k] = false; });
@@ -57251,7 +57266,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(() => { try{
     const tg = document.getElementById('loginMoreToggleBtn'); if(!tg) return;
     let b = document.getElementById('smLeaveBtn');
-    if(!AppState.settings.smJoinedAsStaff){ if(b) b.remove(); return; }
+    if(!AppState.settings.smJoinedAsStaff && !(AppState.settings.smRegistered && isDevDevice())){ if(b) b.remove(); return; }
     if(!b){ b = document.createElement('button'); b.id = 'smLeaveBtn'; b.type = 'button'; b.onclick = () => smStaffLeave();
       b.textContent = '🚪 یہ فون اس دکان سے الگ کریں';
       b.setAttribute('style', 'margin-top:8px !important; width:100% !important; padding:6px 10px !important; background:#fef2f2 !important; color:#b91c1c !important; border:1.5px solid #fca5a5 !important; border-radius:12px !important; font-weight:800; font-size:14px !important; font-family:inherit; line-height:1.9; box-shadow:none !important;'); tg.after(b); }
