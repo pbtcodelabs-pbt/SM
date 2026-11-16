@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO284'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🔑 کوڈ والے خانے کی لکھائی سادہ: «ڈویلپر سے آیا ہوا کوڈ یہاں پیسٹ کریں»'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO285'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '📦 سبسکرپشن خانے میں «پیکج بڑھائیں / تجدید» بٹن؛ دکان سے الگ کرنے کا بٹن مزید آپشنز کے نیچے چھپا + «الگ» لکھ کر تصدیق'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56805,7 +56805,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const html = head(P.kind === 'SB' ? '🔄 سبسکرپشن کی تجدید' : '📦 پیکج لیں')
       + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">'
       + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:6px 10px;font-size:15px;line-height:1.9">🏪 <b>' + esc(st.businessName) + '</b><br>👤 ' + esc(st.ownerName) + ' — <span dir="ltr" style="font-family:Arial">' + esc(st.businessPhone) + '</span>'
-      + (P.kind === 'SB' && st.subscriptionExpiry ? '<br>📅 موجودہ مدت: <b dir="ltr" style="font-family:Arial">' + formatDateDMY(st.subscriptionExpiry) + '</b> تک' : '') + '</div>'
+      + (P.kind === 'SB' && st.subscriptionExpiry ? '<br>📅 موجودہ مدت: <b dir="ltr" style="font-family:Arial">' + formatDateDMY(st.subscriptionExpiry) + '</b> تک<br><span style="color:#166534;font-weight:800">✅ باقی دن ضائع نہیں — نئی مدت انہی کے بعد جڑے گی؛ پیکج بڑا چنیں تو فون بھی بڑھ جائیں گے</span>' : '') + '</div>'
       + '<div style="font-weight:800;font-size:16px">👥 کتنے لوگ استعمال کریں گے؟</div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:6px">' + PLANS.map(p => chip(P.plan === p, pLabel(p) + '<br><small dir="ltr" style="font-family:Arial;font-size:12px">' + p.replace('P', '') + ' • Rs ' + fmt(R[p]) + '/مہینہ</small>', "smPkgSet('plan','" + p + "')")).join('') + '</div>'
       + '<div style="font-weight:800;font-size:16px">⏱️ کتنی مدت؟</div>'
@@ -57246,6 +57246,9 @@ window.addEventListener('DOMContentLoaded', () => {
     if(!ok1) return;
     const ok2 = await uDialog({ title: '⚠️ پکا؟', message: '«' + esc(shop) + '» سے یہ فون الگ کرنا ہے؟', okText: '✅ ہاں، الگ کریں', cancelText: '✖ نہیں', tone: 'red' });
     if(!ok2) return;
+    // 🛡️ SM1611MO285: تیسری حفاظت — لفظ لکھ کر ہی (غلطی سے دو بار دبانے پر نہیں)
+    const w = prompt('آخری تصدیق: الگ کرنے کے لیے نیچے لفظ «الگ» لکھیں');
+    if(String(w || '').replace(/\s/g, '') !== 'الگ'){ alert('✖ الگ نہیں کیا — فون اسی دکان میں ہے۔'); return; }
     // 🔒 SM1611MO281: الگ ہوتے ہی یادداشت والا پرانا ڈیٹا دوبارہ نہ لکھا جائے (بند ہوتے وقت persistAllData پرانی دکان واپس لکھ دیتا تھا)
     window.__smLeaving = true;
     try{ const _si = Storage.prototype.setItem; Storage.prototype.setItem = function(k, v){ if(window.__smLeaving && typeof k === 'string' && k.indexOf(STORAGE_PREFIX) === 0 && k !== STORAGE_PREFIX + 'settings') return; return _si.apply(this, arguments); }; }catch(e){}
@@ -57268,12 +57271,14 @@ window.addEventListener('DOMContentLoaded', () => {
     location.reload();
   };
   setInterval(() => { try{
-    const tg = document.getElementById('loginMoreToggleBtn'); if(!tg) return;
+    // 🛡️ SM1611MO285 (مالک کا حکم): غلطی سے ہاتھ نہ لگے — «مزید آپشنز» کھولنے پر ہی، سب سے نیچے، چھوٹا
+    const tg = document.getElementById('loginMoreOptions'); if(!tg) return;
     let b = document.getElementById('smLeaveBtn');
     if(!AppState.settings.smJoinedAsStaff && !(AppState.settings.smRegistered && isDevDevice())){ if(b) b.remove(); return; }
     if(!b){ b = document.createElement('button'); b.id = 'smLeaveBtn'; b.type = 'button'; b.onclick = () => smStaffLeave();
       b.textContent = '🚪 یہ فون اس دکان سے الگ کریں';
-      b.setAttribute('style', 'margin-top:8px !important; width:100% !important; padding:6px 10px !important; background:#fef2f2 !important; color:#b91c1c !important; border:1.5px solid #fca5a5 !important; border-radius:12px !important; font-weight:800; font-size:14px !important; font-family:inherit; line-height:1.9; box-shadow:none !important;'); tg.after(b); }
+      b.setAttribute('style', 'margin-top:34px !important; width:auto !important; display:block; margin-inline:auto !important; padding:3px 12px !important; background:transparent !important; color:#b91c1c !important; border:1px dashed #fca5a5 !important; border-radius:10px !important; font-weight:700; font-size:12.5px !important; font-family:inherit; line-height:1.9; box-shadow:none !important; opacity:.85;'); }
+    if(tg.lastElementChild !== b) tg.appendChild(b);
   }catch(e){} }, 1500);
 
   // 🔑 SM1611MO283 (مالک کا حکم): کوڈ لگانا «آپ کی سبسکرپشن کی معلومات» کے «🔑 کوڈ» والے خانے میں ہی — کوڈ / پورا پیغام کاپی، یہاں ایک ٹچ = خود پیسٹ + لگ جائے؛
@@ -57304,6 +57309,16 @@ window.addEventListener('DOMContentLoaded', () => {
     const r = _rlli.apply(this, arguments);
     try{
       const box = document.getElementById('loginLicenseInfoBox'); if(!box || AppState.settings.smJoinedAsStaff) return r;
+      // 📦 SM1611MO285 (مالک کا حکم): چلتے پیکج پر نیا / بڑا پیکج — ایک بٹن، اسی خانے میں سب سے اوپر
+      if(AppState.settings.smRegistered && !document.getElementById('smPkgMore')){
+        const pb = document.createElement('button'); pb.id = 'smPkgMore'; pb.type = 'button'; pb.onclick = () => smPkgOpen(false);
+        pb.textContent = '📦 پیکج بڑھائیں / تجدید کریں';
+        pb.setAttribute('style', 'width:100% !important;margin:4px 0 8px !important;padding:8px 12px !important;border:none;border-radius:12px !important;background:linear-gradient(135deg,#f59e0b,#d97706) !important;color:#fff !important;font-weight:800;font-size:17px;' + K + 'line-height:1.8;box-shadow:0 3px 8px rgba(217,119,6,.35)');
+        box.prepend(pb);
+      }
+      // ہمیشہ نظر — «سبسکرپشن چیک / تازہ کریں» کے فوراً نیچے («مزید آپشنز» کھولے بغیر)
+      const pb = box.querySelector('#smPkgMore') || document.getElementById('smPkgMore'), sc = document.getElementById('smSubCheckBtn');
+      if(pb && sc && sc.parentElement && pb.previousElementSibling !== sc.parentElement) sc.parentElement.after(pb);
       const rows = [...box.querySelectorAll('span')].filter(x => /🔑 کوڈ/.test(x.textContent));
       const codeRow = rows[0] && rows[0].closest('div[style*="border:1.5px"]'); if(!codeRow || codeRow.querySelector('#smLicIn')) return r;
       const d = document.createElement('div'); d.style.cssText = 'margin-top:7px';
