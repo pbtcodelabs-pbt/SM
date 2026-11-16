@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO287'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '📋 ڈویلپر پینل: NB / SB والا پورا پیغام پیلے ڈبے میں پیسٹ ہو تو خود سبز ڈبے کا کارڈ کھلتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO288'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🔑 ڈویلپر پینل: «لاگ اِن نہیں» والے سرخ ڈبے میں «ابھی لاگ اِن کریں» بٹن'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56729,8 +56729,8 @@ window.addEventListener('DOMContentLoaded', () => {
     return r.json();
   }
   // 🔐 SM1611MO280: ڈویلپر پینل والا پاس ورڈ — اپنا خانہ (حروف + ہندسوں والا کی بورڈ، پہلے صرف ہندسے کھلتے تھے)
-  let _devPw = '';
-  function pwBox(msg){
+  let _devPw = '', _fbPw = ''; // _fbPw: SM1611MO288 — فائربیس والا پاس ورڈ الگ ہو تو (صرف یادداشت میں)
+  function pwBox(msg, raw){
     return new Promise(res => {
       const o = ov('smDevPwOv', head('🔐 ڈویلپر پینل کا پاس ورڈ', 'linear-gradient(135deg,#7c3aed,#4c1d95)') + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px"><div style="font-size:15px;line-height:1.9">' + msg + '</div>'
         + '<input id="smDevPwIn" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" dir="ltr" style="padding:10px;border:2px solid #a78bfa;border-radius:12px;font-size:20px;text-align:center;font-family:Arial">'
@@ -56740,7 +56740,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const inp = o.querySelector('#smDevPwIn'), done = v => { o.remove(); res(v); };
       setTimeout(() => inp.focus(), 80);
       o.querySelector('#smDevPwNo').onclick = () => done(null);
-      const go = async () => { const v = inp.value; if(await devPasswordOk(v)) done(v.trim()); else { o.querySelector('#smDevPwErr').textContent = '❌ پاس ورڈ غلط ہے'; inp.select(); } };
+      const go = async () => { const v = inp.value; if(raw ? v.trim() : await devPasswordOk(v)) done(v.trim()); else { o.querySelector('#smDevPwErr').textContent = '❌ پاس ورڈ غلط ہے'; inp.select(); } };
       o.querySelector('#smDevPwOk').onclick = go; inp.addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
     });
   }
@@ -56748,7 +56748,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // 🔐 SM1611MO280: کلاؤڈ میں لائسنس / ریٹ لکھنا صرف ڈویلپر کی فائربیس شناخت سے (50 منٹ) — وقت ختم ہو تو اسی پینل والے پاس ورڈ سے خاموشی سے نئی
   const _dff = window.devFirestoreFetch;
   window.devFirestoreFetch = devFirestoreFetch = async function(path, options){
-    try{ if(!fbDevSignedIn()){ if(!_devPw) await devPw(); if(_devPw) await fbDevSignIn(_devPw); } }catch(e){}
+    try{ if(!fbDevSignedIn()){ if(!_devPw && !_fbPw) await devPw(); if(_fbPw) await fbDevSignIn(_fbPw); else if(_devPw) await fbDevSignIn(_devPw); } }catch(e){}
     return _dff.apply(this, arguments);
   };
   const _udp = window.unlockDevSecretPanel;
@@ -57154,11 +57154,21 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     return _gpr.apply(this, arguments);
   };
+  // 🔑 SM1611MO288 (مالک کی جانچ): سرخ «لاگ اِن نہیں» ڈبے میں بٹن — پاس ورڈ لکھیں، فائربیس ڈویلپر لاگ اِن، کارڈ دوبارہ
+  window.smcDevLogin = async function(){
+    for(let i = 0; i < 2; i++){
+      const v = await pwBox(i ? '❌ ڈویلپر پینل والے پاس ورڈ سے کلاؤڈ نہیں کھلا — اب ڈویلپر کے فائربیس اکاؤنٹ (piarybhai) کا پاس ورڈ لکھیں:' : '🔑 کلاؤڈ میں لاگ اِن — ڈویلپر پینل والا پاس ورڈ لکھیں:', i > 0);
+      if(!v) return;
+      if(await fbDevSignIn(v)){ if(i) _fbPw = v; else _devPw = v; toast('✅ لاگ اِن ہو گیا — اب «پیسے وصول» دبائیں'); return smcDevGo(); }
+      if(!navigator.onLine){ alert('📶 انٹرنیٹ نہیں — نیٹ چالو کر کے دوبارہ'); return; }
+    }
+    alert('❌ لاگ اِن نہیں ہوا۔ ڈویلپر کی فائربیس ای میل کا پاس ورڈ چیک کریں۔');
+  };
   window.smcDevGo = async function(){
     const code = (document.getElementById('smcDevIn').value || '').replace(/\D/g, '').slice(-6), card = document.getElementById('smcDevCard');
     if(code.length !== 6){ alert('6 ہندسوں کا کوڈ لکھیں'); return; }
     card.innerHTML = '<div style="padding:8px;text-align:center">⏳ …</div>';
-    if(!fbDevSignedIn() && _devPw){ try{ await fbDevSignIn(_devPw); }catch(e){} }
+    if(!fbDevSignedIn() && (_fbPw || _devPw)){ try{ await fbDevSignIn(_fbPw || _devPw); }catch(e){} }
     let j = null; try{ j = await smc({ op: 'get', code }, true); }catch(e){}
     if(!j || !j.ok){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">❌ ' + (j && j.reason === 'expired' ? 'کوڈ پرانا ہو گیا' : j && j.reason === 'wait' ? 'بہت زیادہ کوشیشیں — 15 منٹ بعد' : j && j.reason === 'dev_only' ? 'ڈویلپر پاس ورڈ ضروری ہے' : 'کوڈ نہیں ملا') + '</div>'; return; }
     if(j.kind === 'JS'){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">یہ ملازم کا کوڈ ہے — مالک کے فون پر لکھا جاتا ہے</div>'; return; }
@@ -57173,7 +57183,7 @@ window.addEventListener('DOMContentLoaded', () => {
       + row('🆔 UID', '<span dir="ltr" style="font-size:11px">' + esc(d.uid || '') + '</span>')
       + (d.tid ? row('🧾 TID', '<span dir="ltr">' + esc(d.tid) + '</span>') : '')
       + (d.shot ? '<img src="' + d.shot + '" style="max-width:100%;border-radius:8px;margin-top:4px">' : (d.tid ? '' : '<div style="color:#b45309">ثبوت ابھی نہیں آیا — رقم خود چیک کریں</div>'))
-      + (fbDevSignedIn() ? '' : '<div style="background:#fee2e2;border:2px solid #dc2626;border-radius:10px;padding:6px;margin-top:6px;color:#991b1b;font-weight:800">⚠️ کلاؤڈ میں ڈویلپر لاگ اِن نہیں ہو سکا — کوڈ جاری نہیں ہوگا۔ ڈویلپر پینل والا پاس ورڈ اور فائربیس (piarybhai) والا پاس ورڈ ایک جیسے ہونے چاہییں۔</div>')
+      + (fbDevSignedIn() ? '' : '<div style="background:#fee2e2;border:2px solid #dc2626;border-radius:10px;padding:6px;margin-top:6px;color:#991b1b;font-weight:800">⚠️ کلاؤڈ میں ڈویلپر لاگ اِن نہیں — پہلے نیچے بٹن سے لاگ اِن کریں، پھر «پیسے وصول»۔<button type="button" onclick="smcDevLogin()" style="display:block;width:100%;margin-top:6px;padding:8px;border:none;border-radius:10px;background:#1d4ed8;color:#fff;font-weight:900;font-size:16px;cursor:pointer;font-family:inherit;line-height:1.8">🔑 ابھی لاگ اِن کریں</button></div>')
       + (j.st === 'new' ? '<div style="display:flex;gap:6px;margin-top:6px"><button type="button" onclick="smcDevIssue()" style="flex:2;padding:9px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:900;cursor:pointer">✅ پیسے وصول — ' + (j.kind === 'SB' ? 'مدت بڑھائیں' : 'کوڈ جاری کریں') + '</button><button type="button" onclick="smcDevNo()" style="flex:1;padding:9px;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-weight:900;cursor:pointer">❌ رد</button></div>' : '')
       + '</div>';
   };
