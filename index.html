@@ -10486,7 +10486,7 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO287'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const APP_BUILD_VERSION = 'SM1611MO288'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
 const UPDATE_NOTE = '📋 ڈویلپر پینل: NB / SB والا پورا پیغام پیلے ڈبے میں پیسٹ ہو تو خود سبز ڈبے کا کارڈ کھلتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
@@ -11020,11 +11020,12 @@ async function fbDevSignIn(password){
     const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: FB_DEV_EMAIL, password: String(password || ''), returnSecureToken: true })
     });
-    if(!r.ok) return false;
-    const j = await r.json();
+    const j = await r.json().catch(() => ({}));
+    if(!r.ok){ window._fbDevErr = (j && j.error && j.error.message) || String(r.status); return false; }
+    window._fbDevErr = '';
     _fbDevTok = { t: j.idToken, until: Date.now() + 50 * 60000 }; // پاس ورڈ کہیں محفوظ نہیں
     return true;
-  }catch(e){ return false; }
+  }catch(e){ window._fbDevErr = 'NETWORK'; return false; }
 }
 function fbDevSignedIn(){ return !!(_fbDevTok && _fbDevTok.until > Date.now()); }
 async function devFirestoreFetch(path, options = {}){
@@ -57173,9 +57174,23 @@ window.addEventListener('DOMContentLoaded', () => {
       + row('🆔 UID', '<span dir="ltr" style="font-size:11px">' + esc(d.uid || '') + '</span>')
       + (d.tid ? row('🧾 TID', '<span dir="ltr">' + esc(d.tid) + '</span>') : '')
       + (d.shot ? '<img src="' + d.shot + '" style="max-width:100%;border-radius:8px;margin-top:4px">' : (d.tid ? '' : '<div style="color:#b45309">ثبوت ابھی نہیں آیا — رقم خود چیک کریں</div>'))
-      + (fbDevSignedIn() ? '' : '<div style="background:#fee2e2;border:2px solid #dc2626;border-radius:10px;padding:6px;margin-top:6px;color:#991b1b;font-weight:800">⚠️ کلاؤڈ میں ڈویلپر لاگ اِن نہیں ہو سکا — کوڈ جاری نہیں ہوگا۔ ڈویلپر پینل والا پاس ورڈ اور فائربیس (piarybhai) والا پاس ورڈ ایک جیسے ہونے چاہییں۔</div>')
+      + (fbDevSignedIn() ? '' : '<div style="background:#fee2e2;border:2px solid #dc2626;border-radius:10px;padding:6px;margin-top:6px;color:#991b1b;font-weight:800">⚠️ کلاؤڈ میں ڈویلپر لاگ اِن نہیں ہو سکا — کوڈ جاری نہیں ہوگا۔ ڈویلپر پینل والا پاس ورڈ اور فائربیس (piarybhai) والا پاس ورڈ ایک جیسے ہونے چاہییں۔'
+        + '<div style="display:flex;gap:6px;margin-top:8px"><input id="smcDevLoginPw" type="password" dir="ltr" autocomplete="current-password" placeholder="فائربیس (piarybhai) کا پاس ورڈ" onkeydown="if(event.key===\'Enter\')smcDevLogin()" style="flex:1;min-width:0;padding:8px;border:2px solid #dc2626;border-radius:8px;font-size:16px;text-align:center;background:#fff"><button type="button" onclick="smcDevLogin()" style="padding:8px 12px;border:none;border-radius:8px;background:#b91c1c;color:#fff;font-weight:900;cursor:pointer">🔐 ڈویلپر لاگ اِن</button></div>'
+        + '<button type="button" onclick="smcDevGo()" style="margin-top:6px;width:100%;padding:8px;border:2px solid #b91c1c;border-radius:8px;background:#fff;color:#b91c1c;font-weight:900;cursor:pointer">🔄 ریفریش — دوبارہ جانچیں</button>'
+        + '<div id="smcDevLoginMsg" style="margin-top:5px;font-size:13px"></div></div>')
       + (j.st === 'new' ? '<div style="display:flex;gap:6px;margin-top:6px"><button type="button" onclick="smcDevIssue()" style="flex:2;padding:9px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:900;cursor:pointer">✅ پیسے وصول — ' + (j.kind === 'SB' ? 'مدت بڑھائیں' : 'کوڈ جاری کریں') + '</button><button type="button" onclick="smcDevNo()" style="flex:1;padding:9px;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-weight:900;cursor:pointer">❌ رد</button></div>' : '')
       + '</div>';
+  };
+  // 🔐 SM1611MO288: ایرر کے ڈبے ہی میں ڈویلپر لاگ اِن — پاس ورڈ لکھیں، لاگ اِن ہو تو کارڈ خود تازہ
+  window.smcDevLogin = async function(){
+    const inp = document.getElementById('smcDevLoginPw'), msg = document.getElementById('smcDevLoginMsg');
+    const pw = inp ? inp.value : '';
+    if(!pw){ if(msg){ msg.style.color = '#b91c1c'; msg.textContent = 'پاس ورڈ لکھیں'; } return; }
+    if(msg){ msg.style.color = '#334155'; msg.textContent = '⏳ لاگ اِن ہو رہا ہے…'; }
+    let ok = false; try{ ok = await fbDevSignIn(pw); }catch(e){}
+    if(ok){ _devPw = pw; await window.smcDevGo(); return; }
+    const er = String(window._fbDevErr || '');
+    if(msg){ msg.style.color = '#b91c1c'; msg.textContent = '❌ ' + (/INVALID_PASSWORD|INVALID_LOGIN|EMAIL_NOT_FOUND/.test(er) ? 'پاس ورڈ غلط ہے' : er === 'NETWORK' ? 'انٹرنیٹ نہیں ہے' : /TOO_MANY/.test(er) ? 'بہت زیادہ کوششیں — کچھ دیر بعد' : 'لاگ اِن نہیں ہوا (' + er + ')'); }
   };
   window.smcDevNo = async function(){ if(!DEV || !confirm('یہ درخواست رد کریں؟')) return; try{ await smc({ op: 'set', code: DEV.code, st: 'no' }, true); }catch(e){} document.getElementById('smcDevCard').innerHTML = '<div style="padding:8px;font-weight:800">❌ رد کر دی</div>'; DEV = null; };
   async function devDone(res){ try{ await smc({ op: 'set', code: DEV.code, st: 'done', res }, true); }catch(e){} const c = document.getElementById('smcDevCard'); if(c) c.innerHTML = '<div style="padding:8px;font-weight:900;color:#15803d">✅ ' + DEV.kind + '-' + DEV.code + ' مکمل — دکاندار کی ایپ ایک منٹ میں خود چالو</div>'; DEV = null; }
