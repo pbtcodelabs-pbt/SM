@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO289'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '💳 لاگ اِن صفحے پر «پیکج پلانز» کا شیئر ہونے والا کارڈ؛ ڈویلپر لاگ اِن کا بڑا خانہ + 👁 + ای میل سے نیا پاس ورڈ'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO290'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '💳 «پیکج پلانز» کا بٹن اب ہر فون کے لاگ اِن صفحے پر «مزید آپشنز» سے اوپر'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -57264,12 +57264,13 @@ window.addEventListener('DOMContentLoaded', () => {
     };
   };
   setInterval(() => { try{
-    if(AppState.settings.smJoinedAsStaff || document.getElementById('smPlansBtn')) return;
-    const sc = document.getElementById('smSubCheckBtn'); if(!sc || !sc.parentElement) return;
+    // SM1611MO290: ہر فون (ملازم کا بھی) — «مزید آپشنز» سے اوپر، ہمیشہ نظر
+    const tg = document.getElementById('loginMoreToggleBtn'); if(!tg) return;
+    let ex = document.getElementById('smPlansBtn'); if(ex){ if(ex.nextElementSibling !== tg) tg.before(ex); return; }
     const b = document.createElement('button'); b.id = 'smPlansBtn'; b.type = 'button'; b.onclick = () => smPlansOpen();
     b.textContent = '💳 پیکج پلانز دیکھیں / شیئر کریں';
-    b.setAttribute('style', 'width:100% !important;margin:0 0 8px !important;padding:6px 12px !important;border:2px solid #f59e0b !important;border-radius:12px !important;background:#fffbeb !important;color:#92400e !important;font-weight:800;font-size:15px;' + K + 'line-height:1.8;box-shadow:none !important');
-    const pk = document.getElementById('smPkgMore'); (pk || sc.parentElement).after(b);
+    b.setAttribute('style', 'width:100% !important;margin:0 0 10px !important;padding:8px 12px !important;border:none !important;border-radius:12px !important;background:linear-gradient(135deg,#f59e0b,#b45309) !important;color:#fff !important;font-weight:800;font-size:17px;' + K + 'line-height:1.8;box-shadow:0 3px 8px rgba(180,83,9,.35) !important');
+    tg.before(b);
   }catch(e){} }, 1500);
 
   window.smcDevNo = async function(){ if(!DEV || !confirm('یہ درخواست رد کریں؟')) return; try{ await smc({ op: 'set', code: DEV.code, st: 'no' }, true); }catch(e){} document.getElementById('smcDevCard').innerHTML = '<div style="padding:8px;font-weight:800">❌ رد کر دی</div>'; DEV = null; };
