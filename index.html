@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO286'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🚫 ملازم ڈیلیٹ کریں تو اس کا فون خود دکان سے الگ؛ کوڈ والا خانہ الگ — پیکج خود بڑھتا ہے، کوڈ صرف اگر خود نہ بڑھے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO287'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '📋 ڈویلپر پینل: NB / SB والا پورا پیغام پیلے ڈبے میں پیسٹ ہو تو خود سبز ڈبے کا کارڈ کھلتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -57142,6 +57142,18 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   setInterval(() => { try{ devBox(); }catch(e){} }, 1500);
   let DEV = null;
+  // 📋 SM1611MO287 (مالک کی جانچ): پیلے «گاہک کا پیغام» ڈبے میں NB / SB والا پورا پیغام پیسٹ ہو تو خود اوپر سبز ڈبے کا کارڈ کھلے
+  const _gpr = window.giftParseRequest;
+  if(typeof _gpr === 'function') window.giftParseRequest = giftParseRequest = function(t){
+    const m = String(t || '').toUpperCase().match(/\b(NB|SB)\s*-?\s*(\d{6})\b/);
+    if(m){
+      const inp = document.getElementById('smcDevIn'), msg = document.getElementById('giftCodePasteMsg');
+      if(inp){ inp.value = m[1] + '-' + m[2]; smcDevGo(); try{ document.getElementById('smcDevBox').scrollIntoView({ behavior: 'smooth', block: 'start' }); }catch(e){} }
+      if(msg){ msg.style.color = '#166534'; msg.textContent = '✅ کوڈ ' + m[1] + '-' + m[2] + ' ملا — اوپر سبز ڈبے میں کارڈ کھل گیا: پیسے مل گئے ہوں تو «✅ پیسے وصول» دبائیں'; }
+      return;
+    }
+    return _gpr.apply(this, arguments);
+  };
   window.smcDevGo = async function(){
     const code = (document.getElementById('smcDevIn').value || '').replace(/\D/g, '').slice(-6), card = document.getElementById('smcDevCard');
     if(code.length !== 6){ alert('6 ہندسوں کا کوڈ لکھیں'); return; }
