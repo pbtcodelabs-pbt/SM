@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO277'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'گوگل ڈرائیو کا سوال پہلے دن نہیں (بعد میں بٹن)؛ پیکج کی درخواست کے دوران مفت ٹرائل چلتا رہے، ایپ فوراً کھلے؛ کوڈ والا نظام مزید محفوظ'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO278'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🎁 سال کا پیکج اب 10 مہینوں کی رقم میں — 2 مہینے مفت'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56710,6 +56710,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const K = "font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;";
   const fmt = n => Number(n || 0).toLocaleString('en-US');
   const mLabel = m => m === 12 ? '1 سال' : (m === 1 ? '1 مہینہ' : m + ' مہینے');
+  const payM = m => m === 12 ? 10 : m; // 🎁 SM1611MO278 (مالک کا حکم): سال = 10 مہینوں کی رقم، 2 مہینے مفت
   const dDays = m => m === 12 ? 365 : m * 30;
   const pLabel = p => p === 'P1' ? 'صرف مالک' : 'مالک + ' + SM_PLAN_STAFF[p] + ' ملازم';
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -56771,7 +56772,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const R = await loadRates(); if(P){ P.R = R; draw(); }
   };
   function draw(){
-    const st = AppState.settings, R = P.R, amt = (R[P.plan] || 0) * P.m;
+    const st = AppState.settings, R = P.R, amt = (R[P.plan] || 0) * payM(P.m);
     const chip = (on, t, js) => '<button type="button" onclick="' + js + '" style="flex:1 1 45%;min-width:0;padding:7px 4px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;line-height:1.7;' + K + (on ? 'background:#16a34a;color:#fff;border:2px solid #15803d' : 'background:#f8fafc;color:#14532d;border:2px solid #bbf7d0') + '">' + t + '</button>';
     const html = head(P.kind === 'SB' ? '🔄 سبسکرپشن کی تجدید' : '📦 پیکج لیں')
       + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">'
@@ -56780,15 +56781,15 @@ window.addEventListener('DOMContentLoaded', () => {
       + '<div style="font-weight:800;font-size:16px">👥 کتنے لوگ استعمال کریں گے؟</div>'
       + '<div style="display:flex;flex-wrap:wrap;gap:6px">' + PLANS.map(p => chip(P.plan === p, pLabel(p) + '<br><small dir="ltr" style="font-family:Arial;font-size:12px">' + p.replace('P', '') + ' • Rs ' + fmt(R[p]) + '/مہینہ</small>', "smPkgSet('plan','" + p + "')")).join('') + '</div>'
       + '<div style="font-weight:800;font-size:16px">⏱️ کتنی مدت؟</div>'
-      + '<div style="display:flex;flex-wrap:wrap;gap:6px">' + MONTHS.map(m => chip(P.m === m, mLabel(m), "smPkgSet('m'," + m + ")")).join('') + '</div>'
-      + '<div style="background:#ecfdf5;border:2px solid #16a34a;border-radius:14px;padding:6px;text-align:center"><div style="font-size:15px;font-weight:800;color:#065f46">💰 کل رقم</div><div dir="ltr" style="font-family:Arial Black,Arial;font-size:28px;color:#065f46">Rs ' + fmt(amt) + '</div><div dir="ltr" style="font-family:Arial;font-size:12px;color:#475569">' + fmt(R[P.plan]) + ' × ' + P.m + '</div></div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:6px">' + MONTHS.map(m => chip(P.m === m, mLabel(m) + (m === 12 ? '<br><small style="font-size:12px">🎁 2 مہینے مفت</small>' : ''), "smPkgSet('m'," + m + ")")).join('') + '</div>'
+      + '<div style="background:#ecfdf5;border:2px solid #16a34a;border-radius:14px;padding:6px;text-align:center"><div style="font-size:15px;font-weight:800;color:#065f46">💰 کل رقم</div><div dir="ltr" style="font-family:Arial Black,Arial;font-size:28px;color:#065f46">Rs ' + fmt(amt) + '</div><div dir="ltr" style="font-family:Arial;font-size:12px;color:#475569">' + fmt(R[P.plan]) + ' × ' + payM(P.m) + (P.m === 12 ? ' — 🎁 12 مہینے، 2 مفت' : '') + '</div></div>'
       + '<button type="button" id="smPkgSend" onclick="smPkgSend()" style="' + btnS('#25d366', '#fff') + 'font-size:19px">📨 ڈویلپر کو بھیجیں</button>'
       + '<button type="button" onclick="document.getElementById(\'smPkgOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">✖ بند کریں</button></div>';
     ov('smPkgOv', html);
   }
   window.smPkgSet = function(k, v){ P[k] = v; draw(); };
   window.smPkgSend = async function(){
-    const st = AppState.settings, R = P.R, amt = (R[P.plan] || 0) * P.m, b = document.getElementById('smPkgSend');
+    const st = AppState.settings, R = P.R, amt = (R[P.plan] || 0) * payM(P.m), b = document.getElementById('smPkgSend');
     if(b){ b.disabled = true; b.textContent = '⏳ بھیجا جا رہا ہے…'; }
     const data = { uid: uid(), shop: st.businessName || '', owner: st.ownerName || '', mobile: st.businessPhone || '', plan: P.plan, m: P.m, days: dDays(P.m), amt, rate: R[P.plan] || 0,
       cur: st.lastActivationCode || '', exp: st.subscriptionExpiry || '', curPlan: smPlan(), trial: !!st.isOnFreeTrial, ver: (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '' };
@@ -56799,7 +56800,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const msg = (P.kind === 'SB' ? '🔄 سبزی منڈی — سبسکرپشن کی تجدید' : '🥬 سبزی منڈی — نیا پیکج')
       + '\nدکان: ' + data.shop + '\nنام: ' + data.owner + ' — ' + data.mobile
       + '\nپیکج: ' + P.plan.replace('P', '') + ' (' + pLabel(P.plan) + ') — ' + mLabel(P.m)
-      + '\nرقم: Rs ' + fmt(amt)
+      + '\nرقم: Rs ' + fmt(amt) + (P.m === 12 ? ' (سال — 10 مہینوں کی رقم، 2 مہینے مفت)' : '')
       + (P.kind === 'SB' && data.exp ? '\nموجودہ مدت: ' + formatDateDMY(data.exp) + ' تک' : '')
       + '\nکوڈ: ' + P.kind + '-' + j.code
       + '\n👉 رقم وصول ہونے اور تصدیق کے بعد کوڈ جاری کر دیں۔';
@@ -57167,7 +57168,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const html = head('💰 پیکج کے ریٹ — ہر مہینہ')
       + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:7px">'
       + PLANS.map(p => '<label style="display:flex;align-items:center;gap:8px;font-weight:800">' + '<span style="flex:1">' + p.replace('P', '') + ' — ' + pLabel(p) + '</span><input data-p="' + p + '" class="smcRateIn" inputmode="numeric" dir="ltr" value="' + (R[p] || 0) + '" style="width:110px;padding:7px;border:2px solid #16a34a;border-radius:10px;font-size:18px;text-align:center;font-family:Arial"></label>').join('')
-      + '<div style="font-size:12.5px;color:#475569">نیا ریٹ دکاندار کے فون پر اگلی درخواست میں خود نظر آئے گا۔ پرانی درخواستوں کی رقم نہیں بدلتی۔</div>'
+      + '<div style="font-size:12.5px;color:#475569">نیا ریٹ دکاندار کے فون پر اگلی درخواست میں خود نظر آئے گا۔ پرانی درخواستوں کی رقم نہیں بدلتی۔ 🎁 سال کا پیکج = 10 مہینوں کی رقم (2 مہینے مفت)۔</div>'
       + '<button type="button" onclick="smcRatesSave()" style="' + btnS('#16a34a', '#fff') + '">💾 محفوظ کریں</button>'
       + '<button type="button" onclick="document.getElementById(\'smRatesOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">✖ بند</button></div>';
     ov('smRatesOv', html);
@@ -57175,6 +57176,10 @@ window.addEventListener('DOMContentLoaded', () => {
   window.smcRatesSave = async function(){
     const R = {}; document.querySelectorAll('.smcRateIn').forEach(i => { R[i.dataset.p] = Math.max(0, parseInt(String(i.value).replace(/\D/g, ''), 10) || 0); });
     if(!R.P1){ alert('ریٹ درست لکھیں'); return; }
+    if(!fbDevSignedIn()){ // 🔐 SM1611MO278: ڈویلپر کی پہچان کا وقت ختم ہو تو یہیں پاس ورڈ — «محفوظ نہیں ہوا» نہیں
+      const pw = await uDialog({ title: '🔐 ڈویلپر پاس ورڈ', message: 'ریٹ محفوظ کرنے کے لیے ڈویلپر پاس ورڈ لکھیں:', input: 'password', okText: '✅ ٹھیک ہے', cancelText: '✖', tone: 'green' });
+      if(!pw) return; if(!(await fbDevSignIn(String(pw)))){ alert('❌ پاس ورڈ غلط ہے'); return; }
+    }
     try{
       const r = await devFirestoreFetch('licenses/__smrates?key=' + FIREBASE_API_KEY, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { rates: { stringValue: JSON.stringify(R) }, updatedAt: { integerValue: String(Date.now()) } } }) });
       if(!r || !r.ok) throw new Error(r ? r.status : 'net');
