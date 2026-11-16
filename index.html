@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO293'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '⛔ ڈویلپر سبسکرپشن معطل / دوبارہ چالو کر سکتا ہے — آدھے گھنٹے میں لاگو؛ 7 دن انٹرنیٹ نہ ملے تو «انٹرنیٹ چالو کریں»';
+const APP_BUILD_VERSION = 'SM1611MO294'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🔐 ہیلپ ڈیسک سے سیدھا اس ایپ کا ڈویلپر پینل — سب ایپس میں ایک ہی پاس ورڈ';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -50185,7 +50185,7 @@ function devEnterAppDirectly(){
 // 🔐 FM210FR277: ڈویلپر پاسورڈ کی ایک ہی جانچ (ماسٹر پاسورڈ ہمیشہ؛ پینل سے بدلا ہوا الگ پاسورڈ بھی)
 async function devPasswordOk(entered){
   const enteredHash = await hashPin(String(entered || '').trim());
-  return (enteredHash === DEFAULT_DEV_PANEL_PASSWORD_HASH) || (!!AppState.settings.devPanelPasswordHash && enteredHash === AppState.settings.devPanelPasswordHash);
+  return (enteredHash === DEFAULT_DEV_PANEL_PASSWORD_HASH) || (!!AppState.settings.devPanelPasswordHash && enteredHash === AppState.settings.devPanelPasswordHash) || (typeof pbtHubPwOk === 'function' && await pbtHubPwOk(entered)); // PBT-DEVHUB
 }
 // 🔐 FM210FR278: "ڈویلپر کا فون" صرف اسی وقت تک جب تک ایپ کھلی ہے (sessionStorage) — ایپ بند ہوتے ہی یہ فون پھر
 // عام دکاندار کا فون؛ دکاندار کے فون پر ڈویلپر پینل کھولنے سے وہ ہمیشہ کے لیے "ڈویلپر کا فون" نہیں بنتا۔ کلاؤڈ پر کبھی نہیں جاتا
@@ -58928,6 +58928,18 @@ window.openHelpDesk = openHelpDesk;
 /* SM0911MO258 (ہیلپ ڈیسک #159): بل نمبر کی مرمت — کھلنے پر اور ہر 2 منٹ (کلاؤڈ سے آئے بل کے بعد بھی) */
 setTimeout(function(){ try{ if(smBillSerialFix() && typeof renderBillHistory === 'function') renderBillHistory(); }catch(e){} }, 5000);
 setInterval(function(){ try{ if(document.visibilityState === 'visible') smBillSerialFix(); }catch(e){} }, 120000);
+</script>
+<script>
+/* 🔐 PBT-DEVHUB (مالک کا حکم، 16 نومبر 2026): ہیلپ ڈیسک «🔐 سب ڈویلپر پینل» سے سیدھا یہاں کا ڈویلپر پینل (`?devpanel=1`)
+   + ایک مشترکہ پاس ورڈ: ہیلپ ڈیسک اسی ویب سائٹ پر `pbt_devpass_v1` = SHA-256('PBTDEV|' + پاس ورڈ) رکھتا ہے — یہ پینل اسے بھی مانتا ہے (`pbtHubPwOk`)۔ */
+window.pbtHubPwOk = async function(p){
+  try{ const h = (function(){ try{ const f = document.createElement('iframe'); f.style.display = 'none'; document.documentElement.appendChild(f); const v = f.contentWindow.localStorage.getItem('pbt_devpass_v1'); f.remove(); return v; }catch(e){ return null; } })() || localStorage.getItem('pbt_devpass_v1');   /* ایپ کا اپنا نام والا خانہ نہیں — سیدھا ویب سائٹ کا */ if(!h || !p) return false;
+    const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('PBTDEV|' + String(p).trim()));
+    return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('') === h; }catch(e){ return false; }
+};
+(function(){ try{ if(!/[?&]devpanel=1\b/.test(location.search)) return;
+  window.addEventListener('load', () => setTimeout(() => { try{ document.querySelectorAll('.modalOverlay.show').forEach(m=>m.classList.remove('show')); openDevSecretPanel(); const m = document.getElementById('devSecretModal'); if(m){ document.body.appendChild(m); m.style.zIndex = '2147483000'; } }catch(e){} }, 3500));
+}catch(e){} })();
 </script>
 </body>
 </html>
