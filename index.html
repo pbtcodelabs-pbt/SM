@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO278'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🎁 سال کا پیکج اب 10 مہینوں کی رقم میں — 2 مہینے مفت'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO279'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🚪 ملازم کا فون خود دکان سے الگ ہو سکتا ہے (لاگ اِن صفحے پر سرخ بٹن)'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -57204,6 +57204,34 @@ window.addEventListener('DOMContentLoaded', () => {
       bs.forEach(b => { b.style.fontFamily = 'inherit'; b.style.fontSize = '17px'; b.style.lineHeight = '1.9'; }); }
     m.classList.add('show');
   };
+  // 🚪 SM1611MO279 (مالک کا حکم): ملازم کا فون خود دکان سے الگ — لاگ اِن ← «مزید آپشنز» ← «🚪 یہ فون اس دکان سے الگ کریں»؛
+  //   دکان کا اصل ریکارڈ کلاؤڈ میں ویسا (صرف اس فون کی نقل ہٹتی ہے)؛ صرف سبزی منڈی کی اپنی چیزیں (fmPos_) — AIO وغیرہ کبھی نہیں
+  window.smStaffLeave = async function(){
+    const st = AppState.settings; if(!st.smJoinedAsStaff){ alert('یہ فون کسی دکان سے ملازم کے طور پر جڑا ہوا نہیں۔'); return; }
+    const shop = st.businessName || 'دکان';
+    const pend = Object.keys(st).filter(k => /PendingSync$/.test(k) && st[k]);
+    const ok1 = await uDialog({ title: '🚪 دکان سے الگ کریں', message: 'یہ فون «' + esc(shop) + '» سے الگ ہو جائے گا۔<br>• دکان کا اصل ریکارڈ کلاؤڈ میں محفوظ رہے گا (مالک کے پاس)<br>• اس فون سے اس دکان کی نقل ہٹ جائے گی<br>• پھر یہ فون نئی دکان یا دوسری دکان کے لیے خالی' + (pend.length ? '<br><br>⚠️ <b>اس فون کا کچھ کام ابھی کلاؤڈ پر نہیں گیا</b> — پہلے انٹرنیٹ چالو کر کے ایپ ایک دو منٹ کھلی رکھیں۔' : ''), okText: 'آگے', cancelText: '✖ نہیں', tone: 'red' });
+    if(!ok1) return;
+    const ok2 = await uDialog({ title: '⚠️ پکا؟', message: '«' + esc(shop) + '» سے یہ فون الگ کرنا ہے؟', okText: '✅ ہاں، الگ کریں', cancelText: '✖ نہیں', tone: 'red' });
+    if(!ok2) return;
+    try{ (typeof smLsKeys === 'function' ? smLsKeys() : Object.keys(localStorage)).filter(k => k.indexOf(STORAGE_PREFIX) === 0 && k !== STORAGE_PREFIX + 'settings').forEach(k => { try{ localStorage.removeItem(k); }catch(e){} }); }catch(e){}
+    ['fm_phoneOwner', 'fm_bioCred', 'smJsPend', 'smJoinUser'].forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
+    ['businessPhone', 'smShopCode', 'businessName', 'ownerName', 'ownerPhoto', 'businessLogo', 'lastActivationCode', 'subscriptionExpiry', 'subscriptionActivatedOn', 'smPendReq', 'smRegisteredAt'].forEach(k => { delete st[k]; });
+    Object.keys(st).forEach(k => { if(/PendingSync$/.test(k)) st[k] = false; });
+    st.smRegistered = false; st.smJoinedAsStaff = false; st.smPlan = 'P1'; st.isOnFreeTrial = false;
+    try{ saveToStorage('settings', st); }catch(e){}
+    alert('✅ یہ فون «' + shop + '» سے الگ ہو گیا۔');
+    location.reload();
+  };
+  setInterval(() => { try{
+    const tg = document.getElementById('loginMoreToggleBtn'); if(!tg) return;
+    let b = document.getElementById('smLeaveBtn');
+    if(!AppState.settings.smJoinedAsStaff){ if(b) b.remove(); return; }
+    if(!b){ b = document.createElement('button'); b.id = 'smLeaveBtn'; b.type = 'button'; b.onclick = () => smStaffLeave();
+      b.textContent = '🚪 یہ فون اس دکان سے الگ کریں';
+      b.setAttribute('style', 'margin-top:8px !important; width:100% !important; padding:6px 10px !important; background:#fef2f2 !important; color:#b91c1c !important; border:1.5px solid #fca5a5 !important; border-radius:12px !important; font-weight:800; font-size:14px !important; font-family:inherit; line-height:1.9; box-shadow:none !important;'); tg.after(b); }
+  }catch(e){} }, 1500);
+
   window.dismissGDriveFirstRunPrompt = dismissGDriveFirstRunPrompt = function(){
     document.getElementById('gdriveFirstRunModal')?.classList.remove('show');
     try{ AppState.settings.smGdLater = Date.now(); saveToStorage('settings', AppState.settings); }catch(e){}
