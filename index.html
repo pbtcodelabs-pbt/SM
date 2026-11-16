@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO279'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🚪 ملازم کا فون خود دکان سے الگ ہو سکتا ہے (لاگ اِن صفحے پر سرخ بٹن)'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO280'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🔐 ریٹ اور دکاندار کا کوڈ اب ڈویلپر پینل والے پاس ورڈ سے — حروف والا کی بورڈ، پینل کھلا ہو تو دوبارہ نہیں پوچھتا'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56716,16 +56716,44 @@ window.addEventListener('DOMContentLoaded', () => {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   async function smc(body, dev){
     const h = { 'Content-Type': 'application/json' };
-    if(dev){ // 🔐 SM1611MO276: NB / SB صرف ڈویلپر کی فائربیس شناخت سے
-      if(!fbDevSignedIn()){
-        const pw = await uDialog({ title: '🔐 ڈویلپر پاس ورڈ', message: 'دکاندار کا کوڈ کھولنے کے لیے ڈویلپر پاس ورڈ لکھیں:', input: 'password', okText: '✅ ٹھیک ہے', cancelText: '✖', tone: 'green' });
-        if(!pw || !(await fbDevSignIn(String(pw)))) return { ok: false, reason: 'dev_only' };
-      }
-      h.Authorization = 'Bearer ' + _fbDevTok.t;
+    if(dev){ // 🔐 SM1611MO280: NB / SB صرف ڈویلپر — ڈویلپر پینل والا پاس ورڈ (پینل کھلتے وقت یاد، ایپ بند ہوتے ہی بھول)؛ فائربیس شناخت ہو تو وہ بھی
+      if(!(await devPw())) return { ok: false, reason: 'dev_only' };
+      body = Object.assign({}, body, { devpw: _devPw });
+      try{ if(fbDevSignedIn()) h.Authorization = 'Bearer ' + _fbDevTok.t; }catch(e){}
     }
     const r = await fetch(API, { method: 'POST', headers: h, body: JSON.stringify(body) });
     return r.json();
   }
+  // 🔐 SM1611MO280: ڈویلپر پینل والا پاس ورڈ — اپنا خانہ (حروف + ہندسوں والا کی بورڈ، پہلے صرف ہندسے کھلتے تھے)
+  let _devPw = '';
+  function pwBox(msg){
+    return new Promise(res => {
+      const o = ov('smDevPwOv', head('🔐 ڈویلپر پینل کا پاس ورڈ', 'linear-gradient(135deg,#7c3aed,#4c1d95)') + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px"><div style="font-size:15px;line-height:1.9">' + msg + '</div>'
+        + '<input id="smDevPwIn" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" dir="ltr" style="padding:10px;border:2px solid #a78bfa;border-radius:12px;font-size:20px;text-align:center;font-family:Arial">'
+        + '<div id="smDevPwErr" style="color:#b91c1c;font-weight:800;min-height:20px"></div>'
+        + '<div style="display:flex;gap:8px"><button type="button" id="smDevPwNo" style="flex:1;' + btnS('#e2e8f0', '#334155') + '">✖</button><button type="button" id="smDevPwOk" style="flex:2;' + btnS('#7c3aed', '#fff') + '">✅ ٹھیک ہے</button></div></div>');
+      o.style.zIndex = '2147483646';
+      const inp = o.querySelector('#smDevPwIn'), done = v => { o.remove(); res(v); };
+      setTimeout(() => inp.focus(), 80);
+      o.querySelector('#smDevPwNo').onclick = () => done(null);
+      const go = async () => { const v = inp.value; if(await devPasswordOk(v)) done(v.trim()); else { o.querySelector('#smDevPwErr').textContent = '❌ پاس ورڈ غلط ہے'; inp.select(); } };
+      o.querySelector('#smDevPwOk').onclick = go; inp.addEventListener('keydown', e => { if(e.key === 'Enter') go(); });
+    });
+  }
+  async function devPw(){ if(_devPw) return true; const v = await pwBox('وہی پاس ورڈ لکھیں جس سے ڈویلپر پینل کھلتا ہے:'); if(!v) return false; _devPw = v; return true; }
+  // 🔐 SM1611MO280: کلاؤڈ میں لائسنس / ریٹ لکھنا صرف ڈویلپر کی فائربیس شناخت سے (50 منٹ) — وقت ختم ہو تو اسی پینل والے پاس ورڈ سے خاموشی سے نئی
+  const _dff = window.devFirestoreFetch;
+  window.devFirestoreFetch = devFirestoreFetch = async function(path, options){
+    try{ if(!fbDevSignedIn()){ if(!_devPw) await devPw(); if(_devPw) await fbDevSignIn(_devPw); } }catch(e){}
+    return _dff.apply(this, arguments);
+  };
+  const _udp = window.unlockDevSecretPanel;
+  window.unlockDevSecretPanel = unlockDevSecretPanel = async function(){
+    const v = ((document.getElementById('devSecretPasswordInput') || {}).value || '').trim();
+    const r = await _udp.apply(this, arguments);
+    try{ if(v && await devPasswordOk(v)) _devPw = v; }catch(e){}
+    return r;
+  };
   // 🔐 SM1611MO276: ہر فون کی اپنی لمبی خفیہ چابی (چھوٹا device UID نہیں) — کوڈ کی حالت / جواب صرف اسی فون کو
   const tok = () => { let t = ''; try{ t = localStorage.getItem('smReqTok') || ''; if(t.length < 32){ const a = new Uint8Array(16); crypto.getRandomValues(a); t = Array.from(a, x => x.toString(16).padStart(2, '0')).join(''); localStorage.setItem('smReqTok', t); } }catch(e){} return t; };
   window.smcApi = smc;
@@ -57176,10 +57204,7 @@ window.addEventListener('DOMContentLoaded', () => {
   window.smcRatesSave = async function(){
     const R = {}; document.querySelectorAll('.smcRateIn').forEach(i => { R[i.dataset.p] = Math.max(0, parseInt(String(i.value).replace(/\D/g, ''), 10) || 0); });
     if(!R.P1){ alert('ریٹ درست لکھیں'); return; }
-    if(!fbDevSignedIn()){ // 🔐 SM1611MO278: ڈویلپر کی پہچان کا وقت ختم ہو تو یہیں پاس ورڈ — «محفوظ نہیں ہوا» نہیں
-      const pw = await uDialog({ title: '🔐 ڈویلپر پاس ورڈ', message: 'ریٹ محفوظ کرنے کے لیے ڈویلپر پاس ورڈ لکھیں:', input: 'password', okText: '✅ ٹھیک ہے', cancelText: '✖', tone: 'green' });
-      if(!pw) return; if(!(await fbDevSignIn(String(pw)))){ alert('❌ پاس ورڈ غلط ہے'); return; }
-    }
+    if(!(await devPw())) return; // 🔐 SM1611MO280: ڈویلپر پینل والا پاس ورڈ (پینل کھلا ہو تو دوبارہ نہیں)
     try{
       const r = await devFirestoreFetch('licenses/__smrates?key=' + FIREBASE_API_KEY, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { rates: { stringValue: JSON.stringify(R) }, updatedAt: { integerValue: String(Date.now()) } } }) });
       if(!r || !r.ok) throw new Error(r ? r.status : 'net');
