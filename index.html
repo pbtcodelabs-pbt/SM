@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO292'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '💳 پیکج پلانز کارڈ: «سبزی اور فروٹ کے کاروبار کے لیے جدید، ہائی اسپیڈ اور بہترین سافٹ ویئر»'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO293'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '⛔ ڈویلپر سبسکرپشن معطل / دوبارہ چالو کر سکتا ہے — آدھے گھنٹے میں لاگو؛ 7 دن انٹرنیٹ نہ ملے تو «انٹرنیٹ چالو کریں»';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -49840,6 +49840,7 @@ function renderIssuedCodesList(){
       ${expiryLine}
       ${licContactRow(it)}
       <div style="display:flex; gap:6px;">
+        ${isRevoked ? `<button onclick="if(confirm('کوڈ ${it.code} دوبارہ چالو کریں؟ دکاندار کی ایپ آدھے گھنٹے میں (یا کھولتے ہی) خود چل پڑے گی۔')) reactivateLicenseCode('${it.code}')" style="flex:1; padding:6px; background:#dcfce7; color:#166534; border:none; border-radius:7px; font-size:11.5px; font-weight:800; cursor:pointer;">▶️ دوبارہ چالو کریں</button>` : ''}
         ${!isRevoked ? `<button onclick="suspendLicenseCode('${it.code}')" style="flex:1; padding:6px; background:#fef3c7; color:#92400e; border:none; border-radius:7px; font-size:11.5px; font-weight:800; cursor:pointer;">⏸️ معطل کریں</button>` : `<button onclick="reactivateLicenseCode('${it.code}')" style="flex:1; padding:6px; background:#dcfce7; color:#15803d; border:none; border-radius:7px; font-size:11.5px; font-weight:800; cursor:pointer;">▶️ دوبارہ فعال کریں</button>`}
         ${!isRevoked ? `<button onclick="extendLicenseCode('${it.code}')" style="flex:1; padding:6px; background:#dbeafe; color:#1d4ed8; border:none; border-radius:7px; font-size:11.5px; font-weight:800; cursor:pointer;">➕ مدت بڑھائیں</button>` : ''}
         <button onclick="deleteLicenseCode('${it.code}')" style="flex:1; padding:6px; background:#fee2e2; color:#b91c1c; border:none; border-radius:7px; font-size:11.5px; font-weight:800; cursor:pointer;">🗑️ ڈیلیٹ کریں</button>
@@ -49848,7 +49849,7 @@ function renderIssuedCodesList(){
     }).join('');
 }
 async function suspendLicenseCode(code){
-  if(!confirm(`کوڈ ${code} معطل کریں؟ یہ اب کسی کے لیے بھی کام نہیں کرے گا۔`)) return;
+  if(!confirm(`کوڈ ${code} معطل کریں؟\n\nدکاندار کی ایپ آدھے گھنٹے کے اندر (یا کھولتے ہی) رک جائے گی، اس کے ملازموں کے فون بھی۔ بعد میں «▶️ دوبارہ چالو کریں» سے بحال ہو سکتی ہے۔`)) return;
   // ---------- 🐞 FM10SEPTH0844AM فکس: Auth Token شامل کیا (وجہ اوپر activateSubscription میں دیکھیں) ---------- -->
   await devFirestoreFetch(`licenses/${encodeURIComponent(code)}?updateMask.fieldPaths=active&key=${FIREBASE_API_KEY}`, {
     method: 'PATCH', headers: {'Content-Type':'application/json'},
@@ -58762,6 +58763,145 @@ window.openHelpDesk = openHelpDesk;
       return _imp.apply(this, arguments);
     };
   }
+})();
+</script>
+<script type="text/fm-boot">
+/* ⛔ SM1611MO293 (مالک کا حکم — «معطل / بحال، آدھے گھنٹے میں، انٹرنیٹ کے بغیر نہیں»):
+   (1) ڈویلپر پینل کی کوڈز فہرست میں معطل کوڈ پر «▶️ دوبارہ چالو کریں» (`reactivateLicenseCode`)۔
+   (2) معطلی کھلی ایپ میں بھی: `resyncLicenseOnline` ہر 30 منٹ + ایپ سامنے آنے پر؛ معطل = `settings.licSuspended` (اسی کوڈ کا نام)
+       → `isSubscriptionActive` false، پرانے ریکارڈ (`restoreSubscriptionFromCloud`) سے واپس نہیں آتی، ملازم کے فون بھی (دکان کا آئینہ `susp`)؛
+       ڈویلپر بحال کرے تو اگلی جانچ پر اسی کوڈ کی تاریخ خود واپس۔ نیا کوڈ لگے تو معطلی ختم۔
+   (3) پیڈ فون (اپنا کوڈ) 7 دن سے زیادہ سرور سے نہ ملے (`licOkAt`) تو «📶 انٹرنیٹ چالو کریں» کا پردہ — جانچ ہوتے ہی خود ہٹتا ہے۔ */
+(function(){
+  const S = () => AppState.settings;
+  const OFF_DAYS = 7;
+  const own = () => { const st = S(); return !st.smJoinedAsStaff && !(typeof devPermUnlocked === 'function' && devPermUnlocked()); };
+  async function licDoc(code){
+    const r = await fetch(`${FIRESTORE_BASE}/licenses/${encodeURIComponent(code)}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' });
+    if(r.status === 404) return { missing: true };
+    if(!r.ok) return null;
+    return _parseFirestoreFields((await r.json()).fields || {});
+  }
+  function banner(t, bg){
+    const d = document.createElement('div'); d.textContent = t;
+    d.style.cssText = 'position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:2147483647;background:' + bg + ';color:#fff;padding:10px 18px;border-radius:14px;font-weight:800;direction:rtl;max-width:92vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)';
+    document.body.appendChild(d); setTimeout(() => d.remove(), 6000);
+  }
+  let _busy = false;
+  window.resyncLicenseOnline = resyncLicenseOnline = async function(){
+    const st = S();
+    if(!own() || _busy) return;
+    const code = st.licSuspended || st.lastActivationCode;
+    if(!code || (st.isOnFreeTrial && !st.licSuspended)) return;
+    if(navigator.onLine === false) return;
+    _busy = true;
+    try{
+      let d = null; try{ d = await licDoc(code); }catch(e){}
+      if(!d) return;
+      st.licOkAt = Date.now();
+      if(d.active === false){
+        const fresh = st.licSuspended !== code || !!st.subscriptionExpiry;
+        st.licSuspended = code; st.subscriptionExpiry = null; persistAllData();
+        offCheck();
+        if(fresh){
+          try{ smPushLicenseMirror(); }catch(e){}
+          try{ setupLoginScreen(); }catch(e){}
+          alert('⛔ آپ کی سبسکرپشن ڈویلپر نے روک دی ہے۔\n\nمزید معلومات کے لیے ڈویلپر سے رابطہ کریں۔');
+          try{ location.reload(); }catch(e){}
+        }
+        return;
+      }
+      if(st.licSuspended === code){   // ▶️ ڈویلپر نے دوبارہ چالو کیا
+        delete st.licSuspended;
+        const exp = d.lifetime ? '2099-12-31' : (d.expiresAt ? _smYMD(new Date(Number(d.expiresAt))) : '');
+        persistAllData();
+        if(exp && exp >= _smYMD(new Date())){
+          _licApplyRestore(exp, d.activatedAt ? _smYMD(new Date(Number(d.activatedAt))) : '', code, smNormPlan(d.plan));
+          try{ smPushLicenseMirror(); }catch(e){}
+          banner('✅ آپ کی سبسکرپشن دوبارہ چالو ہو گئی — ' + formatDateDMY(exp) + ' تک', '#15803d');
+          setTimeout(() => { try{ location.reload(); }catch(e){} }, 2500);
+        }
+        return;
+      }
+      persistAllData();
+      offCheck();
+    } finally { _busy = false; }
+  };
+  // معطل ہو تو کوئی پرانا ریکارڈ سبسکرپشن واپس نہ لائے
+  const _isa = window.isSubscriptionActive;
+  window.isSubscriptionActive = isSubscriptionActive = function(){ if(S().licSuspended && own()) return false; return _isa.apply(this, arguments); };
+  const _rsc = window.restoreSubscriptionFromCloud;
+  window.restoreSubscriptionFromCloud = restoreSubscriptionFromCloud = async function(){
+    if(S().licSuspended && own()){ await resyncLicenseOnline(); return isSubscriptionActive(); }
+    return _rsc.apply(this, arguments);
+  };
+  const _act = window.activateSubscription;
+  window.activateSubscription = activateSubscription = async function(c){
+    const was = S().licSuspended;
+    if(was){ delete S().licSuspended; }
+    let r; try{ r = await _act.apply(this, arguments); }catch(e){ if(was) S().licSuspended = was; throw e; }
+    if(!(r && r.success) && was) S().licSuspended = was;
+    else if(r && r.success){ S().licOkAt = Date.now(); persistAllData(); offCheck(); }
+    return r;
+  };
+  // ملازم کے فون: دکان کا آئینہ (license) — مالک معطل ہو تو `susp`
+  const _push = window.smPushLicenseMirror;
+  if(typeof _push === 'function') window.smPushLicenseMirror = smPushLicenseMirror = async function(){
+    const r = await _push.apply(this, arguments);
+    try{
+      if(!smIsCloudPlan() || AppState.currentRole === 'salesman' || S().smJoinedAsStaff) return r;
+      await authFirestoreFetch(`${smShopBase()}license?updateMask.fieldPaths=susp&key=${FIREBASE_API_KEY}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { susp: { booleanValue: !!S().licSuspended } } }) });
+    }catch(e){}
+    return r;
+  };
+  const _pull = window.smPullLicenseMirror;
+  if(typeof _pull === 'function') window.smPullLicenseMirror = smPullLicenseMirror = async function(){
+    const before = isSubscriptionActive();
+    const r = await _pull.apply(this, arguments);
+    try{
+      const res = await authFirestoreFetch(`${smShopBase()}license?key=${FIREBASE_API_KEY}`, { cache: 'no-store' });
+      if(res && res.ok){ const f = (await res.json()).fields || {}; if(f.susp && f.susp.booleanValue){ S().subscriptionExpiry = null; saveToStorage('settings', S()); } }
+    }catch(e){}
+    if(before && !isSubscriptionActive() && S().smJoinedAsStaff){ alert('⛔ دکان کی سبسکرپشن رک گئی ہے — مالک سے رابطہ کریں۔'); try{ location.reload(); }catch(e){} }
+    return r;
+  };
+  // ⏱️ ہر 30 منٹ اور ایپ سامنے آنے پر (30 منٹ میں ایک بار)
+  let _last = 0;
+  const tick = (force) => {
+    if(!force && Date.now() - _last < 30 * 60000) return; _last = Date.now();
+    try{ if(S().smJoinedAsStaff) smPullLicenseMirror(); else resyncLicenseOnline(); }catch(e){}
+  };
+  setInterval(() => tick(true), 30 * 60000);
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') tick(false); });
+  window.addEventListener('online', () => tick(true));
+  // 📶 7 دن سے سرور سے نہیں ملا
+  function offNeeded(){
+    const st = S();
+    if(!own() || !st.lastActivationCode || st.isOnFreeTrial || st.licSuspended) return false;
+    if(!st.licOkAt){ st.licOkAt = Date.now(); try{ persistAllData(); }catch(e){} return false; }
+    return Date.now() - st.licOkAt > OFF_DAYS * 864e5;
+  }
+  function offCheck(){
+    const need = offNeeded();
+    let o = document.getElementById('smNetOv');
+    if(!need){ if(o) o.remove(); return; }
+    if(o) return;
+    o = document.createElement('div'); o.id = 'smNetOv'; o.setAttribute('dir', 'rtl');
+    o.style.cssText = 'position:fixed;inset:0;z-index:2147483640;background:rgba(15,23,42,.88);display:flex;align-items:center;justify-content:center;padding:16px';
+    o.innerHTML = '<div style="background:#fff;border-radius:20px;max-width:400px;width:100%;padding:18px;text-align:center;line-height:2;font-family:\'JameelNooriNastaleeq\',\'Noto Nastaliq Urdu\',serif">'
+      + '<div style="font-size:46px;line-height:1.2">📶</div><div style="font-size:22px;font-weight:900;color:#0f172a">انٹرنیٹ چالو کریں</div>'
+      + '<div style="font-size:16px;color:#334155">' + OFF_DAYS + ' دن سے آپ کی سبسکرپشن کی جانچ نہیں ہو سکی۔ موبائل ڈیٹا یا وائی فائی چالو کر کے نیچے بٹن دبائیں — ایپ فوراً کھل جائے گی۔</div>'
+      + '<button type="button" id="smNetGo" style="margin-top:10px;width:100%;padding:12px;border:none;border-radius:14px;background:#16a34a;color:#fff;font-weight:900;font-size:19px;cursor:pointer;font-family:inherit">🔄 دوبارہ جانچیں</button>'
+      + '<div id="smNetMsg" style="font-size:14px;color:#b91c1c;font-weight:800;min-height:22px"></div></div>';
+    document.body.appendChild(o);
+    o.querySelector('#smNetGo').onclick = async () => {
+      const m = o.querySelector('#smNetMsg'); m.style.color = '#334155'; m.textContent = '⏳ …';
+      await resyncLicenseOnline(); offCheck();
+      if(document.getElementById('smNetOv')){ m.style.color = '#b91c1c'; m.textContent = '❌ ابھی انٹرنیٹ نہیں ملا — ڈیٹا / وائی فائی چیک کریں'; }
+    };
+  }
+  setTimeout(offCheck, 4000); setInterval(offCheck, 60000);
+  window.smNetCheck = offCheck;
 })();
 </script>
 <script>
