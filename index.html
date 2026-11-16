@@ -3539,7 +3539,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <div id="smTrialLoginTxt" style="font-size:16px; font-weight:800; line-height:2;"></div>
       <div style="display:flex; gap:6px; margin-top:4px;">
         <button type="button" onclick="smTrialToggleCode()" style="flex:1; width:auto !important; margin:0 !important; padding:6px 4px !important; border-radius:10px !important; background:#1d4ed8 !important; color:#fff !important; font-family:inherit; font-size:14px !important; font-weight:800; box-shadow:none !important; line-height:1.9;">🔑 کوڈ لگائیں</button>
-        <button type="button" onclick="smOpenCodeRequest(false)" style="flex:1; width:auto !important; margin:0 !important; padding:6px 4px !important; border-radius:10px !important; background:#16a34a !important; color:#fff !important; font-family:inherit; font-size:14px !important; font-weight:800; box-shadow:none !important; line-height:1.9;">📲 کوڈ منگوائیں</button>
+        <button type="button" onclick="smOpenCodeRequest(false)" style="flex:1; width:auto !important; margin:0 !important; padding:6px 4px !important; border-radius:10px !important; background:#16a34a !important; color:#fff !important; font-family:inherit; font-size:14px !important; font-weight:800; box-shadow:none !important; line-height:1.9;">📦 پیکج / تجدید</button>
       </div>
       <div id="smTrialCodeBox" style="display:none; margin-top:6px;">
         <input id="smTrialCodeInput" type="text" dir="ltr" placeholder="ایکٹیویشن کوڈ" style="width:100% !important; box-sizing:border-box; text-align:center; font-family:'Arial Black',Arial,sans-serif; font-size:16px; border:2px solid #93c5fd !important; border-radius:10px !important;">
@@ -4166,7 +4166,7 @@ function smOwner(){ try{ return AppState.settings.ownerName || 'مالک'; }catc
       <div id="smTrialHomeBar" dir="rtl" style="display:none; margin:0 2px 10px; padding:7px 9px; border-radius:14px; background:linear-gradient(145deg,#fef9c3,#fde68a); border:2px solid #f59e0b; font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif; color:#78350f; text-align:center;">
         <div id="smTrialHomeTxt" style="font-size:15px; font-weight:800; line-height:2;"></div>
         <div style="display:flex; gap:6px; margin-top:3px;">
-          <button type="button" onclick="smOpenCodeRequest(false)" style="flex:1; padding:7px 4px; border:none; border-radius:10px; background:#16a34a; color:#fff; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">📲 کوڈ منگوائیں</button>
+          <button type="button" onclick="smOpenCodeRequest(false)" style="flex:1; padding:7px 4px; border:none; border-radius:10px; background:#16a34a; color:#fff; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">📦 پیکج / تجدید</button>
           <button type="button" onclick="smHomeApplyCode()" style="flex:1; padding:7px 4px; border:none; border-radius:10px; background:#1d4ed8; color:#fff; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">🔑 کوڈ لگائیں</button>
         </div>
       </div>
@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1511SU274'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'نارنجی ڈبہ اب صرف کل کے دن کی کم وصولی؛ لال ڈبہ آج تک کی ٹوٹل کم وصولی'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO275'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'نیا آسان نظام: پیکج کی درخواست چھوٹے کوڈ سے، ادائیگی کے 3 اکاؤنٹ، ملازم اپنا کوڈ بنا کر خود جڑے؛ ای میل لاگ اِن ختم'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -10543,10 +10543,16 @@ window.__cloudSyncError = null;
 function _isOwnerAuth(a){ return !!(a && a.owner === true && a.refreshToken); }
 async function ensureFirebaseAuth(){
   const auth = AppState.settings.fbAuth;
-  if(!_isOwnerAuth(auth)){
-    window.__cloudSyncError = 'مالک لاگ ان ضروری ہے';
-    try{ ownerGateShow(); }catch(e){}
-    return null;
+  // 🔓 SM1611MO275 (مالک کا حکم — سبزی منڈی ہر نئے کاروبار کے لیے): ای میل والا دروازہ ختم؛ شناخت نہ ہو تو خاموش گمنام شناخت (پہلے جیسی)
+  if(!auth || !auth.refreshToken){
+    try{
+      const r0 = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ returnSecureToken: true }) });
+      if(!r0.ok){ let why = 'HTTP ' + r0.status; try{ const eb = await r0.json(); if(eb && eb.error && eb.error.message) why = eb.error.message; }catch(e2){} window.__cloudSyncError = `Auth failed (${why}) on ${location.hostname}`; return null; }
+      const d0 = await r0.json();
+      AppState.settings.fbAuth = { localId: d0.localId, idToken: d0.idToken, refreshToken: d0.refreshToken, expiresAt: Date.now() + (parseInt(d0.expiresIn || '3600') * 1000) };
+      persistAllData(); window.__cloudSyncError = null;
+      return AppState.settings.fbAuth.idToken;
+    }catch(e){ window.__cloudSyncError = `Network/Auth error on ${location.hostname}: ${e.message}`; return null; }
   }
   if(auth.idToken && auth.expiresAt && auth.expiresAt > Date.now() + 60000){
     window.__cloudSyncError = null;
@@ -10561,7 +10567,7 @@ async function ensureFirebaseAuth(){
     if(res.ok){
       const data = await res.json();
       AppState.settings.fbAuth = {
-        owner: true, email: auth.email || '',
+        owner: !!auth.owner, email: auth.email || '',
         localId: data.user_id, idToken: data.id_token, refreshToken: data.refresh_token,
         expiresAt: Date.now() + (parseInt(data.expires_in || '3600') * 1000)
       };
@@ -10573,10 +10579,9 @@ async function ensureFirebaseAuth(){
     try{ const eb = await res.json(); reason = (eb && eb.error && eb.error.message) || ''; }catch(e2){}
     if(/TOKEN_EXPIRED|INVALID_REFRESH_TOKEN|USER_DISABLED|USER_NOT_FOUND|CREDENTIAL_TOO_OLD|INVALID_GRANT/i.test(reason)){
       // مالک نے پاس ورڈ بدل دیا یا اکاؤنٹ بند کر دیا — اس موبائل کو دوبارہ لاگ ان کرنا ہو گا
-      delete AppState.settings.fbAuth;
+      delete AppState.settings.fbAuth; // SM1611MO275: اگلی بار خود نئی گمنام شناخت
       persistAllData();
       window.__cloudSyncError = 'لاگ ان ختم ہو گیا: ' + reason;
-      try{ ownerGateShow(); }catch(e3){}
       return null;
     }
     window.__cloudSyncError = `Auth failed (${reason || ('HTTP ' + res.status)}) on ${location.hostname}`;
@@ -10647,10 +10652,7 @@ function ownerGateShow(){
   document.getElementById('ownerGateBtn').addEventListener('click', go);
   d.addEventListener('keydown', ev => { if(ev.key === 'Enter') go(); });
 }
-(function(){
-  const chk = () => { try{ if(!window.__APP_WRONG_REPO && !_isOwnerAuth(AppState.settings.fbAuth)) ownerGateShow(); }catch(e){} };
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', chk); else chk();
-})();
+/* SM1611MO275: ای میل لاگ اِن کا خودکار دروازہ ہٹایا (ownerGateShow اب کہیں نہیں کھلتا) */
 
 
 // ---------- Firestore کو authenticated (Bearer token) درخواست بھیجنے کا مختصر طریقہ ----------
@@ -49728,7 +49730,7 @@ async function loadIssuedCodesList(){
     const res = await devFirestoreFetch(`licenses?key=${FIREBASE_API_KEY}&pageSize=300`); // 📊 SM2410SA179: فہرست صرف ڈویلپر
     if(!res.ok) throw new Error('فہرست نہیں مل سکی');
     const data = await res.json();
-    const docs = data.documents || [];
+    const docs = (data.documents || []).filter(d => !/\/__[^/]*$/.test(d.name)); // SM1611MO275: __smrates (ریٹ) کوڈ نہیں
     // ---------- تازہ ترین کوڈ سب سے اوپر ----------
     _issuedCodesCache = docs.map(d => {
       const code = d.name.split('/').pop();
@@ -49966,6 +49968,7 @@ function licPayConfirm(o){
     let lastRate = 0; try{ lastRate = _licNum(localStorage.getItem(KEY)) || _licNum(localStorage.getItem('smLicMonthly')); }catch(e){}
     const prev = o.prev || null;
     const st = { days: Number(o.days) || 30, rate: lastRate || (o.plan && typeof SM_PLAN_STAFF !== 'undefined' && SM_PLAN_STAFF[o.plan] !== undefined ? (SM_PLAN_STAFF[o.plan] + 1) * 1000 : 1000), deal: 0, dealEd: false, paid: 0, paidEd: false };
+    { const pre = window._smcPre; if(pre){ if(pre.days) st.days = pre.days; if(pre.rate) st.rate = pre.rate; if(pre.deal){ st.deal = pre.deal; st.dealEd = true; } } } // 🔢 SM1611MO275: دکاندار کے NB / SB کوڈ سے مدت، ریٹ، رقم
     const CH = o.allowLifetime ? [30, 90, 180, 365, 36500] : [30, 90, 180, 365];
     const monthsOf = d => d >= 36500 ? 0 : Math.max(1, Math.round(d / 30));
     const ov = document.createElement('div');
@@ -56135,7 +56138,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <button type="button" onclick="smRegSave()" style="width:100%; margin-top:8px; padding:10px; border:none; border-radius:12px; background:linear-gradient(135deg,#16a34a,#065f46); color:#fff; font-family:inherit; font-size:19px; font-weight:800; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); line-height:1.9;">🎁 7 دن کا مفت ٹرائل شروع کریں</button>
       <div style="display:flex; gap:8px; margin-top:8px;">
         <button type="button" onclick="smRegToggleCode()" style="flex:1; padding:8px 4px; border:2px solid #1d4ed8; border-radius:12px; background:#eff6ff; color:#1e3a8a; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">🔑 ایکٹیویشن کوڈ لگائیں</button>
-        <button type="button" onclick="smOpenCodeRequest(true)" style="flex:1; padding:8px 4px; border:2px solid #16a34a; border-radius:12px; background:#f0fdf4; color:#14532d; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">📲 کوڈ منگوائیں</button>
+        <button type="button" onclick="smOpenCodeRequest(true)" style="flex:1; padding:8px 4px; border:2px solid #16a34a; border-radius:12px; background:#f0fdf4; color:#14532d; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">📦 پیکج / تجدید</button>
       </div>
       <div id="smRegCodeBox" style="display:none; margin-top:8px; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:12px; padding:8px;">
         <input id="smRegCodeInput" type="text" dir="ltr" placeholder="ایکٹیویشن کوڈ یہاں لکھیں" style="width:100%; box-sizing:border-box; padding:9px; border:2px solid #93c5fd; border-radius:10px; font-size:17px; text-align:center; font-family:'Arial Black',Arial,sans-serif;">
@@ -56144,7 +56147,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:8px; flex-wrap:wrap;">
         <span style="font-size:12px; color:#64748b;">ابتدائی پن: <b dir="ltr">1234</b></span>
-        <a href="javascript:void(0)" onclick="smJoinAsStaff()" style="font-size:12.5px; color:#1d4ed8; font-weight:800;">📲 ملازم ہیں؟ دکان سے جڑیں</a>
+        <a href="javascript:void(0)" onclick="smStaffJoinOpen()" style="font-size:12.5px; color:#1d4ed8; font-weight:800;">🧑‍💼 ملازم ہیں؟ دکان سے جڑیں</a>
         <a href="javascript:void(0)" onclick="smRegRestoreOwner()" style="font-size:12.5px; color:#92400e; font-weight:800;">🔁 مالک ہیں، ایپ دوبارہ لگائی؟ پرانی دکان واپس لائیں</a>
         <span id="smRegVersion" dir="ltr" style="display:inline-block; background:#15803d; color:#fff; font-family:Arial,sans-serif; font-size:12px; font-weight:700; letter-spacing:.4px; padding:3px 12px; border-radius:999px;"></span>
       </div>
@@ -56684,6 +56687,481 @@ window.addEventListener('DOMContentLoaded', () => {
   }catch(e){}
   if(!AppState.settings.smRegistered) document.getElementById('smRegOverlay').style.display = 'block';
 });
+</script>
+<script type="text/fm-boot">
+/* 🔢 SM1611MO275 (مالک کا حکم — «لمبے پیغام نہیں، چھوٹے کوڈ»): تین چھوٹے 6 ہندسوں کے کوڈ — تفصیل سرور پر (AIO worker /smcode)
+   NB-xxxxxx  نیا کاروبار: دکاندار پیکج + مدت چنے (رقم ریٹ سے خود) ← ڈویلپر کو تیار پیغام + فوراً ادائیگی کے 3 اکاؤنٹ
+   SB-xxxxxx  تجدید: وہی، پرانا کوڈ / تاریخ ساتھ
+   JS-xxxxxx  ملازم کا فون (نام، موبائل، اپنا PIN) ← مالک ملازمین والی اسکرین میں 6 ہندسے لکھے ← ملازم کا فون خود جڑ کر اندر
+   ڈویلپر پینل «🎁 کوڈ بنائیں» کے اوپر «🔑 دکاندار کا کوڈ لکھیں» — سب خانے خود، پیسے آنے پر ✅ ← UID پر کوڈ (فون خود چالو) / مدت بڑھے۔
+   ریٹ: ڈویلپر پینل «💰 پیکج کے ریٹ» ← licenses/__smrates (سب فون یہیں سے پڑھتے ہیں)۔ */
+(function(){
+  const API = 'https://aio-pos-verify.pbtcodelabs.workers.dev/smcode';
+  const PAY = [
+    { n: 'ایزی پیسہ', t: 'Abdul Hafeez', no: '03206793793', pk: 'pk.com.telenor.phoenix', c: '#15803d', bg: '#f0fdf4' },
+    { n: 'جاز کیش', t: 'Abdul Hafeez', no: '03206793793', pk: 'com.techlogix.mobilinkcustomer', c: '#b91c1c', bg: '#fef2f2' },
+    { n: 'میزان بینک', t: 'Abdul Hafeez', no: '98270103048186', iban: 'PK63MEZN0098270103048186', pk: 'invo8.meezan.mb', c: '#6d28d9', bg: '#f5f3ff' }
+  ];
+  const PLANS = ['P1', 'P1+1', 'P1+2', 'P1+3'];
+  const MONTHS = [1, 3, 6, 12];
+  const RATES0 = { 'P1': 1000, 'P1+1': 2000, 'P1+2': 3000, 'P1+3': 4000 };
+  const K = "font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;";
+  const fmt = n => Number(n || 0).toLocaleString('en-US');
+  const mLabel = m => m === 12 ? '1 سال' : (m === 1 ? '1 مہینہ' : m + ' مہینے');
+  const dDays = m => m === 12 ? 365 : m * 30;
+  const pLabel = p => p === 'P1' ? 'صرف مالک' : 'مالک + ' + SM_PLAN_STAFF[p] + ' ملازم';
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  async function smc(body){
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return r.json();
+  }
+  window.smcApi = smc;
+  const uid = () => { try{ return String(getOrCreateDeviceUID()); }catch(e){ return ''; } };
+  function toast(t, bg){
+    const d = document.createElement('div'); d.textContent = t;
+    d.style.cssText = 'position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:2147483647;background:' + (bg || '#15803d') + ';color:#fff;padding:10px 18px;border-radius:14px;font-weight:800;direction:rtl;max-width:92vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3);' + K;
+    document.body.appendChild(d); setTimeout(() => d.remove(), 5000);
+  }
+  function ov(id, html){
+    let o = document.getElementById(id); if(o) o.remove();
+    o = document.createElement('div'); o.id = id; o.setAttribute('dir', 'rtl');
+    o.style.cssText = 'position:fixed;inset:0;z-index:2147483300;background:rgba(15,23,42,.62);display:flex;align-items:center;justify-content:center;padding:12px;' + K;
+    o.innerHTML = '<div style="background:#fff;border-radius:20px;max-width:420px;width:100%;max-height:94vh;overflow:auto;box-shadow:0 18px 50px rgba(0,0,0,.4)">' + html + '</div>';
+    document.body.appendChild(o); return o;
+  }
+  const head = (t, bg) => '<div style="background:' + (bg || 'linear-gradient(135deg,#16a34a,#065f46)') + ';color:#fff;padding:10px 14px;font-size:21px;font-weight:800;text-align:center;line-height:1.9">' + t + '</div>';
+  const btnS = (bg, c) => 'border:none;border-radius:12px;padding:9px 10px;font-weight:800;font-size:16px;cursor:pointer;background:' + bg + ';color:' + c + ';' + K + 'line-height:1.8';
+
+  // ---------- 💰 ریٹ ----------
+  function rates(){ try{ const r = JSON.parse(localStorage.getItem('smRates') || 'null'); if(r && r.P1) return r; }catch(e){} return Object.assign({}, RATES0); }
+  async function loadRates(){
+    try{
+      const r = await fetch(FIRESTORE_BASE + '/licenses/__smrates?key=' + FIREBASE_API_KEY, { cache: 'no-store' });
+      if(!r.ok) return rates();
+      const d = await r.json(); const j = JSON.parse(((d.fields || {}).rates || {}).stringValue || '{}');
+      if(j && j.P1){ localStorage.setItem('smRates', JSON.stringify(j)); return j; }
+    }catch(e){}
+    return rates();
+  }
+  window.smRates = rates;
+
+  // ---------- 📦 پیکج / تجدید کی درخواست (دکاندار کا فون) ----------
+  const isRenew = () => { const st = AppState.settings; return !!(st.lastActivationCode || (!st.isOnFreeTrial && st.subscriptionExpiry)); };
+  let P = null;
+  window.smPkgOpen = async function(fromReg){
+    if(fromReg){ if(typeof smRegCollect === 'function' && !smRegCollect()) return; }
+    const st = AppState.settings;
+    if(st.smJoinedAsStaff){ alert('یہ ملازم کا فون ہے — سبسکرپشن مالک اپنے فون سے لیتا ہے۔'); return; }
+    if(!st.smRegistered || !st.businessPhone){ alert('پہلے دکان کا نام، مالک کا نام اور موبائل نمبر لکھیں۔'); return; }
+    const kind = isRenew() ? 'SB' : 'NB';
+    P = { kind, plan: (kind === 'SB' && PLANS.indexOf(smPlan()) >= 0) ? smPlan() : 'P1+1', m: 6, R: rates() };
+    draw();
+    const R = await loadRates(); if(P){ P.R = R; draw(); }
+  };
+  function draw(){
+    const st = AppState.settings, R = P.R, amt = (R[P.plan] || 0) * P.m;
+    const chip = (on, t, js) => '<button type="button" onclick="' + js + '" style="flex:1 1 45%;min-width:0;padding:7px 4px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;line-height:1.7;' + K + (on ? 'background:#16a34a;color:#fff;border:2px solid #15803d' : 'background:#f8fafc;color:#14532d;border:2px solid #bbf7d0') + '">' + t + '</button>';
+    const html = head(P.kind === 'SB' ? '🔄 سبسکرپشن کی تجدید' : '📦 پیکج لیں')
+      + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">'
+      + '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:6px 10px;font-size:15px;line-height:1.9">🏪 <b>' + esc(st.businessName) + '</b><br>👤 ' + esc(st.ownerName) + ' — <span dir="ltr" style="font-family:Arial">' + esc(st.businessPhone) + '</span>'
+      + (P.kind === 'SB' && st.subscriptionExpiry ? '<br>📅 موجودہ مدت: <b dir="ltr" style="font-family:Arial">' + formatDateDMY(st.subscriptionExpiry) + '</b> تک' : '') + '</div>'
+      + '<div style="font-weight:800;font-size:16px">👥 کتنے لوگ استعمال کریں گے؟</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:6px">' + PLANS.map(p => chip(P.plan === p, pLabel(p) + '<br><small dir="ltr" style="font-family:Arial;font-size:12px">' + p.replace('P', '') + ' • Rs ' + fmt(R[p]) + '/مہینہ</small>', "smPkgSet('plan','" + p + "')")).join('') + '</div>'
+      + '<div style="font-weight:800;font-size:16px">⏱️ کتنی مدت؟</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:6px">' + MONTHS.map(m => chip(P.m === m, mLabel(m), "smPkgSet('m'," + m + ")")).join('') + '</div>'
+      + '<div style="background:#ecfdf5;border:2px solid #16a34a;border-radius:14px;padding:6px;text-align:center"><div style="font-size:15px;font-weight:800;color:#065f46">💰 کل رقم</div><div dir="ltr" style="font-family:Arial Black,Arial;font-size:28px;color:#065f46">Rs ' + fmt(amt) + '</div><div dir="ltr" style="font-family:Arial;font-size:12px;color:#475569">' + fmt(R[P.plan]) + ' × ' + P.m + '</div></div>'
+      + '<button type="button" id="smPkgSend" onclick="smPkgSend()" style="' + btnS('#25d366', '#fff') + 'font-size:19px">📨 ڈویلپر کو بھیجیں</button>'
+      + '<button type="button" onclick="document.getElementById(\'smPkgOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">✖ بند کریں</button></div>';
+    ov('smPkgOv', html);
+  }
+  window.smPkgSet = function(k, v){ P[k] = v; draw(); };
+  window.smPkgSend = async function(){
+    const st = AppState.settings, R = P.R, amt = (R[P.plan] || 0) * P.m, b = document.getElementById('smPkgSend');
+    if(b){ b.disabled = true; b.textContent = '⏳ بھیجا جا رہا ہے…'; }
+    const data = { uid: uid(), shop: st.businessName || '', owner: st.ownerName || '', mobile: st.businessPhone || '', plan: P.plan, m: P.m, days: dDays(P.m), amt, rate: R[P.plan] || 0,
+      cur: st.lastActivationCode || '', exp: st.subscriptionExpiry || '', curPlan: smPlan(), trial: !!st.isOnFreeTrial, ver: (typeof APP_BUILD_VERSION !== 'undefined') ? APP_BUILD_VERSION : '' };
+    let j = null; try{ j = await smc({ op: 'put', kind: P.kind, uid: uid(), data }); }catch(e){}
+    if(!j || !j.ok){ if(b){ b.disabled = false; b.textContent = '📨 ڈویلپر کو بھیجیں'; } alert('⚠️ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں' + (j && j.reason === 'wait' ? ' (کچھ دیر بعد)' : '')); return; }
+    const req = { code: j.code, kind: P.kind, plan: P.plan, m: P.m, amt, at: Date.now() };
+    st.smPendReq = req; try{ saveToStorage('settings', st); }catch(e){}
+    const msg = (P.kind === 'SB' ? '🔄 سبزی منڈی — سبسکرپشن کی تجدید' : '🥬 سبزی منڈی — نیا پیکج')
+      + '\nدکان: ' + data.shop + '\nنام: ' + data.owner + ' — ' + data.mobile
+      + '\nپیکج: ' + P.plan.replace('P', '') + ' (' + pLabel(P.plan) + ') — ' + mLabel(P.m)
+      + '\nرقم: Rs ' + fmt(amt)
+      + (P.kind === 'SB' && data.exp ? '\nموجودہ مدت: ' + formatDateDMY(data.exp) + ' تک' : '')
+      + '\nکوڈ: ' + P.kind + '-' + j.code
+      + '\n👉 رقم وصول ہونے اور تصدیق کے بعد کوڈ جاری کر دیں۔';
+    const o = document.getElementById('smPkgOv'); if(o) o.remove();
+    try{ window.open('https://wa.me/' + getDeveloperContact().whatsapp + '?text=' + encodeURIComponent(msg), '_blank'); }catch(e){}
+    smPayShow(true);
+  };
+
+  // ---------- 💳 ادائیگی کا پاپ اپ ----------
+  window.smPayShow = function(fresh){
+    const r = AppState.settings.smPendReq; if(!r) return;
+    const cards = PAY.map((a, i) => '<div style="background:' + a.bg + ';border:2px solid ' + a.c + ';border-radius:14px;padding:7px 10px">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px;color:' + a.c + '">' + a.n + '</b><span dir="ltr" style="font-family:Arial;font-size:13px;color:#334155">' + a.t + '</span></div>'
+      + '<div dir="ltr" style="font-family:Arial Black,Arial;font-size:20px;text-align:center;color:#0f172a;letter-spacing:1px">' + a.no + '</div>'
+      + (a.iban ? '<div dir="ltr" style="font-family:Arial;font-size:11.5px;text-align:center;color:#475569">IBAN: ' + a.iban + '</div>' : '')
+      + '<div style="display:flex;gap:6px;margin-top:4px"><button type="button" onclick="smPayCopy(' + i + ')" style="flex:1;' + btnS('#fff', a.c) + 'border:1.5px solid ' + a.c + ';font-size:14px;padding:5px">📋 نمبر کاپی</button>'
+      + '<button type="button" onclick="smPayApp(' + i + ')" style="flex:1;' + btnS(a.c, '#fff') + 'font-size:14px;padding:5px">📲 ایپ کھولیں</button></div></div>').join('');
+    const html = head(fresh ? '✅ آپ کی درخواست ڈویلپر کو پہنچ گئی' : '⏳ ادائیگی باقی', 'linear-gradient(135deg,#0f766e,#134e4a)')
+      + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">'
+      + '<div style="text-align:center;font-size:16px;line-height:2">📦 ' + r.plan.replace('P', '') + ' (' + pLabel(r.plan) + ') — ' + mLabel(r.m) + '<br>💰 <b dir="ltr" style="font-family:Arial Black,Arial;font-size:24px;color:#065f46">Rs ' + fmt(r.amt) + '</b><br>اس رقم کو نیچے کسی ایک اکاؤنٹ میں بھیجیں تاکہ آپ کو کوڈ بنا کر بھیجا جا سکے:</div>'
+      + cards
+      + '<div style="background:#fffbeb;border:1.5px dashed #d97706;border-radius:12px;padding:7px 10px"><div style="font-weight:800;font-size:15px;color:#92400e">📸 ادائیگی کا ثبوت (اختیاری)</div>'
+      + '<input id="smPayTid" dir="ltr" placeholder="Transaction ID" style="width:100%;box-sizing:border-box;padding:7px;border:1.5px solid #d97706;border-radius:10px;font-size:15px;margin-top:4px;text-align:center">'
+      + '<div style="display:flex;gap:6px;margin-top:5px"><label style="flex:1;text-align:center;' + btnS('#fef3c7', '#92400e') + 'font-size:14px;padding:5px">🖼️ اسکرین شاٹ<input type="file" accept="image/*" style="display:none" onchange="smPayShot(this)"></label>'
+      + '<button type="button" onclick="smPayProof()" style="flex:1;' + btnS('#d97706', '#fff') + 'font-size:14px;padding:5px">📨 ثبوت بھیجیں</button></div><div id="smPayMsg" style="font-size:13px;font-weight:800;text-align:center;margin-top:3px"></div></div>'
+      + '<div style="font-size:13px;color:#475569;text-align:center;line-height:1.9">رقم ملتے ہی ڈویلپر کوڈ جاری کرے گا — آپ کی ایپ <b>خود</b> چالو ہو جائے گی، کچھ لکھنا نہیں۔<br>درخواست نمبر: <b dir="ltr" style="font-family:Arial">' + r.kind + '-' + r.code + '</b></div>'
+      + '<button type="button" onclick="document.getElementById(\'smPayOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">ٹھیک ہے</button></div>';
+    ov('smPayOv', html);
+  };
+  let _shot = '';
+  window.smPayCopy = async function(i){ const a = PAY[i]; try{ await navigator.clipboard.writeText(a.no); toast('📋 ' + a.n + ' نمبر کاپی ہو گیا'); }catch(e){ prompt('نمبر کاپی کر لیں:', a.no); } };
+  window.smPayApp = function(i){
+    const a = PAY[i]; try{ navigator.clipboard.writeText(a.no); }catch(e){}
+    if(/Android/i.test(navigator.userAgent)) location.href = 'intent://#Intent;package=' + a.pk + ';S.browser_fallback_url=' + encodeURIComponent('https://play.google.com/store/apps/details?id=' + a.pk) + ';end';
+    else window.open('https://play.google.com/store/apps/details?id=' + a.pk, '_blank');
+  };
+  window.smPayShot = function(inp){ const f = inp.files && inp.files[0]; if(!f) return; smShrinkImage(f, d => { _shot = d; const m = document.getElementById('smPayMsg'); if(m){ m.style.color = '#15803d'; m.textContent = '✅ اسکرین شاٹ لگ گیا — «ثبوت بھیجیں» دبائیں'; } }); };
+  window.smPayProof = async function(){
+    const r = AppState.settings.smPendReq, m = document.getElementById('smPayMsg'), tid = (document.getElementById('smPayTid').value || '').trim();
+    if(!tid && !_shot){ m.style.color = '#b91c1c'; m.textContent = 'Transaction ID لکھیں یا اسکرین شاٹ لگائیں'; return; }
+    m.style.color = '#334155'; m.textContent = '⏳ …';
+    let j = null; try{ j = await smc({ op: 'proof', code: r.code, uid: uid(), tid, shot: _shot }); }catch(e){}
+    if(j && j.ok){ m.style.color = '#15803d'; m.textContent = '✅ ثبوت ڈویلپر کو پہنچ گیا'; _shot = ''; } else { m.style.color = '#b91c1c'; m.textContent = '⚠️ نہیں گیا — انٹرنیٹ چیک کریں'; }
+  };
+  // ⏳ «ادائیگی باقی» کی چھوٹی پٹی + ہر منٹ حالت (جاری ہوتے ہی خود چالو)
+  function pendPill(){
+    const r = AppState.settings && AppState.settings.smPendReq;
+    let p = document.getElementById('smPendPill');
+    if(!r || Date.now() - r.at > 30 * 864e5){ if(p) p.remove(); return; }
+    if(!p){ p = document.createElement('button'); p.id = 'smPendPill'; p.type = 'button'; p.onclick = () => smPayShow(false);
+      p.style.cssText = 'position:fixed;bottom:74px;left:10px;z-index:2147482000;border:none;border-radius:999px;background:#d97706;color:#fff;padding:5px 14px;font-weight:800;font-size:14px;box-shadow:0 4px 12px rgba(0,0,0,.3);cursor:pointer;' + K;
+      document.body.appendChild(p); }
+    p.textContent = '⏳ ادائیگی باقی — Rs ' + fmt(r.amt);
+  }
+  let _pollBusy = false;
+  async function pollReq(){
+    const st = AppState.settings, r = st && st.smPendReq; pendPill();
+    if(!r || _pollBusy || navigator.onLine === false) return; _pollBusy = true;
+    try{
+      const j = await smc({ op: 'me', code: r.code, uid: uid() });
+      if(j && (j.st === 'done' || j.st === 'no' || j.reason === 'expired' || j.reason === 'none')){
+        delete st.smPendReq; saveToStorage('settings', st); pendPill();
+        if(j.st === 'done'){
+          try{ await restoreSubscriptionFromCloud(); }catch(e){}
+          try{ if(typeof licRecheckExtend === 'function') await licRecheckExtend(true); }catch(e){}
+          try{ await smRefreshSubscription(null); }catch(e){}
+          try{ smPushLicenseMirror(); }catch(e){}
+          toast('✅ آپ کا پیکج جاری ہو گیا — ' + (st.subscriptionExpiry ? formatDateDMY(st.subscriptionExpiry) + ' تک' : ''));
+          try{ const g = document.getElementById('subscriptionGateScreen'); if(g && getComputedStyle(g).display !== 'none' && isSubscriptionActive()) setTimeout(() => location.reload(), 1800); }catch(e){}
+        }
+      }
+    }catch(e){}
+    _pollBusy = false;
+  }
+  setTimeout(pollReq, 5000); setInterval(pollReq, 60000);
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) pollReq(); });
+
+  // ---------- تجدید کے سب راستے اسی نئے پاپ اپ پر ----------
+  const _odc = window.openDevChat;
+  window.openDevChat = openDevChat = function(ctx){
+    try{ const st = AppState.settings; if(ctx === 'subscription' && st.smRegistered && !st.smJoinedAsStaff){ smPkgOpen(false); return; } }catch(e){}
+    return _odc.apply(this, arguments);
+  };
+  window.smOpenCodeRequest = smOpenCodeRequest = function(fromReg){ return smPkgOpen(!!fromReg); };
+  function ownerGate(){
+    try{
+      const st = AppState.settings; if(!st.smRegistered || st.smJoinedAsStaff) return;
+      const g = document.getElementById('subscriptionGateScreen'); if(!g) return;
+      const h = g.querySelector('h2'); if(h) h.textContent = '🔒 سبسکرپشن ختم ہو گئی';
+      const s = document.getElementById('subGateStatus'); if(s) s.textContent = 'کام جاری رکھنے کے لیے نیچے سے پیکج کی درخواست بھیجیں — رقم ملتے ہی ایپ خود کھل جائے گی۔';
+      g.querySelectorAll('.loginHint').forEach(x => x.style.display = 'none');
+      if(!document.getElementById('smGateReq')){
+        const b = document.createElement('button'); b.id = 'smGateReq'; b.type = 'button';
+        b.textContent = '🔄 سبسکرپشن / پیکج کی درخواست'; b.onclick = () => smPkgOpen(false);
+        b.style.cssText = 'width:100%;margin:0 0 12px;padding:12px;border:none;border-radius:12px;background:#16a34a;color:#fff;font-weight:800;font-size:18px;cursor:pointer;line-height:1.8;' + K;
+        const box = g.querySelector('.loginBox'); if(box && s) s.after(b);
+      }
+      if(st.smPendReq && !document.getElementById('smGatePay')){
+        const p = document.createElement('button'); p.id = 'smGatePay'; p.type = 'button'; p.textContent = '⏳ ادائیگی باقی — اکاؤنٹ دیکھیں'; p.onclick = () => smPayShow(false);
+        p.style.cssText = 'width:100%;margin:0 0 12px;padding:9px;border:2px solid #d97706;border-radius:12px;background:#fffbeb;color:#92400e;font-weight:800;font-size:16px;cursor:pointer;' + K;
+        const b = document.getElementById('smGateReq'); if(b) b.after(p);
+      }
+    }catch(e){}
+  }
+  const _ssg = window.showSubscriptionGate;
+  window.showSubscriptionGate = showSubscriptionGate = function(){ const r = _ssg.apply(this, arguments); setTimeout(ownerGate, 80); setTimeout(ownerGate, 800); return r; };
+  // لاگ اِن کی سرخ پٹی دبائیں تو تجدید
+  document.addEventListener('click', e => { const p = e.target && e.target.closest && e.target.closest('#loginSubStatus.smSubWarn'); if(p && !AppState.settings.smJoinedAsStaff) smPkgOpen(false); });
+
+  // ================= 🧑‍💼 ملازم: JS کوڈ =================
+  window.smStaffJoinOpen = function(){
+    const p = (() => { try{ return JSON.parse(localStorage.getItem('smJsPend') || 'null'); }catch(e){ return null; } })();
+    if(p && p.code && Date.now() - p.at < 2 * 864e5) return jsWait(p);
+    const html = head('🧑‍💼 دکان سے جڑیں', 'linear-gradient(135deg,#1d4ed8,#1e3a8a)')
+      + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">'
+      + '<div style="font-size:14px;color:#334155;line-height:1.9">اپنی تفصیل لکھیں — ایک چھوٹا کوڈ بنے گا جو آپ اپنے مالک کو بھیجیں گے۔</div>'
+      + '<label style="font-weight:800">👤 آپ کا نام *</label><input id="smJsName" dir="rtl" style="padding:9px;border:2px solid #93c5fd;border-radius:10px;font-size:17px;' + K + '">'
+      + '<label style="font-weight:800">📱 آپ کا موبائل نمبر *</label><input id="smJsMob" type="tel" inputmode="numeric" dir="ltr" placeholder="03XXXXXXXXX" maxlength="13" style="padding:9px;border:2px solid #93c5fd;border-radius:10px;font-size:18px;text-align:center;font-family:Arial">'
+      + '<label style="font-weight:800">🔑 اپنا PIN بنائیں (4 ہندسے) *</label><input id="smJsPin" type="tel" inputmode="numeric" dir="ltr" maxlength="6" placeholder="••••" style="padding:9px;border:2px solid #93c5fd;border-radius:10px;font-size:22px;text-align:center;font-family:Arial;letter-spacing:6px">'
+      + '<div style="font-size:12.5px;color:#64748b">یہی PIN لکھ کر آپ روز ایپ میں داخل ہوں گے — یاد رکھیں۔</div>'
+      + '<button type="button" id="smJsGo" onclick="smJsMake()" style="' + btnS('#1d4ed8', '#fff') + 'font-size:19px">🔢 کوڈ بنائیں</button>'
+      + '<button type="button" onclick="document.getElementById(\'smJsOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">✖ بند کریں</button></div>';
+    ov('smJsOv', html);
+  };
+  window.smJsMake = async function(){
+    const name = (document.getElementById('smJsName').value || '').trim(), mob = (document.getElementById('smJsMob').value || '').replace(/[^0-9]/g, ''), pin = (document.getElementById('smJsPin').value || '').replace(/\D/g, '');
+    if(name.length < 2){ alert('اپنا نام لکھیں'); return; }
+    if(!/^03\d{9}$/.test(mob)){ alert('درست موبائل نمبر لکھیں (03XXXXXXXXX)'); return; }
+    if(pin.length < 4){ alert('کم از کم 4 ہندسوں کا PIN بنائیں'); return; }
+    if(/^(\d)\1+$/.test(pin) || pin === '1234'){ alert('یہ PIN بہت آسان ہے — کوئی اور PIN بنائیں'); return; }
+    const b = document.getElementById('smJsGo'); b.disabled = true; b.textContent = '⏳ …';
+    let j = null; try{ j = await smc({ op: 'put', kind: 'JS', uid: uid(), data: { name, mobile: mob, pinH: await hashPin(pin) } }); }catch(e){}
+    if(!j || !j.ok){ b.disabled = false; b.textContent = '🔢 کوڈ بنائیں'; alert('⚠️ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں'); return; }
+    const p = { code: j.code, name, mobile: mob, at: Date.now() };
+    try{ localStorage.setItem('smJsPend', JSON.stringify(p)); sessionStorage.setItem('smJoinPin', pin); localStorage.setItem('smJoinName', name); }catch(e){}
+    jsWait(p);
+  };
+  function jsMsg(p){ return 'سبزی منڈی — دکان سے جڑنے کا کوڈ: JS-' + p.code + '\nنام: ' + p.name + '\nموبائل: ' + p.mobile + '\n👉 مالک: مینیو ← ملازمین ← «ملازم کا کوڈ» میں یہ 6 ہندسے لکھیں: ' + p.code; }
+  function jsWait(p){
+    const html = head('🧑‍💼 یہ کوڈ مالک کو بھیجیں', 'linear-gradient(135deg,#1d4ed8,#1e3a8a)')
+      + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:9px;text-align:center">'
+      + '<div dir="ltr" style="font-family:Arial Black,Arial;font-size:38px;color:#1e3a8a;letter-spacing:3px;background:#eff6ff;border:2px dashed #3b82f6;border-radius:14px;padding:6px">JS-' + p.code + '</div>'
+      + '<div style="font-size:15px;line-height:1.9">' + esc(p.name) + ' — <span dir="ltr" style="font-family:Arial">' + esc(p.mobile) + '</span></div>'
+      + '<div style="display:flex;gap:6px"><button type="button" onclick="smJsShare()" style="flex:1;' + btnS('#25d366', '#fff') + '">📤 مالک کو واٹس ایپ</button><button type="button" onclick="smJsCopy()" style="flex:1;' + btnS('#e0f2fe', '#075985') + '">📋 کاپی</button></div>'
+      + '<div id="smJsStat" style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:7px;font-size:15px;font-weight:800;color:#92400e;line-height:1.9">⏳ مالک کی منظوری کا انتظار…<br><small style="font-weight:400">مالک کوڈ لکھے گا تو یہ فون خود دکان سے جڑ جائے گا</small></div>'
+      + '<button type="button" onclick="smJsCancel()" style="' + btnS('#fee2e2', '#b91c1c') + 'font-size:14px">🗑️ نیا کوڈ بنائیں</button>'
+      + '<button type="button" onclick="document.getElementById(\'smJsOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">بند کریں (کوڈ محفوظ رہے گا)</button></div>';
+    ov('smJsOv', html);
+    jsPoll();
+  }
+  const jsPend = () => { try{ return JSON.parse(localStorage.getItem('smJsPend') || 'null'); }catch(e){ return null; } };
+  window.smJsShare = () => { const p = jsPend(); if(p) window.open('https://wa.me/?text=' + encodeURIComponent(jsMsg(p)), '_blank'); };
+  window.smJsCopy = async () => { const p = jsPend(); if(!p) return; try{ await navigator.clipboard.writeText(jsMsg(p)); toast('📋 کاپی ہو گیا'); }catch(e){ prompt('کاپی کر لیں:', jsMsg(p)); } };
+  window.smJsCancel = () => { try{ localStorage.removeItem('smJsPend'); }catch(e){} const o = document.getElementById('smJsOv'); if(o) o.remove(); smStaffJoinOpen(); };
+  let _jsT = null, _jsBusy = false;
+  async function jsPoll(){
+    clearTimeout(_jsT); const p = jsPend(); if(!p || _jsBusy) return;
+    if(AppState.settings.smJoinedAsStaff && AppState.settings.smRegistered){ localStorage.removeItem('smJsPend'); return; }
+    _jsBusy = true;
+    try{
+      const j = await smc({ op: 'me', code: p.code, uid: uid() });
+      const s = document.getElementById('smJsStat');
+      if(j && j.st === 'ok' && j.res){
+        const r = JSON.parse(j.res);
+        if(s){ s.style.background = '#dcfce7'; s.style.color = '#166534'; s.innerHTML = '✅ مالک نے منظور کر دیا — ' + esc(r.shop || '') + '<br>دکان سے جڑ رہا ہے…'; }
+        try{ await smc({ op: 'set', code: p.code, st: 'joined', uid: uid() }); }catch(e){}
+        try{ localStorage.removeItem('smJsPend'); localStorage.setItem('smJoinUser', r.uname || p.name); }catch(e){}
+        _jsBusy = false;
+        await smJoinAsStaff('موبائل: ' + r.m + '\nکوڈ: ' + r.c);
+        return;
+      }
+      if(j && (j.st === 'no' || j.reason === 'expired' || j.reason === 'none')){
+        localStorage.removeItem('smJsPend');
+        if(s){ s.style.background = '#fee2e2'; s.style.color = '#b91c1c'; s.textContent = '❌ ' + (j.st === 'no' ? 'مالک نے منظور نہیں کیا' : 'کوڈ کی مدت ختم') + ' — نیا کوڈ بنائیں'; }
+        _jsBusy = false; return;
+      }
+    }catch(e){}
+    _jsBusy = false;
+    _jsT = setTimeout(jsPoll, 6000);
+  }
+  if(jsPend()) setTimeout(jsPoll, 4000);
+  window.smJoinAsStaffPaste = window.smJoinAsStaff;
+  // جڑنے کے بعد: ملازم کا نام چنا اور اپنا PIN خود لکھ کر اندر
+  function autoLogin(){
+    let pin = '', nm = ''; try{ pin = sessionStorage.getItem('smJoinPin') || ''; nm = localStorage.getItem('smJoinUser') || ''; }catch(e){}
+    if(!pin || !nm || !AppState.settings.smJoinedAsStaff) return;
+    let n = 0;
+    const t = setInterval(async () => {
+      n++; if(n > 40){ clearInterval(t); return; }
+      try{ if(AppState.currentUser){ clearInterval(t); sessionStorage.removeItem('smJoinPin'); return; } }catch(e){}
+      const sel = document.getElementById('employeeLoginSelect'); if(!sel) return;
+      const u = (usersData || []).find(x => x.role === 'salesman' && (x.username === nm || x.name === nm) && x.is_active !== false);
+      if(!u) return;
+      if(![...sel.options].some(o => String(o.value) === String(u.user_id))){ try{ if(typeof setupLoginScreen === 'function') setupLoginScreen(); }catch(e){} return; }
+      sel.value = String(u.user_id); const pi = document.getElementById('employeePinInput'); if(pi) pi.value = pin;
+      clearInterval(t); try{ sessionStorage.removeItem('smJoinPin'); localStorage.removeItem('smJoinUser'); }catch(e){}
+      try{ await employeeLogin(); toast('✅ خوش آمدید ' + u.name + ' — آپ دکان سے جڑ گئے'); }catch(e){}
+    }, 1500);
+  }
+  window.addEventListener('load', () => setTimeout(autoLogin, 2500));
+
+  // ---------- مالک کا فون: ملازمین کی اسکرین میں «ملازم کا کوڈ لکھیں» ----------
+  function ownerBox(){
+    const row = document.getElementById('smShopCodeRow'); if(!row) return;
+    let b = document.getElementById('smJsOwnerBox');
+    const act = document.querySelector('.screen.active');
+    const show = act && act.id === 'screen-users' && AppState.currentRole === 'admin' && !AppState.settings.smJoinedAsStaff;
+    if(!show){ if(b) b.style.display = 'none'; return; }
+    if(!b){
+      b = document.createElement('div'); b.id = 'smJsOwnerBox'; b.setAttribute('dir', 'rtl');
+      b.style.cssText = 'margin:4px 0 8px;background:#eff6ff;border:2px solid #3b82f6;border-radius:14px;padding:8px 10px;' + K;
+      b.innerHTML = '<div style="font-weight:800;font-size:16px;color:#1e3a8a;line-height:1.9">🧑‍💼 نیا ملازم جوڑیں — ملازم کا کوڈ لکھیں</div>'
+        + '<div style="display:flex;gap:6px"><input id="smJsOwnerIn" type="tel" inputmode="numeric" dir="ltr" maxlength="9" placeholder="JS-______" style="flex:1;min-width:0;padding:8px;border:2px solid #93c5fd;border-radius:10px;font-size:22px;text-align:center;font-family:Arial Black,Arial;letter-spacing:3px">'
+        + '<button type="button" onclick="smJsOwnerGo()" style="width:auto !important;margin:0 !important;' + btnS('#1d4ed8', '#fff') + 'padding:6px 16px !important">🔍 کھولیں</button></div>'
+        + '<div style="font-size:12px;color:#475569;line-height:1.8">ملازم اپنے فون پر «دکان سے جڑیں» سے کوڈ بنا کر آپ کو بھیجے گا</div>';
+      row.parentNode.insertBefore(b, row);
+    }
+    b.style.display = 'block';
+  }
+  const _rul = window.renderUserList;
+  window.renderUserList = renderUserList = function(){ const r = _rul.apply(this, arguments); try{ ownerBox(); }catch(e){} return r; };
+  let JSP = null;
+  window.smJsOwnerGo = async function(){
+    const code = (document.getElementById('smJsOwnerIn').value || '').replace(/\D/g, '').slice(-6);
+    if(code.length !== 6){ alert('ملازم کا 6 ہندسوں کا کوڈ لکھیں'); return; }
+    let j = null; try{ j = await smc({ op: 'get', code }); }catch(e){}
+    if(!j || !j.ok){ alert(j && j.reason === 'wait' ? '⚠️ بہت زیادہ غلط کوشیشیں — 15 منٹ بعد' : j && j.reason === 'expired' ? '⌛ یہ کوڈ پرانا ہو گیا — ملازم سے نیا کوڈ بنوائیں' : '❌ یہ کوڈ نہیں ملا — دوبارہ دیکھیں (یا انٹرنیٹ چیک کریں)'); return; }
+    if(j.kind !== 'JS'){ alert('یہ ملازم کا کوڈ نہیں ہے'); return; }
+    if(j.st !== 'new'){ alert('یہ کوڈ پہلے ہی استعمال ہو چکا ہے'); return; }
+    const d = JSON.parse(j.data || '{}');
+    const lim = SM_PLAN_STAFF[smPlan()] || 0, cnt = usersData.filter(u => u.role !== 'admin' && u.role !== 'customer' && u.is_active !== false).length;
+    if(!isSubscriptionActive() || AppState.settings.isOnFreeTrial || cnt >= lim){
+      if(confirm('📦 ' + (lim === 0 || AppState.settings.isOnFreeTrial ? 'ملازم جوڑنے کے لیے پیکج 1+1 یا اس سے بڑا چاہیے۔' : 'آپ کے پیکج (' + pLabel(smPlan()) + ') میں ملازموں کی حد پوری ہو گئی۔') + '\n\nپیکج بڑھانے کی درخواست بھیجیں؟')) smPkgOpen(false);
+      return;
+    }
+    if(usersData.some(u => u.pin === d.pinH)){
+      try{ await smc({ op: 'set', code, st: 'no' }); }catch(e){}
+      alert('⚠️ ملازم کا PIN کسی اور کے PIN جیسا ہے — ملازم سے کہیں کہ نیا کوڈ (نئے PIN کے ساتھ) بنائے۔'); return;
+    }
+    JSP = { code, d };
+    openNewUserModal();
+    const set = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+    set('nuName', d.name); set('nuUsername', d.name); set('nuPhone', d.mobile); set('nuRole', 'salesman');
+    try{ toggleNewUserScreensBox(); }catch(e){}
+    const pin = document.getElementById('nuPin'); if(pin){ pin.value = String(100000 + Math.floor(Math.random() * 899999)); pin.dataset.smHid = '1'; pin.style.display = 'none'; }
+    let note = document.getElementById('smJsNuNote');
+    if(!note){ note = document.createElement('div'); note.id = 'smJsNuNote'; const nm = document.getElementById('nuName'); if(nm) nm.parentNode.insertBefore(note, nm); }
+    note.style.cssText = 'background:#dbeafe;border-radius:10px;padding:6px 10px;margin-bottom:6px;font-weight:800;color:#1e3a8a;direction:rtl;' + K;
+    note.textContent = '🧑‍💼 کوڈ JS-' + code + ' سے — PIN ملازم نے خود بنایا ہے۔ صرف اسکرینوں پر ✓ لگا کر محفوظ کریں۔';
+  };
+  const _snu = window.saveNewUser;
+  window.saveNewUser = saveNewUser = async function(){
+    const cur = JSP; const tmp = cur ? (document.getElementById('nuPin') || {}).value : '';
+    const before = usersData.length;
+    await _snu.apply(this, arguments);
+    if(!cur) return;
+    const u = usersData.length > before ? usersData.find(x => x.pinPlain === tmp) : null;
+    if(!u) return; // فارم میں کوئی کمی — مالک دوبارہ محفوظ کرے
+    JSP = null; u.pin = cur.d.pinH; u.pinPlain = ''; u.joinCode = cur.code;
+    try{ saveToStorage('users', usersData); pushUsersToCloud(); }catch(e){}
+    try{ renderUserList(); }catch(e){}
+    let j = null; try{ j = await smc({ op: 'set', code: cur.code, st: 'ok', res: { m: smShopMobile(), c: smShopCode(), plan: smPlan(), uname: u.username || u.name, shop: smBiz() } }); }catch(e){}
+    if(j && j.ok){ toast('✅ ' + u.name + ' شامل — اب اس کا فون خود جڑ جائے گا'); ownerWatch(cur.code, u.name); const oi = document.getElementById('smJsOwnerIn'); if(oi) oi.value = ''; }
+    else alert('⚠️ ملازم بن گیا مگر اس کے فون تک اطلاع نہیں گئی (انٹرنیٹ) — دوبارہ کوشش کے لیے وہی کوڈ پھر لکھیں۔');
+  };
+  const _cnu = window.closeNewUserModal;
+  window.closeNewUserModal = closeNewUserModal = function(){
+    const r = _cnu.apply(this, arguments);
+    const pin = document.getElementById('nuPin'); if(pin){ pin.style.display = ''; delete pin.dataset.smHid; }
+    const n = document.getElementById('smJsNuNote'); if(n) n.remove();
+    const i = document.getElementById('smJsOwnerIn'); if(i && !JSP) i.value = '';
+    return r;
+  };
+  function ownerWatch(code, name){
+    let n = 0;
+    const t = setInterval(async () => {
+      if(++n > 60){ clearInterval(t); return; }
+      try{ const j = await smc({ op: 'get', code }); if(j && j.st === 'joined'){ clearInterval(t); toast('✅ ' + name + ' کا فون دکان سے جڑ گیا'); } }catch(e){}
+    }, 15000);
+  }
+
+  // ================= 👨‍💻 ڈویلپر پینل: «🔑 دکاندار کا کوڈ لکھیں» + ریٹ =================
+  function devBox(){
+    const paste = document.getElementById('giftCodePasteInput'); if(!paste) return;
+    const anchor = paste.parentNode; if(document.getElementById('smcDevBox')) return;
+    const b = document.createElement('div'); b.id = 'smcDevBox'; b.setAttribute('dir', 'rtl');
+    b.style.cssText = 'background:#ecfdf5;border:2px solid #16a34a;border-radius:12px;padding:8px;margin-bottom:8px;';
+    b.innerHTML = '<div style="font-weight:900;font-size:14px;color:#065f46;margin-bottom:5px">🔑 دکاندار کا کوڈ لکھیں (NB / SB)</div>'
+      + '<div style="display:flex;gap:6px"><input id="smcDevIn" type="tel" inputmode="numeric" dir="ltr" maxlength="9" placeholder="NB-______" style="flex:1;min-width:0;padding:7px;border:2px solid #16a34a;border-radius:8px;font-size:20px;text-align:center;font-family:Arial Black,Arial;letter-spacing:2px">'
+      + '<button type="button" onclick="smcDevGo()" style="padding:6px 14px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:900;cursor:pointer">🔍 کھولیں</button></div>'
+      + '<div id="smcDevCard"></div>'
+      + '<button type="button" onclick="smcRatesEdit()" style="margin-top:6px;width:100%;padding:6px;border:1.5px solid #0d9488;border-radius:8px;background:#fff;color:#0f766e;font-weight:800;cursor:pointer">💰 پیکج کے ریٹ (ہر مہینہ) — بدلیں</button>';
+    anchor.parentNode.insertBefore(b, anchor);
+  }
+  setInterval(() => { try{ devBox(); }catch(e){} }, 1500);
+  let DEV = null;
+  window.smcDevGo = async function(){
+    const code = (document.getElementById('smcDevIn').value || '').replace(/\D/g, '').slice(-6), card = document.getElementById('smcDevCard');
+    if(code.length !== 6){ alert('6 ہندسوں کا کوڈ لکھیں'); return; }
+    card.innerHTML = '<div style="padding:8px;text-align:center">⏳ …</div>';
+    let j = null; try{ j = await smc({ op: 'get', code }); }catch(e){}
+    if(!j || !j.ok){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">❌ ' + (j && j.reason === 'expired' ? 'کوڈ پرانا ہو گیا' : j && j.reason === 'wait' ? 'بہت زیادہ کوشیشیں — 15 منٹ بعد' : 'کوڈ نہیں ملا') + '</div>'; return; }
+    if(j.kind === 'JS'){ card.innerHTML = '<div style="padding:8px;color:#b91c1c;font-weight:800">یہ ملازم کا کوڈ ہے — مالک کے فون پر لکھا جاتا ہے</div>'; return; }
+    const d = JSON.parse(j.data || '{}'); DEV = { code, kind: j.kind, d, st: j.st };
+    const row = (k, v) => v ? '<div><span style="color:#64748b">' + k + ':</span> <b>' + v + '</b></div>' : '';
+    card.innerHTML = '<div style="background:#fff;border:1.5px solid #86efac;border-radius:10px;padding:8px;margin-top:6px;font-size:13.5px;line-height:1.9">'
+      + '<div style="font-weight:900;font-size:15px;color:' + (j.kind === 'SB' ? '#1d4ed8' : '#065f46') + '">' + (j.kind === 'SB' ? '🔄 تجدید' : '🥬 نیا پیکج') + ' — ' + j.kind + '-' + code + (j.st !== 'new' ? ' <span style="color:#b91c1c">(' + (j.st === 'done' ? '✅ جاری ہو چکا' : j.st) + ')</span>' : '') + '</div>'
+      + row('🏪 دکان', esc(d.shop)) + row('👤 نام', esc(d.owner)) + row('📱 موبائل', '<span dir="ltr">' + esc(d.mobile) + '</span>')
+      + row('📦 پیکج', esc(String(d.plan || '').replace('P', '')) + ' (' + pLabel(d.plan) + ')') + row('⏱️ مدت', mLabel(Number(d.m)) + ' (' + d.days + ' دن)')
+      + row('💰 رقم', '<span dir="ltr" style="font-size:17px;color:#065f46">Rs ' + fmt(d.amt) + '</span>')
+      + (j.kind === 'SB' ? row('📅 موجودہ', (d.exp ? formatDateDMY(d.exp) : '—') + ' • ' + esc(d.curPlan || '') + ' • ' + esc(d.cur || '')) : '')
+      + row('🆔 UID', '<span dir="ltr" style="font-size:11px">' + esc(d.uid || '') + '</span>')
+      + (d.tid ? row('🧾 TID', '<span dir="ltr">' + esc(d.tid) + '</span>') : '')
+      + (d.shot ? '<img src="' + d.shot + '" style="max-width:100%;border-radius:8px;margin-top:4px">' : (d.tid ? '' : '<div style="color:#b45309">ثبوت ابھی نہیں آیا — رقم خود چیک کریں</div>'))
+      + (j.st === 'new' ? '<div style="display:flex;gap:6px;margin-top:6px"><button type="button" onclick="smcDevIssue()" style="flex:2;padding:9px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:900;cursor:pointer">✅ پیسے وصول — ' + (j.kind === 'SB' ? 'مدت بڑھائیں' : 'کوڈ جاری کریں') + '</button><button type="button" onclick="smcDevNo()" style="flex:1;padding:9px;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-weight:900;cursor:pointer">❌ رد</button></div>' : '')
+      + '</div>';
+  };
+  window.smcDevNo = async function(){ if(!DEV || !confirm('یہ درخواست رد کریں؟')) return; try{ await smc({ op: 'set', code: DEV.code, st: 'no' }); }catch(e){} document.getElementById('smcDevCard').innerHTML = '<div style="padding:8px;font-weight:800">❌ رد کر دی</div>'; DEV = null; };
+  async function devDone(res){ try{ await smc({ op: 'set', code: DEV.code, st: 'done', res }); }catch(e){} const c = document.getElementById('smcDevCard'); if(c) c.innerHTML = '<div style="padding:8px;font-weight:900;color:#15803d">✅ ' + DEV.kind + '-' + DEV.code + ' مکمل — دکاندار کی ایپ ایک منٹ میں خود چالو</div>'; DEV = null; }
+  window.smcDevIssue = async function(){
+    if(!DEV) return; const d = DEV.d, uidV = String(d.uid || '');
+    window._smcPre = { days: Number(d.days) || 30, deal: Number(d.amt) || 0, rate: Number(d.rate) || 0, plan: d.plan };
+    if(DEV.kind === 'SB'){
+      try{ await loadIssuedCodesList(); }catch(e){}
+      const L = _issuedCodesCache || [], U = uidV;
+      const mob = String(d.mobile || '').replace(/\D/g, '').slice(-10);
+      const it = L.find(x => x.code === d.cur) || L.filter(x => x.active !== false && (x.activatedByUid === U || x.boundUid === U)).sort((a, b) => (Number(b.expiresAt) || 0) - (Number(a.expiresAt) || 0))[0]
+        || L.filter(x => x.active !== false && mob && String(_licMob(x) || '').replace(/\D/g, '').slice(-10) === mob).sort((a, b) => (Number(b.expiresAt) || 0) - (Number(a.expiresAt) || 0))[0];
+      if(it && it.activatedAt){
+        const before = Number(it.expiresAt) || 0;
+        await extendLicenseCode(it.code);
+        try{ await loadIssuedCodesList(); }catch(e){}
+        const now = (_issuedCodesCache || []).find(x => x.code === it.code) || {};
+        if((Number(now.expiresAt) || 0) > before){
+          if(d.plan && d.plan !== (it.plan || 'P1')){ try{ await devFirestoreFetch('licenses/' + encodeURIComponent(it.code) + '?updateMask.fieldPaths=plan&key=' + FIREBASE_API_KEY, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { plan: { stringValue: d.plan } } }) }); }catch(e){} }
+          await devDone({ ext: it.code });
+        }
+        window._smcPre = null; return;
+      }
+    }
+    // نیا کوڈ — UID پر بندھا (دکاندار کا فون خود چالو)
+    const set = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+    set('giftCodeNameInput', (d.owner || '') + (d.shop ? ' — ' + d.shop : '')); set('giftCodeMobileInput', d.mobile || '');
+    set('giftCodeUidInput', uidV);
+    set('giftCodePlanInput', d.plan || 'P1');
+    const ds = document.getElementById('giftCodeDaysInput');
+    if(ds){ const v = String(d.days); if([...ds.options].some(o => o.value === v)) ds.value = v; else { ds.value = 'custom'; try{ toggleCustomGiftDaysInput(); }catch(e){} set('giftCodeCustomDaysInput', v); } }
+    const prev = typeof lastGeneratedGiftCode !== 'undefined' ? lastGeneratedGiftCode : null;
+    await generateGiftCode();
+    window._smcPre = null;
+    const now = typeof lastGeneratedGiftCode !== 'undefined' ? lastGeneratedGiftCode : null;
+    if(now && now !== prev) await devDone({ lic: now });
+  };
+  window.smcRatesEdit = async function(){
+    const R = await loadRates();
+    const html = head('💰 پیکج کے ریٹ — ہر مہینہ')
+      + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:7px">'
+      + PLANS.map(p => '<label style="display:flex;align-items:center;gap:8px;font-weight:800">' + '<span style="flex:1">' + p.replace('P', '') + ' — ' + pLabel(p) + '</span><input data-p="' + p + '" class="smcRateIn" inputmode="numeric" dir="ltr" value="' + (R[p] || 0) + '" style="width:110px;padding:7px;border:2px solid #16a34a;border-radius:10px;font-size:18px;text-align:center;font-family:Arial"></label>').join('')
+      + '<div style="font-size:12.5px;color:#475569">نیا ریٹ دکاندار کے فون پر اگلی درخواست میں خود نظر آئے گا۔ پرانی درخواستوں کی رقم نہیں بدلتی۔</div>'
+      + '<button type="button" onclick="smcRatesSave()" style="' + btnS('#16a34a', '#fff') + '">💾 محفوظ کریں</button>'
+      + '<button type="button" onclick="document.getElementById(\'smRatesOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">✖ بند</button></div>';
+    ov('smRatesOv', html);
+  };
+  window.smcRatesSave = async function(){
+    const R = {}; document.querySelectorAll('.smcRateIn').forEach(i => { R[i.dataset.p] = Math.max(0, parseInt(String(i.value).replace(/\D/g, ''), 10) || 0); });
+    if(!R.P1){ alert('ریٹ درست لکھیں'); return; }
+    try{
+      const r = await devFirestoreFetch('licenses/__smrates?key=' + FIREBASE_API_KEY, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fields: { rates: { stringValue: JSON.stringify(R) }, updatedAt: { integerValue: String(Date.now()) } } }) });
+      if(!r || !r.ok) throw new Error(r ? r.status : 'net');
+      localStorage.setItem('smRates', JSON.stringify(R)); document.getElementById('smRatesOv').remove(); toast('✅ ریٹ محفوظ ہو گئے');
+    }catch(e){ alert('❌ محفوظ نہیں ہوا — ڈویلپر لاگ اِن / انٹرنیٹ (' + e.message + ')'); }
+  };
+  setTimeout(() => { try{ loadRates(); }catch(e){} }, 8000);
+})();
 </script>
 <script type="text/fm-boot">
 /* SM_BACKUP_V2_BEGIN */
