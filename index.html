@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO275'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = 'نیا آسان نظام: پیکج کی درخواست چھوٹے کوڈ سے، ادائیگی کے 3 اکاؤنٹ، ملازم اپنا کوڈ بنا کر خود جڑے؛ ای میل لاگ اِن ختم'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO277'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = 'گوگل ڈرائیو کا سوال پہلے دن نہیں (بعد میں بٹن)؛ پیکج کی درخواست کے دوران مفت ٹرائل چلتا رہے، ایپ فوراً کھلے؛ کوڈ والا نظام مزید محفوظ'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56826,10 +56826,18 @@ window.addEventListener('DOMContentLoaded', () => {
       + '<div style="display:flex;gap:6px;margin-top:5px"><label style="flex:1;text-align:center;' + btnS('#fef3c7', '#92400e') + 'font-size:14px;padding:5px">🖼️ اسکرین شاٹ<input type="file" accept="image/*" style="display:none" onchange="smPayShot(this)"></label>'
       + '<button type="button" onclick="smPayProof()" style="flex:1;' + btnS('#d97706', '#fff') + 'font-size:14px;padding:5px">📨 ثبوت بھیجیں</button></div><div id="smPayMsg" style="font-size:13px;font-weight:800;text-align:center;margin-top:3px"></div></div>'
       + '<div style="font-size:13px;color:#475569;text-align:center;line-height:1.9">رقم ملتے ہی ڈویلپر کوڈ جاری کرے گا — آپ کی ایپ <b>خود</b> چالو ہو جائے گی، کچھ لکھنا نہیں۔<br>درخواست نمبر: <b dir="ltr" style="font-family:Arial">' + r.kind + '-' + r.code + '</b></div>'
-      + '<button type="button" onclick="document.getElementById(\'smPayOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">ٹھیک ہے</button></div>';
+      + (trialOn() ? '<div style="background:#ecfdf5;border:2px solid #16a34a;border-radius:12px;padding:6px;text-align:center;font-weight:800;color:#065f46;line-height:1.9">🎁 تب تک آپ کا مفت ٹرائل چل رہا ہے — ' + daysLeftInSubscription() + ' دن باقی<br><small style="font-weight:400">ایپ ابھی سے استعمال کریں</small></div>' : '')
+      + '<button type="button" onclick="smPayDone()" style="' + btnS(trialOn() ? '#16a34a' : '#e2e8f0', trialOn() ? '#fff' : '#334155') + '">' + (trialOn() ? '✅ ٹھیک ہے — ایپ کھولیں' : 'ٹھیک ہے') + '</button></div>';
     ov('smPayOv', html);
   };
   let _shot = '';
+  // 🎁 SM1611MO277: ٹرائل اسی فون (UID) کو زندگی میں ایک بار — پہلی بار کھلتے ہی شروع (getOrCreateDeviceUID)، آن لائن `trials/{uid}` تالا (checkAndLockTrialOnline)
+  const trialOn = () => { try{ return !!(AppState.settings.isOnFreeTrial && isSubscriptionActive()); }catch(e){ return false; } };
+  window.smPayDone = function(){
+    const o = document.getElementById('smPayOv'); if(o) o.remove();
+    const reg = document.getElementById('smRegOverlay');
+    if(reg && getComputedStyle(reg).display !== 'none' && AppState.settings.smRegistered){ try{ localStorage.setItem('smAutoEnterOnce', '1'); }catch(e){} setTimeout(() => location.reload(), 200); } // رجسٹریشن صفحے سے آئے — سیدھا ایپ میں
+  };
   window.smPayCopy = async function(i){ const a = PAY[i]; try{ await navigator.clipboard.writeText(a.no); toast('📋 ' + a.n + ' نمبر کاپی ہو گیا'); }catch(e){ prompt('نمبر کاپی کر لیں:', a.no); } };
   window.smPayApp = function(i){
     const a = PAY[i]; try{ navigator.clipboard.writeText(a.no); }catch(e){}
@@ -57174,6 +57182,27 @@ window.addEventListener('DOMContentLoaded', () => {
     }catch(e){ alert('❌ محفوظ نہیں ہوا — ڈویلپر لاگ اِن / انٹرنیٹ (' + e.message + ')'); }
   };
   setTimeout(() => { try{ loadRates(); }catch(e){} }, 8000);
+
+  // ☁️ SM1611MO277 (مالک کا حکم): گوگل ڈرائیو کا سوال پہلے 24 گھنٹے نہیں — پھر «ابھی جوڑیں» / «⏰ بعد میں» (الگ بٹن، کسی پیکج سے نہیں جڑا)؛
+  //   بعد میں = اگلے دن پھر؛ جڑ جائے (gdriveAccountEmail) تو کبھی نہیں
+  try{ const st = AppState.settings; if(!st.smFirstOpenAt){ st.smFirstOpenAt = st.smRegisteredAt ? Date.parse(st.smRegisteredAt) || Date.now() : Date.now(); saveToStorage('settings', st); } }catch(e){}
+  window.showGDriveFirstRunPrompt = showGDriveFirstRunPrompt = function(){
+    const st = AppState.settings; if(st.gdriveAccountEmail || st.smJoinedAsStaff) return;
+    if(Date.now() - (Number(st.smFirstOpenAt) || Date.now()) < 24 * 3600e3) return;
+    if(st.smGdLater && Date.now() - st.smGdLater < 24 * 3600e3) return;
+    const m = document.getElementById('gdriveFirstRunModal'); if(!m) return;
+    const box = m.querySelector('.backupConfirmBox');
+    if(box && !box.dataset.ur){ box.dataset.ur = '1'; box.setAttribute('dir', 'rtl'); box.style.fontFamily = "'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq',serif";
+      const h = box.querySelector('h3'); if(h){ h.textContent = '☁️ اپنا ڈیٹا محفوظ کریں'; h.style.lineHeight = '1.9'; }
+      const pp = box.querySelector('p'); if(pp){ pp.innerHTML = 'بل، گاہک، بیوپاری اور سارا حساب محفوظ رکھنے کے لیے <b>گوگل ڈرائیو ایک بار جوڑ لیں</b> — پھر بیک اپ خود ہوتا رہے گا (فولڈر «Sabzi Mandi POS Backup»)۔ فون گم یا خراب ہو جائے تب بھی ڈیٹا محفوظ۔'; pp.style.cssText += ';font-size:15px;line-height:2;color:#334155'; }
+      const bs = box.querySelectorAll('button'); if(bs[0]) bs[0].textContent = '☁️ ابھی گوگل ڈرائیو جوڑیں'; if(bs[1]) bs[1].textContent = '⏰ بعد میں';
+      bs.forEach(b => { b.style.fontFamily = 'inherit'; b.style.fontSize = '17px'; b.style.lineHeight = '1.9'; }); }
+    m.classList.add('show');
+  };
+  window.dismissGDriveFirstRunPrompt = dismissGDriveFirstRunPrompt = function(){
+    document.getElementById('gdriveFirstRunModal')?.classList.remove('show');
+    try{ AppState.settings.smGdLater = Date.now(); saveToStorage('settings', AppState.settings); }catch(e){}
+  };
 })();
 </script>
 <script type="text/fm-boot">
@@ -57751,7 +57780,8 @@ window.addEventListener('DOMContentLoaded', () => {
     let el = document.getElementById('driveBackupReminder');
     const last = AppState.settings.lastGDriveBackupAt ? new Date(AppState.settings.lastGDriveBackupAt).getTime() : 0;
     const stale = Date.now() - last > 24 * 3600 * 1000;
-    const need = AppState.currentRole === 'admin' && !busy && (state.needTap || stale);
+    const _fresh = !savedEmail() && Date.now() - (Number(AppState.settings.smFirstOpenAt) || Date.now()) < 24 * 3600e3; // ☁️ SM1611MO277: پہلے 24 گھنٹے ڈرائیو کی کوئی بات نہیں
+    const need = AppState.currentRole === 'admin' && !busy && !_fresh && (state.needTap || stale);
     if(!need){ if(el) el.remove(); return; }
     if(!el){ el = document.createElement('div'); el.id = 'driveBackupReminder'; home.insertBefore(el, home.firstChild); }
     const linked = !!savedEmail();
