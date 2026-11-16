@@ -10486,8 +10486,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM1611MO288'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '📋 ڈویلپر پینل: NB / SB والا پورا پیغام پیلے ڈبے میں پیسٹ ہو تو خود سبز ڈبے کا کارڈ کھلتا ہے'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
+const APP_BUILD_VERSION = 'SM1611MO289'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '💳 لاگ اِن صفحے پر «پیکج پلانز» کا شیئر ہونے والا کارڈ؛ ڈویلپر لاگ اِن کا بڑا خانہ + 👁 + ای میل سے نیا پاس ورڈ'; // 🆕 ہر ورژن پر ایک چھوٹی لائن کہ کیا بدلا — اپڈیٹ مکمل والے کارڈ میں دکھتی ہے
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56147,6 +56147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <button type="button" onclick="smRegToggleCode()" style="flex:1; padding:8px 4px; border:2px solid #1d4ed8; border-radius:12px; background:#eff6ff; color:#1e3a8a; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">🔑 ایکٹیویشن کوڈ لگائیں</button>
         <button type="button" onclick="smOpenCodeRequest(true)" style="flex:1; padding:8px 4px; border:2px solid #16a34a; border-radius:12px; background:#f0fdf4; color:#14532d; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; line-height:1.9;">📦 پیکج / تجدید</button>
       </div>
+      <button type="button" onclick="smPlansOpen()" style="width:100%; margin-top:8px; padding:8px 4px; border:none; border-radius:12px; background:linear-gradient(135deg,#f59e0b,#b45309); color:#fff; font-family:inherit; font-size:16px; font-weight:800; cursor:pointer; line-height:1.9;">💳 پیکج پلانز دیکھیں / شیئر کریں</button>
       <div id="smRegCodeBox" style="display:none; margin-top:8px; background:#eff6ff; border:1.5px solid #93c5fd; border-radius:12px; padding:8px;">
         <input id="smRegCodeInput" type="text" dir="ltr" placeholder="ایکٹیویشن کوڈ یہاں لکھیں" style="width:100%; box-sizing:border-box; padding:9px; border:2px solid #93c5fd; border-radius:10px; font-size:17px; text-align:center; font-family:'Arial Black',Arial,sans-serif;">
         <button type="button" onclick="smRegActivate()" style="width:100%; margin-top:6px; padding:8px; border:none; border-radius:10px; background:#1d4ed8; color:#fff; font-family:inherit; font-size:17px; font-weight:800; cursor:pointer; line-height:1.9;">✅ کوڈ لگا کر ایپ کھولیں</button>
@@ -57174,24 +57175,103 @@ window.addEventListener('DOMContentLoaded', () => {
       + row('🆔 UID', '<span dir="ltr" style="font-size:11px">' + esc(d.uid || '') + '</span>')
       + (d.tid ? row('🧾 TID', '<span dir="ltr">' + esc(d.tid) + '</span>') : '')
       + (d.shot ? '<img src="' + d.shot + '" style="max-width:100%;border-radius:8px;margin-top:4px">' : (d.tid ? '' : '<div style="color:#b45309">ثبوت ابھی نہیں آیا — رقم خود چیک کریں</div>'))
-      + (fbDevSignedIn() ? '' : '<div style="background:#fee2e2;border:2px solid #dc2626;border-radius:10px;padding:6px;margin-top:6px;color:#991b1b;font-weight:800">⚠️ کلاؤڈ میں ڈویلپر لاگ اِن نہیں ہو سکا — کوڈ جاری نہیں ہوگا۔ ڈویلپر پینل والا پاس ورڈ اور فائربیس (piarybhai) والا پاس ورڈ ایک جیسے ہونے چاہییں۔'
-        + '<div style="display:flex;gap:6px;margin-top:8px"><input id="smcDevLoginPw" type="password" dir="ltr" autocomplete="current-password" placeholder="فائربیس (piarybhai) کا پاس ورڈ" onkeydown="if(event.key===\'Enter\')smcDevLogin()" style="flex:1;min-width:0;padding:8px;border:2px solid #dc2626;border-radius:8px;font-size:16px;text-align:center;background:#fff"><button type="button" onclick="smcDevLogin()" style="padding:8px 12px;border:none;border-radius:8px;background:#b91c1c;color:#fff;font-weight:900;cursor:pointer">🔐 ڈویلپر لاگ اِن</button></div>'
-        + '<button type="button" onclick="smcDevGo()" style="margin-top:6px;width:100%;padding:8px;border:2px solid #b91c1c;border-radius:8px;background:#fff;color:#b91c1c;font-weight:900;cursor:pointer">🔄 ریفریش — دوبارہ جانچیں</button>'
-        + '<div id="smcDevLoginMsg" style="margin-top:5px;font-size:13px"></div></div>')
+      + (fbDevSignedIn() ? '' : '<div style="background:#fee2e2;border:2px solid #dc2626;border-radius:12px;padding:8px;margin-top:6px;color:#991b1b;font-weight:800;line-height:1.9">⚠️ کوڈ جاری کرنے کے لیے ایک بار ڈویلپر لاگ اِن کریں (50 منٹ چلے گا)'
+        // 🔐 SM1611MO289 (مالک کا حکم): پورا چوڑا بڑا خانہ + 👁 آنکھ، صاف وجہ، اور «پاس ورڈ یاد نہیں» → ای میل پر نیا
+        + '<div style="position:relative;margin-top:8px"><input id="smcDevLoginPw" type="password" dir="ltr" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="ڈویلپر کا پاس ورڈ" onkeydown="if(event.key===\'Enter\')smcDevLogin()" style="display:block;width:100%;box-sizing:border-box;padding:12px 54px 12px 12px;border:2px solid #dc2626;border-radius:12px;font-size:22px;letter-spacing:2px;text-align:center;background:#fff;color:#0f172a;font-family:Arial,sans-serif">'
+        + '<button type="button" onclick="smcDevEye(this)" title="پاس ورڈ دیکھیں" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:42px;height:42px;border:none;border-radius:10px;background:#f1f5f9;font-size:22px;cursor:pointer;padding:0">👁</button></div>'
+        + '<button type="button" onclick="smcDevLogin()" style="display:block;width:100%;margin-top:8px;padding:10px;border:none;border-radius:12px;background:#b91c1c;color:#fff;font-weight:900;font-size:18px;cursor:pointer;font-family:inherit">🔐 ڈویلپر لاگ اِن</button>'
+        + '<div id="smcDevLoginMsg" style="margin-top:6px;font-size:15px;line-height:1.9"></div>'
+        + '<button type="button" onclick="smcDevReset()" style="display:block;width:100%;margin-top:6px;padding:8px;border:2px dashed #1d4ed8;border-radius:12px;background:#eff6ff;color:#1d4ed8;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit">🔑 پاس ورڈ نہیں چل رہا؟ — ای میل پر نیا پاس ورڈ بنائیں</button>'
+        + '<button type="button" onclick="smcDevGo()" style="display:block;width:100%;margin-top:6px;padding:7px;border:2px solid #b91c1c;border-radius:12px;background:#fff;color:#b91c1c;font-weight:800;cursor:pointer;font-family:inherit">🔄 دوبارہ جانچیں</button></div>')
       + (j.st === 'new' ? '<div style="display:flex;gap:6px;margin-top:6px"><button type="button" onclick="smcDevIssue()" style="flex:2;padding:9px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:900;cursor:pointer">✅ پیسے وصول — ' + (j.kind === 'SB' ? 'مدت بڑھائیں' : 'کوڈ جاری کریں') + '</button><button type="button" onclick="smcDevNo()" style="flex:1;padding:9px;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-weight:900;cursor:pointer">❌ رد</button></div>' : '')
       + '</div>';
   };
   // 🔐 SM1611MO288: ایرر کے ڈبے ہی میں ڈویلپر لاگ اِن — پاس ورڈ لکھیں، لاگ اِن ہو تو کارڈ خود تازہ
+  window.smcDevEye = function(b){ const i = document.getElementById('smcDevLoginPw'); if(!i) return; i.type = i.type === 'password' ? 'text' : 'password'; b.textContent = i.type === 'password' ? '👁' : '🙈'; };
   window.smcDevLogin = async function(){
     const inp = document.getElementById('smcDevLoginPw'), msg = document.getElementById('smcDevLoginMsg');
-    const pw = inp ? inp.value : '';
+    const raw = inp ? inp.value : '', pw = raw.trim();
     if(!pw){ if(msg){ msg.style.color = '#b91c1c'; msg.textContent = 'پاس ورڈ لکھیں'; } return; }
     if(msg){ msg.style.color = '#334155'; msg.textContent = '⏳ لاگ اِن ہو رہا ہے…'; }
-    let ok = false; try{ ok = await fbDevSignIn(pw); }catch(e){}
+    let ok = false; try{ ok = await fbDevSignIn(pw); if(!ok && raw !== pw && !/TOO_MANY/.test(window._fbDevErr || '')) ok = await fbDevSignIn(raw); }catch(e){}
     if(ok){ _devPw = pw; await window.smcDevGo(); return; }
     const er = String(window._fbDevErr || '');
-    if(msg){ msg.style.color = '#b91c1c'; msg.textContent = '❌ ' + (/INVALID_PASSWORD|INVALID_LOGIN|EMAIL_NOT_FOUND/.test(er) ? 'پاس ورڈ غلط ہے' : er === 'NETWORK' ? 'انٹرنیٹ نہیں ہے' : /TOO_MANY/.test(er) ? 'بہت زیادہ کوششیں — کچھ دیر بعد' : 'لاگ اِن نہیں ہوا (' + er + ')'); }
+    if(msg){ msg.style.color = '#b91c1c'; msg.innerHTML = '❌ ' + (/INVALID_PASSWORD|INVALID_LOGIN|EMAIL_NOT_FOUND/.test(er) ? 'یہ پاس ورڈ کلاؤڈ (' + FB_DEV_EMAIL + ') کا نہیں — 👁 دبا کر دیکھیں کہ ٹھیک لکھا ہے؛ یاد نہ ہو تو نیچے نیلا بٹن دبائیں' : er === 'NETWORK' ? 'انٹرنیٹ نہیں ہے' : /TOO_MANY/.test(er) ? 'بہت زیادہ غلط کوششیں — گوگل نے کچھ دیر کے لیے روکا ہے۔ نیچے نیلے بٹن سے نیا پاس ورڈ بنائیں تو فوراً کھل جائے گا' : /DISABLED/.test(er) ? 'یہ اکاؤنٹ بند ہے' : 'لاگ اِن نہیں ہوا (' + esc(er) + ')'); }
   };
+  window.smcDevReset = async function(){
+    const msg = document.getElementById('smcDevLoginMsg');
+    if(!confirm('🔑 ' + FB_DEV_EMAIL + ' پر نیا پاس ورڈ بنانے کی ای میل بھیجیں؟\n\nای میل کا لنک دبا کر وہی پاس ورڈ رکھیں جو ڈویلپر پینل کا ہے — پھر یہ لاگ اِن خود ہوگا۔')) return;
+    try{
+      const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FIREBASE_API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ requestType: 'PASSWORD_RESET', email: FB_DEV_EMAIL }) });
+      if(msg){ msg.style.color = r.ok ? '#166534' : '#b91c1c'; msg.textContent = r.ok ? '✅ ای میل چلی گئی (' + FB_DEV_EMAIL + ') — Gmail کھولیں (Spam بھی دیکھیں)، لنک دبائیں، نیا پاس ورڈ رکھیں، پھر یہاں وہی لکھ کر «ڈویلپر لاگ اِن»۔' : '❌ ای میل نہیں گئی (' + r.status + ') — تھوڑی دیر بعد'; }
+    }catch(e){ if(msg){ msg.style.color = '#b91c1c'; msg.textContent = 'انٹرنیٹ نہیں ہے'; } }
+  };
+  // 💳 SM1611MO289 (مالک کا حکم): «پیکج پلانز» کا خوبصورت کارڈ — لاگ اِن / رجسٹریشن صفحے سے دیکھیں، تصویر شیئر / واٹس ایپ / محفوظ
+  const PL_NAMES = { 'P1': ['صرف مالک', '1 فون'], 'P1+1': ['مالک + 1 ملازم', '2 فون'], 'P1+2': ['مالک + 2 ملازم', '3 فون'], 'P1+3': ['مالک + 3 ملازم', '4 فون'] };
+  async function plansCanvas(R, noLogo){
+    const UR = "'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq',serif";
+    try{ await Promise.all(['900 60px', '700 40px'].map(f => document.fonts.load(f + ' ' + UR, 'سبزی منڈی'))); }catch(e){}
+    const W = 1080, H = 1620, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d'); x.direction = 'rtl';
+    const rr = (X, Y, w, h, r) => { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); };
+    const T = (t, X, Y, f, col, al) => { x.font = f; x.fillStyle = col; x.textAlign = al || 'center'; x.fillText(t, X, Y); };
+    let g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#065f46'); g.addColorStop(1, '#022c22'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    // سر
+    if(!noLogo) try{ const im = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = 'icons/icon-192.png'; });
+      x.save(); rr(W / 2 - 80, 50, 160, 160, 34); x.clip(); x.drawImage(im, W / 2 - 80, 50, 160, 160); x.restore(); }catch(e){}
+    T('سبزی منڈی سافٹ ویئر', W / 2, 300, '900 82px ' + UR, '#fde68a');
+    T('منڈی، آڑھت اور حساب کتاب — سب ایک ایپ میں', W / 2, 375, '700 38px ' + UR, '#d1fae5');
+    rr(140, 420, W - 280, 104, 52); x.fillStyle = '#f59e0b'; x.fill();
+    T('📦 پیکج پلانز — ماہانہ چارجز', W / 2, 492, '900 52px ' + UR, '#fff');
+    // پلان
+    PLANS.forEach((p, n) => {
+      const Y = 570 + n * 190;
+      rr(70, Y, W - 140, 166, 30); x.fillStyle = n % 2 ? '#ecfdf5' : '#ffffff'; x.fill();
+      x.lineWidth = 4; x.strokeStyle = '#34d399'; x.stroke();
+      rr(W - 70 - 150, Y + 33, 120, 100, 22); x.fillStyle = '#065f46'; x.fill();
+      T(p === 'P1' ? '1+0' : p.replace('P', ''), W - 70 - 90, Y + 103, 'bold 52px Arial', '#fde68a');
+      T(PL_NAMES[p][0], W - 260, Y + 82, '900 54px ' + UR, '#064e3b', 'right');
+      T(PL_NAMES[p][1], W - 260, Y + 142, '700 36px ' + UR, '#475569', 'right');
+      x.direction = 'ltr'; T('Rs ' + fmt(R[p] || 0), 380, Y + 92, 'bold 62px Arial', '#047857'); x.direction = 'rtl';
+      T('فی مہینہ', 380, Y + 145, '700 34px ' + UR, '#64748b');
+    });
+    rr(70, 1340, W - 140, 86, 24); x.fillStyle = 'rgba(253,230,138,.15)'; x.fill();
+    T('🎁 سال کا پیکج: صرف 10 مہینوں کی رقم — 2 مہینے مفت', W / 2, 1398, '700 40px ' + UR, '#fde68a');
+    T('حاصل کرنے کے لیے رابطہ کریں', W / 2, 1490, '900 50px ' + UR, '#ffffff');
+    x.direction = 'ltr'; T('📞 0320-6793793', W / 2, 1555, 'bold 50px Arial', '#fde68a'); x.direction = 'rtl';
+    T('پی بی ٹی کوڈ لیبز — PBT Code Labs', W / 2, 1605, '700 32px ' + UR, '#a7f3d0');
+    return c;
+  }
+  window.smPlansOpen = async function(){
+    const o = ov('smPlansOv', head('💳 پیکج پلانز', 'linear-gradient(135deg,#f59e0b,#b45309)') + '<div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px"><div id="smPlansImg" style="text-align:center;padding:30px">⏳ …</div>'
+      + '<button type="button" id="smPlShare" style="' + btnS('#16a34a', '#fff') + '">📤 شیئر کریں (واٹس ایپ / اسٹیٹس)</button>'
+      + '<button type="button" id="smPlSave" style="' + btnS('#e0f2fe', '#075985') + '">⬇️ تصویر محفوظ کریں</button>'
+      + '<button type="button" id="smPlClose" style="' + btnS('#e2e8f0', '#334155') + '">✖ بند کریں</button></div>');
+    o.style.zIndex = '2147483600';
+    o.querySelector('#smPlClose').onclick = () => o.remove();
+    let R = rates(); try{ R = await loadRates(); }catch(e){}
+    let c = await plansCanvas(R), url; try{ url = c.toDataURL('image/png'); }catch(e){ c = await plansCanvas(R, true); url = c.toDataURL('image/png'); }
+    o.querySelector('#smPlansImg').style.padding = '0';
+    o.querySelector('#smPlansImg').innerHTML = '<img src="' + url + '" alt="پیکج پلانز" style="width:100%;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.25)">';
+    const blob = await new Promise(r => c.toBlob(r, 'image/png')), file = new File([blob], 'Sabzi-Mandi-Package-Plans.png', { type: 'image/png' });
+    const txt = 'سبزی منڈی سافٹ ویئر — پیکج پلانز\nحاصل کرنے کے لیے رابطہ کریں: 0320-6793793\nپی بی ٹی کوڈ لیبز';
+    const save = () => { const a = document.createElement('a'); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); };
+    o.querySelector('#smPlSave').onclick = save;
+    o.querySelector('#smPlShare').onclick = async () => {
+      try{ if(navigator.canShare && navigator.canShare({ files: [file] })){ await navigator.share({ files: [file], text: txt }); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
+      save(); toast('⬇️ تصویر محفوظ ہو گئی — واٹس ایپ میں گیلری سے بھیجیں');
+      try{ window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank'); }catch(e){}
+    };
+  };
+  setInterval(() => { try{
+    if(AppState.settings.smJoinedAsStaff || document.getElementById('smPlansBtn')) return;
+    const sc = document.getElementById('smSubCheckBtn'); if(!sc || !sc.parentElement) return;
+    const b = document.createElement('button'); b.id = 'smPlansBtn'; b.type = 'button'; b.onclick = () => smPlansOpen();
+    b.textContent = '💳 پیکج پلانز دیکھیں / شیئر کریں';
+    b.setAttribute('style', 'width:100% !important;margin:0 0 8px !important;padding:6px 12px !important;border:2px solid #f59e0b !important;border-radius:12px !important;background:#fffbeb !important;color:#92400e !important;font-weight:800;font-size:15px;' + K + 'line-height:1.8;box-shadow:none !important');
+    const pk = document.getElementById('smPkgMore'); (pk || sc.parentElement).after(b);
+  }catch(e){} }, 1500);
+
   window.smcDevNo = async function(){ if(!DEV || !confirm('یہ درخواست رد کریں؟')) return; try{ await smc({ op: 'set', code: DEV.code, st: 'no' }, true); }catch(e){} document.getElementById('smcDevCard').innerHTML = '<div style="padding:8px;font-weight:800">❌ رد کر دی</div>'; DEV = null; };
   async function devDone(res){ try{ await smc({ op: 'set', code: DEV.code, st: 'done', res }, true); }catch(e){} const c = document.getElementById('smcDevCard'); if(c) c.innerHTML = '<div style="padding:8px;font-weight:900;color:#15803d">✅ ' + DEV.kind + '-' + DEV.code + ' مکمل — دکاندار کی ایپ ایک منٹ میں خود چالو</div>'; DEV = null; }
   window.smcDevIssue = async function(){
