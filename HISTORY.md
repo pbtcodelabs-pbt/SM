@@ -70,3 +70,4 @@
 - **SM1811WE298 (مالک کا حکم — «آج کی وصولی بھی حصوں میں»):** گاہک کی «💰 وصولی» (`collectModal`) میں ریکوری لسٹ جیسے کئی طریقے: «طریقہ» (نقد / جاز کیش / ایزی پیسہ / بینک) + «➕ دوسرا طریقہ» + کل وصولی؛ `saveCollectReceivable` لپیٹا: ادائیگی کا `method` = «نقد 500 + جاز کیش 500…» (`bsPaySplit` حصوں میں)، `methods`، `cash_amount` = صرف نقد، `cashInHand` سے غیر نقد منہا، کھاتے کی تاریخچہ میں `methods`۔ آج یا پچھلی تاریخ — ایک جیسا۔ پہلے یہاں ایک ہی خانہ (نقد / والٹ) تھا، اسی لیے آج کی وصولی ایک حصہ بنتی تھی۔
 - 19 Nov 2026: CLAUDE.md — every reply to the owner starts with «قبلہ عالی جاہ میں آپ کی نرم گوئی اور اچھے اخلاق کا مشکور ہوں، صورتحال یہ ہے…» (owner's order).
 - SM1911TH299 (19 Nov 2026, #292): challan / stock page top buttons compact (#saTopBtns + #smChCompact292: one line each, 34px, smaller font; labels «📊 آج کی تقسیم», «🧾 چالانوں کا حساب»).
+- 19 Nov 2026: CLAUDE.md — reply opening line changed to the owner's new sentence.
