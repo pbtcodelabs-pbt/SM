@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2211SU300'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '💰 وصولی کارڈ میں آج (اور چنی تاریخ) کی ہر وصولی الگ لائن — وقت، رقم اور حصے (نقد / جاز کیش / ایزی پیسہ / بینک)';
+const APP_BUILD_VERSION = 'SM2211SU301'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🆔 آپ کی اپنی SM ID — لاگ اِن پر ہر وقت نظر؛ پیکج اسی ID پر لگتا ہے اور فون خود چالو ہو جاتا ہے، کوئی کوڈ نہیں';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -59025,6 +59025,112 @@ window.openHelpDesk = openHelpDesk;
       rows = []; m0 = 'cash';
     }
   };
+})();
+</script>
+<script type="text/fm-boot">
+/* 🆔 SM2211SU301 (مالک کا حکم — AIO Direct / My City Shines جیسا): سبزی منڈی کی اپنی «SM ID»
+   مالک کا فون رجسٹر ہوتے ہی سرور (AIO worker /aioid، app SM) سے ایک ID (مثلاً SM48213) — لاگ اِن اور «Subscription Required» پر ہر وقت نظر؛
+   ID کسی کو بھیجنی نہیں — مالک ہیلپ ڈیسک «✅ Activate package (SM ID)» میں سب IDs دیکھ کر پیکج (صرف مالک / مالک + 1، 2، 3 ملازم × مدت) لگاتا ہے؛
+   یہ فون خود سرور سے پوچھتا ہے (/entclaim kind a) → پیکج + مدت + ملازموں کی گنتی خود لگ جاتی ہے + 🎉 مبارکباد۔ ملازم کے فون پر نہیں (وہ دکان کی سبسکرپشن سے)۔
+   پرانا کوڈ والا نظام (NB / SB / JS) ویسا ہی چلتا ہے۔ کلید: localStorage smIdV1 */
+(function(){
+  const W = 'https://aio-pos-verify.pbtcodelabs.workers.dev';
+  const E = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const K = "font-family:'JameelNooriNastaleeqKasheeda','JameelNooriNastaleeq','Noto Nastaliq Urdu',serif;";
+  function me(){ try{ return JSON.parse(localStorage.getItem('smIdV1') || 'null') || {}; }catch(e){ return {}; } }
+  function save(m){ try{ localStorage.setItem('smIdV1', JSON.stringify(m)); }catch(e){} }
+  const st = () => (typeof AppState !== 'undefined' && AppState.settings) || {};
+  const dmy = v => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(v || '')); return m ? m[3] + '/' + m[2] + '/' + m[1] : String(v || ''); };
+  const ownerPhone = () => { const s = st(); return s.smRegistered && !s.smJoinedAsStaff ? String(s.businessPhone || '').replace(/[^0-9]/g, '') : ''; };
+  /* فون کی پہچان (AIO Direct جیسی) + موبائل → ایک پکی چابی: اسی فون پر دوبارہ انسٹال ہو تو وہی ID اور وہی پیکج */
+  function fpv(){ try{ const f = [String(navigator.userAgent || '').replace(/\d+/g, ''), Math.min(screen.width, screen.height), Math.max(screen.width, screen.height), navigator.hardwareConcurrency || 2, new Date().getTimezoneOffset(), navigator.language || '', navigator.platform || ''].join('|');
+    let h1 = 5381, h2 = 52711; for(let i = 0; i < f.length; i++){ const c = f.charCodeAt(i); h1 = (h1 * 33) ^ c; h2 = (h2 * 31 + c) | 0; } return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36); }catch(e){ return ''; } }
+  function devKey(mob){ const m = me(); if(m.dev) return m.dev; const f = fpv() || Math.random().toString(36).slice(2, 12); let h = 0; const k = f + '|' + String(mob).slice(-10); for(let i = 0; i < k.length; i++){ h = ((h << 5) - h + k.charCodeAt(i)) | 0; } m.dev = 'S' + f + (h >>> 0).toString(36); save(m); return m.dev; }
+  async function post(path, body){ const r = await fetch(W + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); return r.json(); }
+  let regBusy = false;
+  async function reg(){
+    const mob = ownerPhone(), m = me(); if(m.id || regBusy || mob.length < 10 || navigator.onLine === false) return;
+    regBusy = true;
+    try{
+      const s = st(), name = String(s.ownerName || s.businessName || 'SM').trim().slice(0, 60) || 'SM';
+      const r = await post('/aioid', { op: 'reg', app: 'SM', dev: devKey(mob), fp: fpv(), name: name.length < 2 ? name + ' ' + (s.businessName || 'SM') : name, mobile: '0' + mob.slice(-10), gmail: '' });
+      if(r && r.ok && r.id){ const m2 = me(); m2.id = r.id; m2.mob = mob; m2.at = Date.now(); save(m2); paint(); check(true); }
+    }catch(e){}
+    regBusy = false;
+  }
+  window.smIdCopy = function(btn){ const id = me().id || ''; const done = () => { if(btn){ const t = btn.textContent; btn.textContent = '✅ کاپی ہو گئی'; setTimeout(() => { btn.textContent = t; }, 1500); } };
+    try{ navigator.clipboard.writeText(id).then(done, () => prompt('Copy', id)); }catch(e){ prompt('Copy', id); } };
+  window.smIdRefresh = function(btn){ if(btn){ btn.disabled = true; btn.textContent = '⏳'; } last = 0; (me().id ? check(true) : reg()).then(() => { if(btn){ btn.disabled = false; btn.textContent = '🔄 تازہ کریں'; } paint(); }); };
+  function cardHTML(small){
+    const m = me(), s = st(); if(!m.id) return '';
+    let stTxt = ''; try{ if(s.smIdExp && isSubscriptionActive()) stTxt = '✅ پیکج: ' + smPlanText(smPlan()) + ' — ' + daysLeftInSubscription() + ' دن باقی (' + dmy(s.subscriptionExpiry) + ' تک)'; }catch(e){}
+    return '<div class="smIdCard" dir="rtl" style="background:linear-gradient(135deg,#e0f2fe,#f0f9ff);border:2px solid #0369a1;border-radius:14px;padding:10px 12px;margin:' + (small ? '0 0 12px' : '10px 0 0') + ';text-align:center;' + K + '">'
+      + '<div style="font-size:15px;font-weight:800;color:#0c4a6e">🆔 آپ کی SM ID</div>'
+      + '<div style="font:900 28px/1.3 Arial,sans-serif;letter-spacing:3px;direction:ltr;color:#0369a1;margin:2px 0 4px">' + E(m.id) + '</div>'
+      + (stTxt ? '<div style="font-size:14px;color:#166534;font-weight:800;margin-bottom:4px">' + E(stTxt) + '</div>' : '')
+      + '<div style="font-size:13px;color:#334155;line-height:1.9">آپ کا پیکج اسی ID پر لگتا ہے — یہ فون خود چالو ہو جاتا ہے، کوئی کوڈ نہیں۔</div>'
+      + '<div style="display:flex;gap:6px;justify-content:center;margin-top:6px"><button type="button" onclick="smIdCopy(this)" style="width:auto!important;margin:0!important;padding:7px 14px!important;border:0;border-radius:10px!important;background:#0369a1!important;color:#fff!important;font-weight:800;font-size:14px">📋 کاپی</button>'
+      + '<button type="button" onclick="smIdRefresh(this)" style="width:auto!important;margin:0!important;padding:7px 14px!important;border:1.5px solid #0369a1;border-radius:10px!important;background:#fff!important;color:#0369a1!important;font-weight:800;font-size:14px">🔄 تازہ کریں</button></div></div>';
+  }
+  function paint(){
+    try{
+      if(!ownerPhone()) { document.querySelectorAll('.smIdCard').forEach(x => x.remove()); return; }
+      const h = cardHTML(false), lb = document.getElementById('loginLicenseInfoBox');
+      if(lb && h){ let c = document.getElementById('smIdLogin'); if(!c){ c = document.createElement('div'); c.id = 'smIdLogin'; }
+        const sc = document.getElementById('smSubCheckBtn'), at = sc && sc.parentElement;   /* لاگ اِن پر اوپر — «سبسکرپشن چیک» کے بٹن سے پہلے */
+        if(at){ if(c.nextElementSibling !== at) at.before(c); } else if(c.nextElementSibling !== lb) lb.before(c);
+        if(c.innerHTML !== h) c.innerHTML = h; }
+      const g = document.getElementById('subGateStatus');
+      if(g && h){ let c = document.getElementById('smIdGate'); if(!c){ c = document.createElement('div'); c.id = 'smIdGate'; g.insertAdjacentElement('afterend', c); } const h2 = cardHTML(true); if(c.innerHTML !== h2) c.innerHTML = h2; }
+    }catch(e){}
+  }
+  function celebrate(plan, expStr, days, life){
+    try{
+      const o0 = document.getElementById('smIdCele'); if(o0) o0.remove();
+      const o = document.createElement('div'); o.id = 'smIdCele';
+      o.style.cssText = 'position:fixed;inset:0;z-index:2147483600;background:rgba(3,37,65,.82);display:flex;align-items:center;justify-content:center;padding:18px';
+      o.innerHTML = '<div dir="rtl" style="background:#fff;border-radius:22px;max-width:380px;width:100%;padding:22px 18px 18px;text-align:center;box-shadow:0 14px 44px rgba(0,0,0,.5);' + K + '">'
+        + '<div style="font-size:54px;line-height:1.2">🎉</div><div style="font-size:24px;font-weight:900;color:#0369a1;margin:4px 0 8px">مبارک ہو! آپ کا پیکج چالو ہو گیا</div>'
+        + '<div style="font-size:17px;color:#334155;line-height:2.1">📦 پیکج: <b>' + E(smPlanText(plan)) + '</b><br>'
+        + (life ? '♾️ لائف ٹائم' : '⏳ <b style="font-family:Arial,sans-serif">' + days + '</b> دن — <b style="font-family:Arial,sans-serif">' + E(dmy(expStr)) + '</b> تک') + '<br>🆔 SM ID: <b style="font-family:Arial,sans-serif;direction:ltr">' + E(me().id) + '</b></div>'
+        + '<button type="button" onclick="document.getElementById(\'smIdCele\').remove()" style="margin-top:14px;width:auto!important;padding:9px 34px!important;border:none!important;border-radius:999px!important;background:#0369a1!important;color:#fff!important;font-size:18px;font-weight:800">جزاک اللہ ✅</button></div>';
+      document.body.appendChild(o);
+    }catch(e){}
+  }
+  let last = 0, busy = false;
+  async function check(force){
+    const m = me(), s = st(); if(!m.id || !m.dev || busy || !ownerPhone() || navigator.onLine === false) return;
+    if(!force && Date.now() - last < 10 * 60e3) return;
+    busy = true; last = Date.now();
+    try{
+      const r = await post('/entclaim', { app: 'SM', kind: 'a', aio: m.id, adev: m.dev, dev: m.dev });
+      if(r && r.ok && r.active){
+        const expStr = r.life ? '2099-12-31' : _smYMD(new Date(r.exp)), staff = Math.max(0, Math.min(5, (parseInt(r.devices, 10) || 1) - 1)), plan = staff ? 'P1+' + staff : 'P1';
+        if(s.smIdExp !== expStr || s.smIdPlan !== plan){
+          const gate = document.getElementById('subscriptionGateScreen'), gateOn = gate && gate.style.display && gate.style.display !== 'none';
+          try{ smSetPlan(plan); }catch(e){}   /* ملازموں کے فون بھی دکان کی سبسکرپشن سے (آئینہ) */
+          if(!s.subscriptionExpiry || expStr > s.subscriptionExpiry || s.isOnFreeTrial || s.smIdExp) s.subscriptionExpiry = expStr;
+          s.subscriptionActivatedOn = _smYMD(new Date()); s.isOnFreeTrial = false; s.trialLockConfirmedOnline = true;
+          s.lastActivationCode = m.id; s.smIdExp = expStr; s.smIdPlan = plan; s.smIdKey = r.key || ('a:' + m.id);
+          try{ persistAllData(); }catch(e){}
+          try{ setupLoginScreen(); }catch(e){} try{ renderSubscriptionBanner(); }catch(e){} try{ renderLoginLicenseInfo(); }catch(e){} try{ syncSubscriptionToCloud(); }catch(e){}
+          let days = 0; try{ days = daysLeftInSubscription(); }catch(e){}
+          celebrate(plan, s.subscriptionExpiry, days, !!r.life);
+          if(gateOn) setTimeout(() => { try{ location.reload(); }catch(e){} }, 6000);
+        }
+      } else if(r && r.ok === false && r.reason === 'revoked' && s.smIdKey){   /* ہیلپ ڈیسک سے معطل */
+        s.subscriptionExpiry = _smYMD(new Date(Date.now() - 864e5)); s.smIdExp = ''; s.smIdKey = '';
+        try{ persistAllData(); setupLoginScreen(); renderSubscriptionBanner(); }catch(e){}
+      }
+    }catch(e){}
+    busy = false; paint();
+  }
+  window.smIdCheck = check; window.smIdMe = me;
+  try{ const r0 = window.renderLoginLicenseInfo; if(typeof r0 === 'function') window.renderLoginLicenseInfo = renderLoginLicenseInfo = function(){ const x = r0.apply(this, arguments); paint(); return x; }; }catch(e){}
+  setTimeout(() => { reg(); check(true); paint(); }, 4000);
+  setInterval(() => { reg(); check(false); paint(); }, 30e3);
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible'){ reg(); check(false); } });
+  window.addEventListener('online', () => { reg(); check(true); });
 })();
 </script>
 <script>
