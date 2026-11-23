@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2211SU302'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '💳 بل پر آج کی وصولی بھی حصوں میں (نقد / جاز کیش / ایزی پیسہ / بینک) — کل والے ڈبے جیسا؛ آج دو وصولیاں ہوں تو ہر ایک الگ لائن';
+const APP_BUILD_VERSION = 'SM2311MO303'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '⏳ پیکج ختم ہونے کی یاد دہانی: 15 دن سے کم رہ جائیں تو ایک بار، 7 دن سے کم پر روز ایک بار — بٹن «📦 پیکج دوبارہ لیں»';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -11631,7 +11631,7 @@ function _origRenderSubscriptionBanner(){
 
   // ---------- روزانہ صرف ایک بار: ہلکا Toast یا (آخری 2 دن میں) زیادہ نمایاں پاپ اپ — صرف Free Trial کے دوران ----------
   if(AppState.settings.isOnFreeTrial) maybeShowTrialReminder(daysLeft);
-  else if(daysLeft <= 7) maybeShowPaidReminder(daysLeft); // #93
+  else if(daysLeft <= 15) maybeShowPaidReminder(daysLeft); // #93 · SM (#380): 15 دن سے کم پر بھی
 }
 
 // ---------- 🎁 روزانہ ایک بار Trial یاد دہانی — 2 دن یا کم بچے ہوں تو زیادہ نمایاں (بٹن والا) پاپ اپ،
@@ -11639,9 +11639,10 @@ function _origRenderSubscriptionBanner(){
 // ---------- ⚠️ ہیلپ ڈیسک #93 (مالک کا حکم): پیڈ سبسکرپشن کے 7 دن سے کم رہ جائیں تو روز ایک بار پاپ اپ (صرف مالک / ایڈمن) ---------- -->
 function maybeShowPaidReminder(daysLeft){
   try{
-    const todayStr = new Date().toISOString().slice(0,10);
-    if(AppState.settings.paidReminderShownOn === todayStr) return;
-    AppState.settings.paidReminderShownOn = todayStr; persistAllData();
+    /* ہیلپ ڈیسک #380 (مالک کا حکم — سب ایپس کا اصول): 15 سے 8 دن — اسی پیکج پر صرف ایک بار؛ 7 دن یا کم — روز ایک بار */
+    const todayStr = new Date().toISOString().slice(0,10), expKey = String(AppState.settings.subscriptionExpiry || '');
+    if(daysLeft > 7){ if(AppState.settings.paidReminder15For === expKey) return; AppState.settings.paidReminder15For = expKey; persistAllData(); }
+    else { if(AppState.settings.paidReminderShownOn === todayStr) return; AppState.settings.paidReminderShownOn = todayStr; persistAllData(); }
     const ov = document.createElement('div');
     ov.style.cssText = 'position:fixed;inset:0;z-index:2147483500;background:rgba(15,23,42,.55);display:flex;align-items:center;justify-content:center;padding:16px;direction:rtl';
     const red = daysLeft <= 3;
@@ -11651,11 +11652,11 @@ function maybeShowPaidReminder(daysLeft){
       <div style="font-size:14px;color:#334155;line-height:1.9">ختم ہونے کی تاریخ: <b dir="ltr">${formatDateDMY(AppState.settings.subscriptionExpiry)}</b><br>کام نہ رکے، اس لیے ابھی تجدید کروا لیں۔</div>
       <div style="display:flex;gap:8px;margin-top:14px">
         <button id="prLater" style="flex:1;padding:11px;border:none;border-radius:10px;background:#e2e8f0;color:#334155;font-weight:900;font-size:14px;cursor:pointer">بعد میں</button>
-        <button id="prRenew" style="flex:1;padding:11px;border:none;border-radius:10px;background:#16a34a;color:#fff;font-weight:900;font-size:14px;cursor:pointer">💬 تجدید کے لیے رابطہ</button>
+        <button id="prRenew" style="flex:1;padding:11px;border:none;border-radius:10px;background:#16a34a;color:#fff;font-weight:900;font-size:14px;cursor:pointer">📦 پیکج دوبارہ لیں</button>
       </div></div>`;
     document.body.appendChild(ov);
     ov.querySelector('#prLater').onclick = () => ov.remove();
-    ov.querySelector('#prRenew').onclick = () => { ov.remove(); try{ openDevChat('subscription'); }catch(e){} };
+    ov.querySelector('#prRenew').onclick = () => { ov.remove(); try{ if(typeof smPkgOpen === 'function') smPkgOpen(); else openDevChat('subscription'); }catch(e){ try{ openDevChat('subscription'); }catch(x){} } };
   }catch(e){}
 }
 function maybeShowTrialReminder(daysLeft){
