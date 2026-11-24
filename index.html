@@ -53,6 +53,10 @@ const APP_EDITION = 'general';
   const of = window.fetch.bind(window);
   window.fetch = function(input, init){
     const u = (typeof input === 'string') ? input : (input && input.url) || '';
+    /* 🛟 SM2411TU315 (ہیلپ ڈیسک #400 — بلال بھائی، اصل وجہ): خالی (نئے) فون کا پیکج P1 ہوتا ہے تو یہ تالا «پرانی دکان واپس لائیں» کی کلاؤڈ جانچ بھی روک دیتا تھا
+       (ہر جانچ 503 → «دکان کلاؤڈ میں نہیں ملی»)؛ اب بحالی کے دوران (2 منٹ) صرف اسی دکان (موبائل-کوڈ) کا پڑھنا (GET) کھلا — لائسنس سے اصل پیکج آتے ہی باقی خود */
+    const RA = window.__smRestAllow, meth = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+    if(RA && Date.now() - RA.t < 120000 && meth === 'GET' && u.indexOf('/documents/shops/' + RA.s + '/') > 0) return of(input, init);
     if(/firestore\.googleapis\.com/.test(u) && /\/documents\/shops\//.test(u) && !smIsCloudPlan()){
       return Promise.resolve(new Response('{}', { status: 503, headers: { 'Content-Type': 'application/json' } }));
     }
@@ -10533,8 +10537,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU314'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🎁 مفت ٹرائل اب دکان کے موبائل نمبر پر یاد — نیا براؤزر / APK یا ڈیٹا صاف کر کے اسی نمبر پر دوبارہ 7 دن نہیں';
+const APP_BUILD_VERSION = 'SM2411TU315'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🛟 دکان کی بحالی: نئے / خالی فون پر بھی پرانی دکان کلاؤڈ سے مل جاتی ہے (پہلے «کلاؤڈ میں نہیں ملی» آ جاتا تھا)';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56660,6 +56664,7 @@ async function smOwnerRestoreShop(pasted, auto){
   /* 🛟 SM2411TU313 (ہیلپ ڈیسک #400 — بلال بھائی): فون میں پچھلی بحالی کا نمبر + کوڈ رہ گیا مگر رجسٹریشن ختم ہو گئی تھی (رجسٹریشن صفحہ) —
      پہلے یہاں «پہلے سے اسی دکان پر ہے» کہہ کر رک جاتا تھا اور دکان کبھی واپس نہ آتی؛ اب صرف تب رکے جب واقعی رجسٹرڈ ہو، ورنہ پوری بحالی */
   window.__smRestWhy = { m: m, c: c, why: '' };
+  window.__smRestAllow = { t: Date.now(), s: m + '-' + c };   /* SM2411TU315: اسی دکان کی کلاؤڈ جانچ پیکج کے تالے سے آزاد */
   if(m === smShopMobile() && c === smShopCode() && AppState.settings.smRegistered){ window.__smRestWhy.why = 'same'; alert('✅ یہ فون پہلے سے اسی دکان پر ہے۔'); return; }
   const base = 'shops/' + m + '-' + c + '/data/';
   let found = 0; const _why = [];
