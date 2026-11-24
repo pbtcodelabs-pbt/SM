@@ -48,10 +48,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with: { name: sm-webview-debug, path: .wvapk/app/build/outputs/apk/debug/*.apk }
       - name: "4) Release"
-        if: env.MODE == 'release'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
+          # SM2411TU311 (مالک کا حکم — «APK کا ڈاؤن لوڈ لنک دو»): چابی نہ ہو تب بھی جانچ والی APK اسی Release پر (سیدھا لنک)
           N=$(jq -r .apkFileName .wvapk/config.json); mkdir -p out
-          cp .wvapk/app/build/outputs/apk/release/app-release.apk "out/$N.apk"
+          if [ "$MODE" = release ]; then cp .wvapk/app/build/outputs/apk/release/app-release.apk "out/$N.apk"; else cp .wvapk/app/build/outputs/apk/debug/*.apk "out/$N.apk"; fi
           gh release delete sm-webview-apk -y --cleanup-tag || true
           gh release create sm-webview-apk "out/$N.apk" --title "📱 سبزی منڈی — APK (ویب ویو) #${{ github.run_number }}" --notes "کروم صاف کرنے سے ڈیٹا نہیں مٹتا۔ ڈاؤن لوڈ کر کے انسٹال کریں — اپڈیٹس ویب سائٹ سے خود آتی ہیں۔"
