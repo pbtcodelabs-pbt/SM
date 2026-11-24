@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU307'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '📱 سبزی منڈی کی نئی APK (ویب ویو) کے لیے تیاری — APK میں ڈیٹا کروم صاف کرنے سے نہیں مٹتا؛ بلوٹوتھ تھرمل پرنٹر سیدھا';
+const APP_BUILD_VERSION = 'SM2411TU308'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🛟 دکان کی بحالی: رجسٹریشن صفحے کے نارنجی ڈبے میں «📱 اس فون کی پہچان» (4 حروف) — ہیلپ ڈیسک کو یہی بتائیں، کچھ لکھنا نہیں';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -59092,7 +59092,8 @@ window.openHelpDesk = openHelpDesk;
   }
   setTimeout(push, 15000); setInterval(push, 30 * 60000);
   window.smShopPtrPush = push;
-  /* 🛟 SM2411TU306 (مالک کا حکم — «کوڈ لکھنے کی مجبوری نہیں، ہیلپ ڈیسک سے ہی دکان چالو»):
+  /* 🛟 SM2411TU308: نارنجی ڈبے میں «📱 اس فون کی پہچان: XXXX» (انتظار والی شناخت `smWaitIdV1` کے آخری 4 حروف) — ہیلپ ڈیسک کی فہرست میں یہی؛ گاہک صرف پڑھ کر بتائے۔
+     🛟 SM2411TU306 (مالک کا حکم — «کوڈ لکھنے کی مجبوری نہیں، ہیلپ ڈیسک سے ہی دکان چالو»):
      خالی (غیر رجسٹر) فون رجسٹریشن صفحے پر خود سرور کو «میں انتظار میں ہوں» بتاتا ہے (/smrestore op wait: اس انسٹال کی پہچان + فون کی پہچان fp + ماڈل)؛
      مالک ہیلپ ڈیسک ← SM ID ← «🛟 دکان کی بحالی» ← «📲 فون پر چالو کریں» ← انتظار والا فون چنے → یہ فون خود دکان واپس لاتا ہے — گاہک کو کچھ نہیں لکھنا۔ */
   function fpv(){ try{ var f = [String(navigator.userAgent || '').replace(/\d+/g, ''), Math.min(screen.width, screen.height), Math.max(screen.width, screen.height), navigator.hardwareConcurrency || 2, new Date().getTimezoneOffset(), navigator.language || '', navigator.platform || ''].join('|');
@@ -59118,7 +59119,7 @@ window.openHelpDesk = openHelpDesk;
   function show(t){ var x = document.getElementById('smHdRestMsg'); if(!x){ if(!t) return; x = document.createElement('div'); x.id = 'smHdRestMsg'; x.setAttribute('style', 'position:fixed;inset:0;z-index:2147483600;background:rgba(3,37,65,.85);display:flex;align-items:center;justify-content:center;padding:18px;color:#fff;font-size:20px;font-weight:800;text-align:center;line-height:2'); document.body.appendChild(x); }
     if(!t){ x.remove(); return; } x.textContent = t; }
   window.smHdRestore = function(){ try{ wait(); }catch(e){}
-    var t = '🛟 دکان کا ریکارڈ غائب ہو گیا — رجسٹریشن صفحہ آ رہا ہے۔ فون: ' + model();
+    var t = '🛟 دکان کا ریکارڈ غائب ہو گیا — رجسٹریشن صفحہ آ رہا ہے۔ فون کی پہچان: ' + wid().slice(-4) + ' · ' + model();
     try{ if(window.PBTHelp && PBTHelp.open) return PBTHelp.open({ app: 'SM', ver: (typeof APP_BUILD_VERSION !== 'undefined' ? APP_BUILD_VERSION : ''), lang: 'ur', text: t }); }catch(e){}
     try{ if(typeof openHelpDesk === 'function') return openHelpDesk(); }catch(e){}
     alert('ہیلپ ڈیسک کو اپنا موبائل نمبر بتائیں — دکان ہماری طرف سے خود واپس آ جائے گی۔'); };
@@ -59126,6 +59127,7 @@ window.openHelpDesk = openHelpDesk;
     var o = document.getElementById('smRegOverlay'); if(!o || document.getElementById('smHdRestBtn')) return;
     var b = document.createElement('div'); b.id = 'smHdRestBtn';
     b.innerHTML = '<b>🛟 پہلے سے دکان تھی اور ریکارڈ غائب ہو گیا؟</b><br>کچھ نہ لکھیں — یہ صفحہ کھلا رکھیں اور ہیلپ ڈیسک کو اپنا موبائل نمبر بتائیں؛ دکان ہماری طرف سے پورے ریکارڈ کے ساتھ خود واپس آ جائے گی۔'
+      + '<div style="margin:6px auto 0;padding:4px 10px;border:2px dashed #b45309;border-radius:10px;background:#fff;display:inline-block">📱 اس فون کی پہچان: <b dir="ltr" style="font:900 24px/1.3 Arial,sans-serif;letter-spacing:4px;color:#7c2d12">' + wid().slice(-4) + '</b><br><span style="font-size:12.5px">ہیلپ ڈیسک کو یہی 4 حروف بتائیں</span></div>'
       + '<button type="button" style="display:block;width:100%;margin:6px 0 0;padding:6px;border:0;border-radius:10px;background:#b45309;color:#fff;font-family:inherit;font-size:15px;font-weight:800">📩 ہیلپ ڈیسک کو بتائیں</button>';
     b.querySelector('button').onclick = function(){ window.smHdRestore(); };
     b.setAttribute('style', 'margin:10px 0 0;padding:8px 10px;border:2px solid #b45309;border-radius:12px;background:#fffbeb;color:#92400e;font-size:14px;line-height:1.9;text-align:center');
