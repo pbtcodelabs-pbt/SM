@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU311'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '✅ ہیلپ ڈیسک سے دکان واپس آئے اور ریکارڈ فون پر آ جائے تو ہیلپ ڈیسک کو خود اطلاع: دکان لائیو ہو گئی';
+const APP_BUILD_VERSION = 'SM2411TU312'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🛟 دکان کی بحالی: دکان نہ ملے تو ہیلپ ڈیسک کو وجہ بھی جاتی ہے (نمبر / کوڈ غلط یا انٹرنیٹ / لاگ اِن)';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56659,10 +56659,12 @@ async function smOwnerRestoreShop(pasted, auto){
   if(c.length !== 8){ if(c) alert('کوڈ درست نہیں — 8 حروف/ہندسے ہونے چاہییں'); return; }
   if(m === smShopMobile() && c === smShopCode()){ alert('✅ یہ فون پہلے سے اسی دکان پر ہے۔'); return; }
   const base = 'shops/' + m + '-' + c + '/data/';
-  let found = 0;
+  let found = 0; const _why = [];
   for(const d of ['license', 'customers', 'products', 'suppliers', 'invoicesIndex']){
-    try{ const r = await authFirestoreFetch(`${base}${d}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' }); if(r && r.ok) found++; }catch(e){}
+    try{ const r = await authFirestoreFetch(`${base}${d}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' }); if(r && r.ok) found++; _why.push(r ? r.status : 0); }catch(e){ _why.push(/auth/.test(String(e && e.message)) ? 'auth' : 'net'); }
   }
+  /* SM2411TU312 (ہیلپ ڈیسک #400): کیوں نہیں ملی — 404 = اس نمبر + کوڈ کی دکان نہیں، 403 = اجازت، auth / net = لاگ اِن یا انٹرنیٹ (ہیلپ ڈیسک کو یہی جاتا ہے) */
+  window.__smRestWhy = { m: m, c: c, why: _why.join(',') };
   if(!found){ alert('❌ اس نمبر اور کوڈ کی کوئی دکان کلاؤڈ میں نہیں ملی (یا انٹرنیٹ نہیں)۔\n\nنمبر اور کوڈ دوبارہ دیکھیں — منشی کے فون والا پیغام سب سے درست ہے۔'); return; }
   if(!auto && !confirm('✅ دکان کلاؤڈ میں مل گئی۔\n\nیہ فون اب اسی پرانی دکان کا مالک بنے گا اور سارا ریکارڈ (کسٹمر، بیوپاری، بل، سٹاک) کلاؤڈ سے واپس آئے گا۔\n\n⚠️ دوبارہ انسٹال کے بعد اس فون پر جو نئی چیزیں ڈالی تھیں وہ اس فون سے ہٹ جائیں گی (کلاؤڈ میں الگ محفوظ رہیں گی)۔\n\nجاری رکھیں؟')) return;
   // 🔓 SM0311TU242 (ہیلپ ڈیسک #54): دوبارہ انسٹال والے خالی فون پر PIN نہیں — وہاں ابھی 1234 ہوتا ہے اور مالک اپنا پرانا PIN لکھتا تو
@@ -59118,7 +59120,7 @@ window.openHelpDesk = openHelpDesk;
         await smOwnerRestoreShop('دکان: ' + (j.push.shop || '') + '\nموبائل: ' + j.push.m + '\nکوڈ: ' + c, true);
         /* SM2411TU310 (ہیلپ ڈیسک #400): بحالی نہ ہو سکی (دکان کلاؤڈ میں نہیں ملی) تو سرور کو بتائیں — ہیلپ ڈیسک میں «❌ نہیں ملی» آئے، اور وہی دکان بار بار نہ آئے */
         var ok = false; try{ ok = !!(AppState && AppState.settings && AppState.settings.smRegistered); }catch(e){}
-        if(!ok){ try{ localStorage.removeItem('smHdRestDone'); }catch(e){} try{ await fetch(W + '/smrestore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'wait', w: wid(), fail: 'notfound', fc: String(j.push.c || '') }) }); }catch(e){} }
+        if(!ok){ try{ localStorage.removeItem('smHdRestDone'); }catch(e){} try{ await fetch(W + '/smrestore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'wait', w: wid(), fail: (window.__smRestWhy && window.__smRestWhy.why ? 'nf:' + window.__smRestWhy.why : 'notfound').slice(0, 40), fc: String(j.push.c || ''), fm: String(j.push.m || '') }) }); }catch(e){} }
         wDone = false; show('');
       }
     }catch(e){}
