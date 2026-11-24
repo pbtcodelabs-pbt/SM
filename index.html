@@ -10537,8 +10537,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU315'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🛟 دکان کی بحالی: نئے / خالی فون پر بھی پرانی دکان کلاؤڈ سے مل جاتی ہے (پہلے «کلاؤڈ میں نہیں ملی» آ جاتا تھا)';
+const APP_BUILD_VERSION = 'SM2411TU316'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🆔 لاگ اِن پر SM ID کا ڈبہ چھوٹا — ایک لائن: ID، 📋 کاپی، 🔄 تازہ';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -59223,19 +59223,20 @@ window.openHelpDesk = openHelpDesk;
     }catch(e){}
     regBusy = false;
   }
-  window.smIdCopy = function(btn){ const id = me().id || ''; const done = () => { if(btn){ const t = btn.textContent; btn.textContent = '✅ کاپی ہو گئی'; setTimeout(() => { btn.textContent = t; }, 1500); } };
+  window.smIdCopy = function(btn){ const id = me().id || ''; const done = () => { if(btn){ const t = btn.textContent; btn.textContent = '✅'; setTimeout(() => { btn.textContent = t; }, 1500); } };
     try{ navigator.clipboard.writeText(id).then(done, () => prompt('Copy', id)); }catch(e){ prompt('Copy', id); } };
-  window.smIdRefresh = function(btn){ if(btn){ btn.disabled = true; btn.textContent = '⏳'; } last = 0; (me().id ? check(true) : reg()).then(() => { if(btn){ btn.disabled = false; btn.textContent = '🔄 تازہ کریں'; } paint(); }); };
+  window.smIdRefresh = function(btn){ if(btn){ btn.disabled = true; btn.textContent = '⏳'; } last = 0; (me().id ? check(true) : reg()).then(() => { if(btn){ btn.disabled = false; btn.textContent = '🔄'; } paint(); }); };
   function cardHTML(small){
     const m = me(), s = st(); if(!m.id) return '';
     let stTxt = ''; try{ if(s.smIdExp && isSubscriptionActive()) stTxt = '✅ پیکج: ' + smPlanText(smPlan()) + ' — ' + daysLeftInSubscription() + ' دن باقی (' + dmy(s.subscriptionExpiry) + ' تک)'; }catch(e){}
-    return '<div class="smIdCard" dir="rtl" style="background:linear-gradient(135deg,#e0f2fe,#f0f9ff);border:2px solid #0369a1;border-radius:14px;padding:10px 12px;margin:' + (small ? '0 0 12px' : '10px 0 0') + ';text-align:center;' + K + '">'
-      + '<div style="font-size:15px;font-weight:800;color:#0c4a6e">🆔 آپ کی SM ID</div>'
-      + '<div style="font:900 28px/1.3 Arial,sans-serif;letter-spacing:3px;direction:ltr;color:#0369a1;margin:2px 0 4px">' + E(m.id) + '</div>'
-      + (stTxt ? '<div style="font-size:14px;color:#166534;font-weight:800;margin-bottom:4px">' + E(stTxt) + '</div>' : '')
-      + '<div style="font-size:13px;color:#334155;line-height:1.9">آپ کا پیکج اسی ID پر لگتا ہے — یہ فون خود چالو ہو جاتا ہے، کوئی کوڈ نہیں۔</div>'
-      + '<div style="display:flex;gap:6px;justify-content:center;margin-top:6px"><button type="button" onclick="smIdCopy(this)" style="width:auto!important;margin:0!important;padding:7px 14px!important;border:0;border-radius:10px!important;background:#0369a1!important;color:#fff!important;font-weight:800;font-size:14px">📋 کاپی</button>'
-      + '<button type="button" onclick="smIdRefresh(this)" style="width:auto!important;margin:0!important;padding:7px 14px!important;border:1.5px solid #0369a1;border-radius:10px!important;background:#fff!important;color:#0369a1!important;font-weight:800;font-size:14px">🔄 تازہ کریں</button></div></div>';
+    /* SM2411TU316 (مالک کا حکم — «اتنا بڑا ڈبہ نہیں، جتنی لکھائی اتنا چھوٹا»): ایک لائن — 🆔 SM ID · نمبر · 📋 · 🔄 (پیکج ہو تو نیچے باریک لائن) */
+    const bt = 'width:auto!important;min-width:0!important;margin:0!important;padding:3px 8px!important;border-radius:8px!important;font-size:13px!important;font-weight:800;line-height:1.4;flex:0 0 auto';
+    return '<div class="smIdCard" dir="rtl" title="آپ کا پیکج اسی ID پر لگتا ہے — یہ فون خود چالو ہو جاتا ہے، کوئی کوڈ نہیں" style="display:block;width:fit-content;max-width:100%;margin:' + (small ? '0 auto 10px' : '8px auto 0') + ';background:#f0f9ff;border:1.5px solid #0369a1;border-radius:10px;padding:4px 8px;text-align:center;' + K + '">'
+      + '<div style="display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:nowrap"><span style="font-size:13px;font-weight:800;color:#0c4a6e;white-space:nowrap">🆔 SM ID</span>'
+      + '<b style="font:900 18px/1.3 Arial,sans-serif;letter-spacing:1px;direction:ltr;color:#0369a1">' + E(m.id) + '</b>'
+      + '<button type="button" onclick="smIdCopy(this)" style="' + bt + ';border:0;background:#0369a1!important;color:#fff!important">📋</button>'
+      + '<button type="button" onclick="smIdRefresh(this)" style="' + bt + ';border:1.5px solid #0369a1;background:#fff!important;color:#0369a1!important">🔄</button></div>'
+      + (stTxt ? '<div style="font-size:12px;color:#166534;font-weight:800">' + E(stTxt) + '</div>' : '') + '</div>';
   }
   function paint(){
     try{
