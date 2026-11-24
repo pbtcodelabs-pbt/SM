@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU308'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🛟 دکان کی بحالی: رجسٹریشن صفحے کے نارنجی ڈبے میں «📱 اس فون کی پہچان» (4 حروف) — ہیلپ ڈیسک کو یہی بتائیں، کچھ لکھنا نہیں';
+const APP_BUILD_VERSION = 'SM2411TU309'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🛟 دکان کی بحالی: رجسٹریشن فارم میں گاہک نمبر یا نام لکھ دے تو ہیلپ ڈیسک کی فہرست میں بھی نظر آتا ہے (لکھنا لازمی نہیں)';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -59100,13 +59100,17 @@ window.openHelpDesk = openHelpDesk;
     var h1 = 5381, h2 = 52711; for(var i = 0; i < f.length; i++){ var c = f.charCodeAt(i); h1 = (h1 * 33) ^ c; h2 = (h2 * 31 + c) | 0; } return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36); }catch(e){ return ''; } }
   function wid(){ var k = 'smWaitIdV1', v = ''; try{ v = localStorage.getItem(k) || ''; }catch(e){} if(!/^W[A-Z0-9]{9}$/.test(v)){ v = 'W'; for(var i = 0; i < 9; i++) v += '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 32)]; try{ localStorage.setItem(k, v); }catch(e){} } return v; }
   function model(){ var u = String(navigator.userAgent || ''), m = u.match(/Android [\d.]+; ([^;)]+?)(?: Build|\))/); return ((m ? m[1] : /iPhone/.test(u) ? 'iPhone' : /Windows/.test(u) ? 'Windows' : /CrOS/.test(u) ? 'Chromebook' : 'فون') + ' · ' + Math.min(screen.width, screen.height) + '×' + Math.max(screen.width, screen.height)).slice(0, 60); }
+  /* SM2411TU309: رجسٹریشن فارم میں گاہک نے (اپنی مرضی سے) نمبر / نام لکھا ہو تو وہ بھی ہیلپ ڈیسک کی فہرست میں — لکھنا لازمی نہیں */
+  function fv(id){ try{ var e = document.getElementById(id); return String(e && e.value || '').replace(/[۰-۹]/g, function(d){ return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).trim(); }catch(e){ return ''; } }
+  var wLast = '';
+  document.addEventListener('input', function(e){ var t = e.target; if(t && /^smReg(Phone|Owner|Shop)$/.test(t.id || '')){ clearTimeout(wait.__t); wait.__t = setTimeout(wait, 2500); } }, true);
   var wBusy = false, wDone = false;
   async function wait(){
     try{
       var s = st(); if(wDone || wBusy || s.smRegistered || !navigator.onLine) return;
       var o = document.getElementById('smRegOverlay'); if(!o || getComputedStyle(o).display === 'none') return;
       wBusy = true;
-      var r = await fetch(W + '/smrestore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'wait', w: wid(), fp: fpv(), ua: model() }) }); var j = await r.json();
+      var r = await fetch(W + '/smrestore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'wait', w: wid(), fp: fpv(), ua: model(), mob: fv('smRegPhone').replace(/[^0-9]/g, '').slice(0, 13), nm: (fv('smRegOwner') + (fv('smRegShop') ? ' · ' + fv('smRegShop') : '')).slice(0, 60) }) }); var j = await r.json();
       if(j && j.ok && j.push && /^03\d{9}$/.test(j.push.m) && String(j.push.c || '').length === 8 && typeof smOwnerRestoreShop === 'function'){
         wDone = true; show('⏳ ہیلپ ڈیسک نے آپ کی دکان «' + (j.push.shop || '') + '» واپس بھیجی ہے — ریکارڈ واپس آ رہا ہے…');
         var c = j.push.c.slice(0, 4) + '-' + j.push.c.slice(4);
