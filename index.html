@@ -10537,8 +10537,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU316'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🆔 لاگ اِن پر SM ID کا ڈبہ چھوٹا — ایک لائن: ID، 📋 کاپی، 🔄 تازہ';
+const APP_BUILD_VERSION = 'SM2411TU317'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '📩 پیکج منگوائیں: «پیکج پلانز» میں پیکج اور مدت چنیں، رقم سامنے — ایک ٹچ سے درخواست، منظور ہوتے ہی فون خود چالو';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -57334,14 +57334,53 @@ window.addEventListener('DOMContentLoaded', () => {
     T('پی بی ٹی کوڈ لیبز — PBT Code Labs', W / 2, 1605, '700 32px ' + UR, '#a7f3d0');
     return c;
   }
+  /* 📩 SM2411TU317 (مالک کا حکم — «دکاندار کو کچھ نہ کرنا پڑے، نہ میسج ادھر نہ ادھر»): پیکج پلانز کے اوپر «پیکج منگوائیں» —
+     پیکج (صرف مالک / +1 / +2 / +3 ملازم) اور مدت (1 / 3 / 6 مہینے، 1 سال = 10 مہینے) چنیں → رقم سامنے → «✅ یہ پیکج منگوائیں» →
+     سرور (/aioid op want، اسی SM ID پر، رقم کے ساتھ) → ہیلپ ڈیسک میں «📩 گاہک نے مانگا»؛ مالک پیسے وصول کر کے (دو تصدیقیں) چالو → یہ فون خود چالو + 🎉۔ صرف مالک کا فون (ملازم کو نہیں) */
+  function wantBox(el, R){
+    if(!el) return; let st0 = {}; try{ st0 = AppState.settings || {}; }catch(e){}
+    if(st0.smJoinedAsStaff){ el.remove(); return; }
+    let me = {}; try{ me = JSON.parse(localStorage.getItem('smIdV1') || 'null') || {}; }catch(e){}
+    const PS = [['P1', 'p1'], ['P1+1', 'p1p1'], ['P1+2', 'p1p2'], ['P1+3', 'p1p3']], MS = [['1m', '1 مہینہ', 1], ['3m', '3 مہینے', 3], ['6m', '6 مہینے', 6], ['1y', '1 سال', 10]];
+    let sp = smNormPlan(st0.smPlan) || 'P1', sm = '1m'; if(!PS.some(x => x[0] === sp)) sp = 'P1';
+    const amt = () => (R[sp] || 0) * MS.find(x => x[0] === sm)[2];
+    const chip = (on) => 'padding:6px 4px;border-radius:10px;font-weight:800;font-size:14px;border:2px solid ' + (on ? '#b45309;background:#fef3c7;color:#7c2d12' : '#e2e8f0;background:#fff;color:#334155') + ';' + K;
+    const W2 = 'https://aio-pos-verify.pbtcodelabs.workers.dev';
+    const draw = (msg) => {
+      const w0 = me.want && me.want.pkg ? me.want : null;
+      el.innerHTML = '<div style="border:2px solid #f59e0b;border-radius:14px;padding:8px 10px;background:#fffbeb;' + K + '">'
+        + '<div style="font-weight:900;color:#7c2d12;font-size:17px">📩 پیکج منگوائیں</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-top:5px">' + PS.map(p => '<button type="button" data-wp="' + p[0] + '" style="' + chip(sp === p[0]) + '">' + pLabel(p[0]) + '</button>').join('') + '</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:5px">' + MS.map(m => '<button type="button" data-wm="' + m[0] + '" style="' + chip(sm === m[0]) + '">' + m[1] + '</button>').join('') + '</div>'
+        + '<div style="margin-top:6px;font-weight:900;font-size:18px;color:#047857">💰 رقم: <span style="font-family:Arial,sans-serif">Rs ' + fmt(amt()) + '</span>' + (sm === '1y' ? ' <small style="color:#b45309">(2 مہینے مفت)</small>' : '') + '</div>'
+        + '<button type="button" id="smWantGo" style="' + btnS('#16a34a', '#fff') + ';margin-top:6px">✅ یہ پیکج منگوائیں</button>'
+        + (msg ? '<div style="margin-top:6px;font-size:14px;line-height:1.9">' + msg + '</div>' : w0 ? '<div style="margin-top:6px;font-size:13px;color:#475569">📨 پچھلی درخواست بھیجی جا چکی ہے — رقم کی تصدیق کے بعد یہ فون خود چالو ہو جائے گا۔</div>' : '<div style="margin-top:6px;font-size:13px;color:#475569">رقم بھیجیں — پیکج منظور ہوتے ہی یہ فون خود چالو ہو جائے گا، کوئی کوڈ نہیں۔</div>')
+        + '</div>';
+      el.querySelectorAll('[data-wp]').forEach(b => b.onclick = () => { sp = b.dataset.wp; draw(); });
+      el.querySelectorAll('[data-wm]').forEach(b => b.onclick = () => { sm = b.dataset.wm; draw(); });
+      el.querySelector('#smWantGo').onclick = async () => {
+        try{ me = JSON.parse(localStorage.getItem('smIdV1') || 'null') || {}; }catch(e){}
+        if(!me.id || !me.dev){ draw('📶 ابھی آپ کی SM ID نہیں بنی — انٹرنیٹ چالو کر کے لاگ اِن صفحے پر «🔄» دبائیں، پھر دوبارہ'); return; }
+        const pkg = 'sm-' + PS.find(x => x[0] === sp)[1] + '-' + sm, a = amt(), b = el.querySelector('#smWantGo'); b.disabled = true; b.textContent = '⏳ بھیجا جا رہا ہے…';
+        try{
+          const r = await (await fetch(W2 + '/aioid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'want', id: me.id, dev: me.dev, pkg, amt: a }) })).json();
+          if(r && r.ok){ me.want = { pkg, at: Date.now(), amt: a }; try{ localStorage.setItem('smIdV1', JSON.stringify(me)); }catch(e){}
+            draw('✅ <b>آپ کا پیکج منظوری کے لیے بھیج دیا گیا ہے</b><br>📦 ' + pLabel(sp) + ' — ' + MS.find(x => x[0] === sm)[1] + ' · <b style="font-family:Arial,sans-serif">Rs ' + fmt(a) + '</b><br>رقم کی تصدیق ہوتے ہی یہ فون خود چالو ہو جائے گا۔'); }
+          else draw('⚠️ نہیں جا سکا — دوبارہ کوشش کریں');
+        }catch(e){ draw('📶 انٹرنیٹ نہیں — انٹرنیٹ چالو کر کے دوبارہ دبائیں'); }
+      };
+    };
+    draw();
+  }
   window.smPlansOpen = async function(){
-    const o = ov('smPlansOv', head('💳 پیکج پلانز', 'linear-gradient(135deg,#f59e0b,#b45309)') + '<div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px"><div id="smPlansImg" style="text-align:center;padding:30px">⏳ …</div>'
+    const o = ov('smPlansOv', head('💳 پیکج پلانز', 'linear-gradient(135deg,#f59e0b,#b45309)') + '<div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px"><div id="smWantBox"></div><div id="smPlansImg" style="text-align:center;padding:30px">⏳ …</div>'
       + '<button type="button" id="smPlShare" style="' + btnS('#16a34a', '#fff') + '">📤 شیئر کریں (واٹس ایپ / اسٹیٹس)</button>'
       + '<button type="button" id="smPlSave" style="' + btnS('#e0f2fe', '#075985') + '">⬇️ تصویر محفوظ کریں</button>'
       + '<button type="button" id="smPlClose" style="' + btnS('#e2e8f0', '#334155') + '">✖ بند کریں</button></div>');
     o.style.zIndex = '2147483600';
     o.querySelector('#smPlClose').onclick = () => o.remove();
     let R = rates(); try{ R = await loadRates(); }catch(e){}
+    try{ wantBox(o.querySelector('#smWantBox'), R); }catch(e){}
     let c = await plansCanvas(R), url; try{ url = c.toDataURL('image/png'); }catch(e){ c = await plansCanvas(R, true); url = c.toDataURL('image/png'); }
     o.querySelector('#smPlansImg').style.padding = '0';
     o.querySelector('#smPlansImg').innerHTML = '<img src="' + url + '" alt="پیکج پلانز" style="width:100%;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.25)">';
