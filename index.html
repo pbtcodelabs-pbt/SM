@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU306'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🛟 دکان کا ریکارڈ غائب ہو جائے تو گاہک کو کوئی کوڈ نہیں لکھنا — رجسٹریشن صفحہ کھلا رہے، ہیلپ ڈیسک سے دکان پورے ریکارڈ کے ساتھ خود واپس';
+const APP_BUILD_VERSION = 'SM2411TU307'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '📱 سبزی منڈی کی نئی APK (ویب ویو) کے لیے تیاری — APK میں ڈیٹا کروم صاف کرنے سے نہیں مٹتا؛ بلوٹوتھ تھرمل پرنٹر سیدھا';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -59045,6 +59045,27 @@ window.openHelpDesk = openHelpDesk;
       rows = []; m0 = 'cash';
     }
   };
+})();
+</script>
+<script type="text/fm-boot">
+/* 📱 SM2411TU307 (مالک کا حکم — ویب ویو APK): APK کے اندر (window.PBTApp) «براہ راست بلوٹوتھ» پرنٹ فون کے اپنے بلوٹوتھ (کلاسک SPP) سے —
+   کروم کی BLE والی پابندی نہیں، سستے تھرمل پرنٹر بھی؛ پہلی بار جوڑے ہوئے پرنٹر کی فہرست، پھر وہی یاد۔ کروم میں پرانا طریقہ ویسا۔ */
+(function(){
+  function apk(){ return !!(window.PBTApp && window.PBTApp.native && window.PBTApp.btPrint); }
+  function wrap(){
+    if(!apk() || typeof printViaWebBluetooth !== 'function' || printViaWebBluetooth.__apk) return;
+    var f = async function(canvasOrId){
+      try{
+        var c = (canvasOrId instanceof HTMLCanvasElement) ? canvasOrId : document.getElementById(canvasOrId || 'invoiceCanvas');
+        if(!c){ alert('❌ بل کی تصویر نہیں ملی'); return; }
+        var r = await window.PBTApp.btPrint(canvasToEscPosRaster(c, AppState.settings.paperWidth));
+        if(r.ok) alert('✅ پرنٹر کو بھیج دیا گیا'); else if(r.msg) alert('❌ ' + r.msg);
+      }catch(e){ alert('❌ پرنٹ: ' + (e && e.message || e)); }
+    };
+    f.__apk = true; window.printViaWebBluetooth = printViaWebBluetooth = f;
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wrap); else wrap();
+  setTimeout(wrap, 1500); setTimeout(wrap, 5000);
 })();
 </script>
 <script type="text/fm-boot">

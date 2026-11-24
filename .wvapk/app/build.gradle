@@ -1,0 +1,32 @@
+plugins { id 'com.android.application' }
+def cfg = new groovy.json.JsonSlurper().parse(file('../config.json'))
+android {
+  namespace 'com.pbtcodelabs.sabzimandi'
+  compileSdk 34
+  defaultConfig {
+    applicationId cfg.packageId
+    minSdk 23
+    targetSdk 34
+    versionCode Integer.parseInt(System.getenv('VCODE') ?: '1')
+    versionName "${cfg.versionName}.${System.getenv('VCODE') ?: '1'}"
+    buildConfigField 'String', 'START_URL', "\"${cfg.url}\""
+    buildConfigField 'String', 'THEME', "\"${cfg.themeColor}\""
+    resValue 'string', 'app_name', cfg.appName
+  }
+  buildFeatures { buildConfig true }
+  lint { checkReleaseBuilds false; abortOnError false }
+  signingConfigs {
+    release {
+      storeFile file(System.getenv('KS_FILE') ?: 'none.jks')
+      storePassword System.getenv('KS_PASS')
+      keyAlias cfg.keyAlias
+      keyPassword System.getenv('KS_PASS')
+    }
+  }
+  buildTypes { release { minifyEnabled false; signingConfig signingConfigs.release } }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+dependencies {
+  implementation 'androidx.webkit:webkit:1.11.0'
+  implementation 'androidx.core:core:1.13.1'
+}

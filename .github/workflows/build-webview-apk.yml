@@ -1,0 +1,50 @@
+# 📱 سبزی منڈی — ویب ویو APK (مالک کا حکم، 24 نومبر 2026)
+# ڈیٹا APK کے اپنے خانے میں — کروم صاف کرنے سے نہیں مٹتا؛ ویب سائٹ ہی کھلتی ہے، اس لیے ہر اپڈیٹ خود آتی ہے۔
+# دستخط کی چابی صرف ریپو کے خفیہ خانے (SMWV_KEYSTORE / SMWV_PASS) میں — ریپو میں کبھی نہیں۔
+# نتیجہ: Release «sm-webview-apk» — ہمیشہ ایک ہی لنک سے تازہ APK
+name: build-webview-apk
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.wvapk/**', '.github/workflows/build-webview-apk.yml']
+permissions:
+  contents: write
+concurrency:
+  group: build-webview-apk
+  cancel-in-progress: true
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - name: "1) دستخط کی چابی"
+        env:
+          KS: ${{ secrets.SMWV_KEYSTORE }}
+          KP: ${{ secrets.SMWV_PASS }}
+        run: |
+          if [ -z "$KS" ] || [ -z "$KP" ]; then echo "::error::SMWV_KEYSTORE / SMWV_PASS خفیہ خانے میں نہیں"; exit 1; fi
+          echo "$KS" | base64 -d > "$RUNNER_TEMP/smwv.jks"
+          echo "KS_FILE=$RUNNER_TEMP/smwv.jks" >> $GITHUB_ENV
+          echo "::add-mask::$KP"; echo "KS_PASS=$KP" >> $GITHUB_ENV
+          echo "VCODE=${{ github.run_number }}" >> $GITHUB_ENV
+      - name: "2) آئیکن"
+        run: |
+          A=.wvapk/app/src/main/res; ICON=$(jq -r .icon .wvapk/config.json)
+          for d in "mdpi 48" "hdpi 72" "xhdpi 96" "xxhdpi 144" "xxxhdpi 192"; do set -- $d; mkdir -p $A/mipmap-$1
+            if command -v convert >/dev/null; then convert "$ICON" -resize ${2}x${2} $A/mipmap-$1/ic_launcher.png; else cp "$ICON" $A/mipmap-$1/ic_launcher.png; fi; done
+          echo "sdk.dir=$ANDROID_HOME" > .wvapk/local.properties
+      - name: "3) APK بنائیں"
+        run: gradle -p .wvapk assembleRelease --no-daemon --stacktrace
+      - name: "4) Release"
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          N=$(jq -r .apkFileName .wvapk/config.json); mkdir -p out
+          cp .wvapk/app/build/outputs/apk/release/app-release.apk "out/$N.apk"
+          gh release delete sm-webview-apk -y --cleanup-tag || true
+          gh release create sm-webview-apk "out/$N.apk" --title "📱 سبزی منڈی — APK (ویب ویو) #${{ github.run_number }}" --notes "کروم صاف کرنے سے ڈیٹا نہیں مٹتا۔ ڈاؤن لوڈ کر کے انسٹال کریں — اپڈیٹس ویب سائٹ سے خود آتی ہیں۔"

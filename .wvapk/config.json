@@ -1,0 +1,10 @@
+{
+  "appName": "سبزی منڈی",
+  "packageId": "com.pbtcodelabs.sabzimandi.wv",
+  "url": "https://pbtcodelabs-pbt.github.io/SM/index.html",
+  "themeColor": "#1565c0",
+  "icon": "icons/icon-512.png",
+  "apkFileName": "SabziMandi",
+  "versionName": "1.0",
+  "keyAlias": "smwv"
+}
