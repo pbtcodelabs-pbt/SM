@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU312'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🛟 دکان کی بحالی: دکان نہ ملے تو ہیلپ ڈیسک کو وجہ بھی جاتی ہے (نمبر / کوڈ غلط یا انٹرنیٹ / لاگ اِن)';
+const APP_BUILD_VERSION = 'SM2411TU313'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🛟 دکان کی بحالی: فون میں پچھلی بحالی کا نمبر / کوڈ رہ گیا ہو اور رجسٹریشن صفحہ آئے تب بھی دکان پورے ریکارڈ کے ساتھ واپس آتی ہے';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56657,7 +56657,10 @@ async function smOwnerRestoreShop(pasted, auto){
   if(!/^03\d{9}$/.test(m)){ if(m) alert('درست موبائل نمبر نہیں ملا'); return; }
   if(!c || c.length !== 8){ c = (prompt('🔐 دکان کا کوڈ (مثلاً K7M2-9QXP):') || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
   if(c.length !== 8){ if(c) alert('کوڈ درست نہیں — 8 حروف/ہندسے ہونے چاہییں'); return; }
-  if(m === smShopMobile() && c === smShopCode()){ alert('✅ یہ فون پہلے سے اسی دکان پر ہے۔'); return; }
+  /* 🛟 SM2411TU313 (ہیلپ ڈیسک #400 — بلال بھائی): فون میں پچھلی بحالی کا نمبر + کوڈ رہ گیا مگر رجسٹریشن ختم ہو گئی تھی (رجسٹریشن صفحہ) —
+     پہلے یہاں «پہلے سے اسی دکان پر ہے» کہہ کر رک جاتا تھا اور دکان کبھی واپس نہ آتی؛ اب صرف تب رکے جب واقعی رجسٹرڈ ہو، ورنہ پوری بحالی */
+  window.__smRestWhy = { m: m, c: c, why: '' };
+  if(m === smShopMobile() && c === smShopCode() && AppState.settings.smRegistered){ window.__smRestWhy.why = 'same'; alert('✅ یہ فون پہلے سے اسی دکان پر ہے۔'); return; }
   const base = 'shops/' + m + '-' + c + '/data/';
   let found = 0; const _why = [];
   for(const d of ['license', 'customers', 'products', 'suppliers', 'invoicesIndex']){
@@ -56670,7 +56673,7 @@ async function smOwnerRestoreShop(pasted, auto){
   // 🔓 SM0311TU242 (ہیلپ ڈیسک #54): دوبارہ انسٹال والے خالی فون پر PIN نہیں — وہاں ابھی 1234 ہوتا ہے اور مالک اپنا پرانا PIN لکھتا تو
   //   «غلط PIN» آ کر واپس لاگ ان صفحہ؛ موبائل نمبر + دکان کا خفیہ کوڈ ہی ثبوت ہے۔ اس فون پر اپنا ریکارڈ ہو تب ہی ایڈمن PIN
   let _own = 0; try{ _own = (customersData || []).length + (suppliersData || []).length + (invoicesData || []).length; }catch(e){}
-  if(_own > 0 && !(await _askAdminPinForSerialMaster('پرانی دکان واپس لانے کے لیے'))) return;
+  if(_own > 0 && !(await _askAdminPinForSerialMaster('پرانی دکان واپس لانے کے لیے'))){ window.__smRestWhy = { m: m, c: c, why: 'pin' }; return; }
   try{ if(typeof pauseCloudPolling === 'function') pauseCloudPolling(60000); }catch(e){}
   // اس فون کا نیا (غلط پتے والا) ڈیٹا اور ملاپ کی بنیادیں صاف — ورنہ خالی فہرستیں پرانی دکان سے ملائی جاتیں
   const keep = new Set(['settings', 'users']);
