@@ -28,7 +28,9 @@ jobs:
           KS: ${{ secrets.SMWV_KEYSTORE }}
           KP: ${{ secrets.SMWV_PASS }}
         run: |
-          if [ -z "$KS" ] || [ -z "$KP" ]; then echo "::error::SMWV_KEYSTORE / SMWV_PASS خفیہ خانے میں نہیں"; exit 1; fi
+          echo "VCODE=${{ github.run_number }}" >> $GITHUB_ENV
+          if [ -z "$KS" ] || [ -z "$KP" ]; then echo "::warning::چابی ابھی خفیہ خانے میں نہیں — صرف جانچ والی (debug) APK، Release نہیں"; echo "MODE=debug" >> $GITHUB_ENV; exit 0; fi
+          echo "MODE=release" >> $GITHUB_ENV
           echo "$KS" | base64 -d > "$RUNNER_TEMP/smwv.jks"
           echo "KS_FILE=$RUNNER_TEMP/smwv.jks" >> $GITHUB_ENV
           echo "::add-mask::$KP"; echo "KS_PASS=$KP" >> $GITHUB_ENV
@@ -40,8 +42,13 @@ jobs:
             if command -v convert >/dev/null; then convert "$ICON" -resize ${2}x${2} $A/mipmap-$1/ic_launcher.png; else cp "$ICON" $A/mipmap-$1/ic_launcher.png; fi; done
           echo "sdk.dir=$ANDROID_HOME" > .wvapk/local.properties
       - name: "3) APK بنائیں"
-        run: gradle -p .wvapk assembleRelease --no-daemon --stacktrace
+        run: if [ "$MODE" = release ]; then gradle -p .wvapk assembleRelease --no-daemon --stacktrace; else gradle -p .wvapk assembleDebug --no-daemon --stacktrace; fi
+      - name: "جانچ والی APK (Artifact)"
+        if: env.MODE == 'debug'
+        uses: actions/upload-artifact@v4
+        with: { name: sm-webview-debug, path: .wvapk/app/build/outputs/apk/debug/*.apk }
       - name: "4) Release"
+        if: env.MODE == 'release'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           N=$(jq -r .apkFileName .wvapk/config.json); mkdir -p out
