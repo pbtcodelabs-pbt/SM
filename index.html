@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU304'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '📅 تاریخ کا پہیہ نیا ہلکا انداز: سفید، بیچ میں سبز پٹی، دن کے ساتھ ہفتے کا دن اور اوپر پوری تاریخ';
+const APP_BUILD_VERSION = 'SM2411TU305'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🛟 دکان کا ریکارڈ غائب ہو جائے (کروم صاف / دوبارہ انسٹال) تو ہیلپ ڈیسک کا 6 ہندسوں کا کوڈ لکھ کر پوری دکان واپس — مالک کا فون دکان کا پتہ SM ID پر خود محفوظ رکھتا ہے';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -59044,6 +59044,54 @@ window.openHelpDesk = openHelpDesk;
       rows = []; m0 = 'cash';
     }
   };
+})();
+</script>
+<script type="text/fm-boot">
+/* 🛟 SM2411TU305 (مالک کا حکم — «دکان اڑ جائے تو ہم اپنی طرف سے، SM ID سے واپس چالو کریں»):
+   (1) مالک کا فون (ہر کھلنے پر، دن میں ایک بار یا پتہ بدلے) اپنی دکان کا پتہ — موبائل + خفیہ کوڈ + ریکارڈ کی گنتی — اسی SM ID پر سرور میں لکھتا ہے (/aioid op shop)۔
+   (2) کروم صاف / دوبارہ انسٹال / نیا فون: رجسٹریشن صفحے پر «🛟 ہیلپ ڈیسک کا کوڈ — دکان واپس لائیں» → اپنا موبائل + 6 ہندسوں کا کوڈ (مالک ہیلپ ڈیسک سے دیتا ہے)
+       → سرور (/smrestore، ایک بار، 24 گھنٹے) سے دکان کا پتہ → وہی پرانا «پرانی دکان واپس لائیں» (smOwnerRestoreShop) — کلاؤڈ سے سارا ریکارڈ۔ */
+(function(){
+  'use strict';
+  var W = 'https://aio-pos-verify.pbtcodelabs.workers.dev', PK = 'smShopPtrV1';
+  function st(){ return (typeof AppState !== 'undefined' && AppState.settings) || {}; }
+  function sid(){ try{ return (JSON.parse(localStorage.getItem('smIdV1') || 'null') || {}); }catch(e){ return {}; } }
+  function count(){ try{ return (customersData || []).length + (suppliersData || []).length + (invoicesData || []).length; }catch(e){ return 0; } }
+  function push(){
+    try{
+      var s = st(), me = sid(); if(!s.smRegistered || s.smJoinedAsStaff || !me.id || !me.dev || !/^SM\d{5}$/.test(me.id)) return;
+      var m = String(s.businessPhone || '').replace(/\D/g, ''), c = String(s.smShopCode || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); if(!/^03\d{9}$/.test(m) || c.length !== 8) return;
+      if(!navigator.onLine) return;
+      var n = count(), day = new Date().toISOString().slice(0, 10), sig = me.id + '|' + m + '|' + c + '|' + day + '|' + Math.floor(Math.log2(n + 1));
+      if(localStorage.getItem(PK) === sig) return;
+      fetch(W + '/aioid', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'shop', id: me.id, dev: me.dev, m: m, c: c, shop: s.businessName || '', owner: s.ownerName || '', n: n }) })
+        .then(function(r){ return r.json(); }).then(function(j){ if(j && j.ok) try{ localStorage.setItem(PK, sig); }catch(e){} }).catch(function(){});
+    }catch(e){}
+  }
+  setTimeout(push, 15000); setInterval(push, 30 * 60000);
+  window.smShopPtrPush = push;
+  /* رجسٹریشن صفحے پر بحالی کا بٹن */
+  window.smHdRestore = async function(){
+    var mob = (prompt('🛟 دکان واپس لائیں (ہیلپ ڈیسک سے)\n\nدکان کا رجسٹر موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, ''); if(!mob) return;
+    if(!/^03\d{9}$/.test(mob)){ alert('درست موبائل نمبر لکھیں (03XXXXXXXXX)'); return; }
+    var code = (prompt('🔢 ہیلپ ڈیسک کا دیا ہوا 6 ہندسوں کا کوڈ:') || '').replace(/[^0-9]/g, ''); if(!code) return;
+    if(code.length !== 6){ alert('کوڈ 6 ہندسوں کا ہوتا ہے'); return; }
+    var j = null; try{ var r = await fetch(W + '/smrestore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ m: mob, code: code }) }); j = await r.json(); }catch(e){ alert('❌ انٹرنیٹ نہیں — دوبارہ کوشش کریں'); return; }
+    if(!j || !j.ok){ alert(j && j.reason === 'wait' ? '⏳ بہت بار غلط کوڈ — ایک گھنٹے بعد کوشش کریں' : j && j.reason === 'mismatch' ? '❌ یہ کوڈ اس موبائل نمبر کا نہیں' : '❌ کوڈ غلط یا پرانا ہو گیا — ہیلپ ڈیسک سے نیا کوڈ لیں'); return; }
+    if(typeof smOwnerRestoreShop !== 'function'){ alert('❌ ایپ پوری نہیں کھلی — صفحہ تازہ کر کے دوبارہ'); return; }
+    var c = j.c.slice(0, 4) + '-' + j.c.slice(4);
+    return smOwnerRestoreShop('دکان: ' + (j.shop || '') + '\nموبائل: ' + j.m + '\nکوڈ: ' + c);
+  };
+  function btn(){
+    var o = document.getElementById('smRegOverlay'); if(!o || document.getElementById('smHdRestBtn')) return;
+    var a = Array.prototype.find.call(o.querySelectorAll('[onclick]'), function(x){ return /smRegRestoreOwner/.test(x.getAttribute('onclick') || ''); });
+    var b = document.createElement('button'); b.type = 'button'; b.id = 'smHdRestBtn'; b.onclick = function(){ window.smHdRestore(); };
+    b.textContent = '🛟 دکان کا ریکارڈ غائب ہو گیا؟ ہیلپ ڈیسک کا کوڈ لکھیں — دکان واپس';
+    b.setAttribute('style', 'display:block;width:100%;margin:10px 0 0;padding:8px 6px;border:2px solid #b45309;border-radius:12px;background:#fffbeb;color:#92400e;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;line-height:1.9');
+    var card = o.querySelector('#smRegStep .smCard') || o.querySelector('.smCard') || o;
+    var first = card.querySelector('label, input'); if(first) card.insertBefore(b, first.closest('div') && first.closest('div') !== card ? first.closest('div') : first); else card.appendChild(b);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(btn, 50); }); else setTimeout(btn, 50);
 })();
 </script>
 <script type="text/fm-boot">
