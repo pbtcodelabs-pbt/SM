@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU305'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🛟 دکان کا ریکارڈ غائب ہو جائے (کروم صاف / دوبارہ انسٹال) تو ہیلپ ڈیسک کا 6 ہندسوں کا کوڈ لکھ کر پوری دکان واپس — مالک کا فون دکان کا پتہ SM ID پر خود محفوظ رکھتا ہے';
+const APP_BUILD_VERSION = 'SM2411TU306'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🛟 دکان کا ریکارڈ غائب ہو جائے تو گاہک کو کوئی کوڈ نہیں لکھنا — رجسٹریشن صفحہ کھلا رہے، ہیلپ ڈیسک سے دکان پورے ریکارڈ کے ساتھ خود واپس';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56649,7 +56649,7 @@ function smRegCollect(){
 //   مٹ گیا اور نئی رجسٹریشن نے نیا کوڈ بنا دیا، ایپ نئے خالی پتے پر دیکھنے لگی (پرانا ڈیٹا کلاؤڈ میں اپنی جگہ محفوظ)۔
 //   مالک وہی پیغام (موبائل + کوڈ) جو ملازمین کو بھیجا تھا، یہاں ڈالے — دکان پہلے کلاؤڈ میں جانچی جاتی ہے، پھر یہ فون اسی کا مالک
 function smRegRestoreOwner(){ return smOwnerRestoreShop(); }
-async function smOwnerRestoreShop(pasted){
+async function smOwnerRestoreShop(pasted, auto){
   const raw = (typeof pasted === 'string' && pasted.trim()) ? pasted : prompt('🔁 پرانی دکان واپس لائیں\n\nوہ پیغام (موبائل نمبر + کوڈ) جو آپ نے پہلے ملازمین کو واٹس ایپ پر بھیجا تھا، کاپی کر کے یہاں پیسٹ کریں۔\n(یا منشی کے فون پر "دکان سے جڑیں" والا پیغام)');
   if(raw === null) return;
   let { mobile: m, code: c } = smParseJoinText(raw);
@@ -56664,7 +56664,7 @@ async function smOwnerRestoreShop(pasted){
     try{ const r = await authFirestoreFetch(`${base}${d}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' }); if(r && r.ok) found++; }catch(e){}
   }
   if(!found){ alert('❌ اس نمبر اور کوڈ کی کوئی دکان کلاؤڈ میں نہیں ملی (یا انٹرنیٹ نہیں)۔\n\nنمبر اور کوڈ دوبارہ دیکھیں — منشی کے فون والا پیغام سب سے درست ہے۔'); return; }
-  if(!confirm('✅ دکان کلاؤڈ میں مل گئی۔\n\nیہ فون اب اسی پرانی دکان کا مالک بنے گا اور سارا ریکارڈ (کسٹمر، بیوپاری، بل، سٹاک) کلاؤڈ سے واپس آئے گا۔\n\n⚠️ دوبارہ انسٹال کے بعد اس فون پر جو نئی چیزیں ڈالی تھیں وہ اس فون سے ہٹ جائیں گی (کلاؤڈ میں الگ محفوظ رہیں گی)۔\n\nجاری رکھیں؟')) return;
+  if(!auto && !confirm('✅ دکان کلاؤڈ میں مل گئی۔\n\nیہ فون اب اسی پرانی دکان کا مالک بنے گا اور سارا ریکارڈ (کسٹمر، بیوپاری، بل، سٹاک) کلاؤڈ سے واپس آئے گا۔\n\n⚠️ دوبارہ انسٹال کے بعد اس فون پر جو نئی چیزیں ڈالی تھیں وہ اس فون سے ہٹ جائیں گی (کلاؤڈ میں الگ محفوظ رہیں گی)۔\n\nجاری رکھیں؟')) return;
   // 🔓 SM0311TU242 (ہیلپ ڈیسک #54): دوبارہ انسٹال والے خالی فون پر PIN نہیں — وہاں ابھی 1234 ہوتا ہے اور مالک اپنا پرانا PIN لکھتا تو
   //   «غلط PIN» آ کر واپس لاگ ان صفحہ؛ موبائل نمبر + دکان کا خفیہ کوڈ ہی ثبوت ہے۔ اس فون پر اپنا ریکارڈ ہو تب ہی ایڈمن PIN
   let _own = 0; try{ _own = (customersData || []).length + (suppliersData || []).length + (invoicesData || []).length; }catch(e){}
@@ -56681,6 +56681,7 @@ async function smOwnerRestoreShop(pasted){
   // 🛟 SM0311TU243 (ہیلپ ڈیسک #57): دوبارہ کھلنے پر کسی وجہ سے رجسٹریشن ضائع ہو تو یہی دوبارہ لگے (رجسٹریشن صفحہ نہ آئے)
   try{ localStorage.setItem('smRestorePending', JSON.stringify({ m, c, shop: AppState.settings.businessName || '', owner: AppState.settings.ownerName || '', at: Date.now() })); }catch(e){}
   try{ saveToStorage('settings', AppState.settings); if(typeof persistAllData === 'function') persistAllData(); }catch(e){}
+  if(auto){ await new Promise(r => setTimeout(r, 2500)); location.reload(); return; }
   alert('✅ پرانی دکان واپس آ گئی۔ ایپ دوبارہ کھل رہی ہے — ریکارڈ آنے میں ایک دو منٹ لگ سکتے ہیں۔');
   location.reload();
 }
@@ -59070,28 +59071,50 @@ window.openHelpDesk = openHelpDesk;
   }
   setTimeout(push, 15000); setInterval(push, 30 * 60000);
   window.smShopPtrPush = push;
-  /* رجسٹریشن صفحے پر بحالی کا بٹن */
-  window.smHdRestore = async function(){
-    var mob = (prompt('🛟 دکان واپس لائیں (ہیلپ ڈیسک سے)\n\nدکان کا رجسٹر موبائل نمبر لکھیں (03XXXXXXXXX):') || '').replace(/[^0-9]/g, ''); if(!mob) return;
-    if(!/^03\d{9}$/.test(mob)){ alert('درست موبائل نمبر لکھیں (03XXXXXXXXX)'); return; }
-    var code = (prompt('🔢 ہیلپ ڈیسک کا دیا ہوا 6 ہندسوں کا کوڈ:') || '').replace(/[^0-9]/g, ''); if(!code) return;
-    if(code.length !== 6){ alert('کوڈ 6 ہندسوں کا ہوتا ہے'); return; }
-    var j = null; try{ var r = await fetch(W + '/smrestore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ m: mob, code: code }) }); j = await r.json(); }catch(e){ alert('❌ انٹرنیٹ نہیں — دوبارہ کوشش کریں'); return; }
-    if(!j || !j.ok){ alert(j && j.reason === 'wait' ? '⏳ بہت بار غلط کوڈ — ایک گھنٹے بعد کوشش کریں' : j && j.reason === 'mismatch' ? '❌ یہ کوڈ اس موبائل نمبر کا نہیں' : '❌ کوڈ غلط یا پرانا ہو گیا — ہیلپ ڈیسک سے نیا کوڈ لیں'); return; }
-    if(typeof smOwnerRestoreShop !== 'function'){ alert('❌ ایپ پوری نہیں کھلی — صفحہ تازہ کر کے دوبارہ'); return; }
-    var c = j.c.slice(0, 4) + '-' + j.c.slice(4);
-    return smOwnerRestoreShop('دکان: ' + (j.shop || '') + '\nموبائل: ' + j.m + '\nکوڈ: ' + c);
-  };
+  /* 🛟 SM2411TU306 (مالک کا حکم — «کوڈ لکھنے کی مجبوری نہیں، ہیلپ ڈیسک سے ہی دکان چالو»):
+     خالی (غیر رجسٹر) فون رجسٹریشن صفحے پر خود سرور کو «میں انتظار میں ہوں» بتاتا ہے (/smrestore op wait: اس انسٹال کی پہچان + فون کی پہچان fp + ماڈل)؛
+     مالک ہیلپ ڈیسک ← SM ID ← «🛟 دکان کی بحالی» ← «📲 فون پر چالو کریں» ← انتظار والا فون چنے → یہ فون خود دکان واپس لاتا ہے — گاہک کو کچھ نہیں لکھنا۔ */
+  function fpv(){ try{ var f = [String(navigator.userAgent || '').replace(/\d+/g, ''), Math.min(screen.width, screen.height), Math.max(screen.width, screen.height), navigator.hardwareConcurrency || 2, new Date().getTimezoneOffset(), navigator.language || '', navigator.platform || ''].join('|');
+    var h1 = 5381, h2 = 52711; for(var i = 0; i < f.length; i++){ var c = f.charCodeAt(i); h1 = (h1 * 33) ^ c; h2 = (h2 * 31 + c) | 0; } return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36); }catch(e){ return ''; } }
+  function wid(){ var k = 'smWaitIdV1', v = ''; try{ v = localStorage.getItem(k) || ''; }catch(e){} if(!/^W[A-Z0-9]{9}$/.test(v)){ v = 'W'; for(var i = 0; i < 9; i++) v += '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 32)]; try{ localStorage.setItem(k, v); }catch(e){} } return v; }
+  function model(){ var u = String(navigator.userAgent || ''), m = u.match(/Android [\d.]+; ([^;)]+?)(?: Build|\))/); return ((m ? m[1] : /iPhone/.test(u) ? 'iPhone' : /Windows/.test(u) ? 'Windows' : /CrOS/.test(u) ? 'Chromebook' : 'فون') + ' · ' + Math.min(screen.width, screen.height) + '×' + Math.max(screen.width, screen.height)).slice(0, 60); }
+  var wBusy = false, wDone = false;
+  async function wait(){
+    try{
+      var s = st(); if(wDone || wBusy || s.smRegistered || !navigator.onLine) return;
+      var o = document.getElementById('smRegOverlay'); if(!o || getComputedStyle(o).display === 'none') return;
+      wBusy = true;
+      var r = await fetch(W + '/smrestore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'wait', w: wid(), fp: fpv(), ua: model() }) }); var j = await r.json();
+      if(j && j.ok && j.push && /^03\d{9}$/.test(j.push.m) && String(j.push.c || '').length === 8 && typeof smOwnerRestoreShop === 'function'){
+        wDone = true; show('⏳ ہیلپ ڈیسک نے آپ کی دکان «' + (j.push.shop || '') + '» واپس بھیجی ہے — ریکارڈ واپس آ رہا ہے…');
+        var c = j.push.c.slice(0, 4) + '-' + j.push.c.slice(4);
+        await smOwnerRestoreShop('دکان: ' + (j.push.shop || '') + '\nموبائل: ' + j.push.m + '\nکوڈ: ' + c, true);
+        wDone = false; show('');
+      }
+    }catch(e){}
+    wBusy = false;
+  }
+  function show(t){ var x = document.getElementById('smHdRestMsg'); if(!x){ if(!t) return; x = document.createElement('div'); x.id = 'smHdRestMsg'; x.setAttribute('style', 'position:fixed;inset:0;z-index:2147483600;background:rgba(3,37,65,.85);display:flex;align-items:center;justify-content:center;padding:18px;color:#fff;font-size:20px;font-weight:800;text-align:center;line-height:2'); document.body.appendChild(x); }
+    if(!t){ x.remove(); return; } x.textContent = t; }
+  window.smHdRestore = function(){ try{ wait(); }catch(e){}
+    var t = '🛟 دکان کا ریکارڈ غائب ہو گیا — رجسٹریشن صفحہ آ رہا ہے۔ فون: ' + model();
+    try{ if(window.PBTHelp && PBTHelp.open) return PBTHelp.open({ app: 'SM', ver: (typeof APP_BUILD_VERSION !== 'undefined' ? APP_BUILD_VERSION : ''), lang: 'ur', text: t }); }catch(e){}
+    try{ if(typeof openHelpDesk === 'function') return openHelpDesk(); }catch(e){}
+    alert('ہیلپ ڈیسک کو اپنا موبائل نمبر بتائیں — دکان ہماری طرف سے خود واپس آ جائے گی۔'); };
   function btn(){
     var o = document.getElementById('smRegOverlay'); if(!o || document.getElementById('smHdRestBtn')) return;
-    var a = Array.prototype.find.call(o.querySelectorAll('[onclick]'), function(x){ return /smRegRestoreOwner/.test(x.getAttribute('onclick') || ''); });
-    var b = document.createElement('button'); b.type = 'button'; b.id = 'smHdRestBtn'; b.onclick = function(){ window.smHdRestore(); };
-    b.textContent = '🛟 دکان کا ریکارڈ غائب ہو گیا؟ ہیلپ ڈیسک کا کوڈ لکھیں — دکان واپس';
-    b.setAttribute('style', 'display:block;width:100%;margin:10px 0 0;padding:8px 6px;border:2px solid #b45309;border-radius:12px;background:#fffbeb;color:#92400e;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;line-height:1.9');
+    var b = document.createElement('div'); b.id = 'smHdRestBtn';
+    b.innerHTML = '<b>🛟 پہلے سے دکان تھی اور ریکارڈ غائب ہو گیا؟</b><br>کچھ نہ لکھیں — یہ صفحہ کھلا رکھیں اور ہیلپ ڈیسک کو اپنا موبائل نمبر بتائیں؛ دکان ہماری طرف سے پورے ریکارڈ کے ساتھ خود واپس آ جائے گی۔'
+      + '<button type="button" style="display:block;width:100%;margin:6px 0 0;padding:6px;border:0;border-radius:10px;background:#b45309;color:#fff;font-family:inherit;font-size:15px;font-weight:800">📩 ہیلپ ڈیسک کو بتائیں</button>';
+    b.querySelector('button').onclick = function(){ window.smHdRestore(); };
+    b.setAttribute('style', 'margin:10px 0 0;padding:8px 10px;border:2px solid #b45309;border-radius:12px;background:#fffbeb;color:#92400e;font-size:14px;line-height:1.9;text-align:center');
     var card = o.querySelector('#smRegStep .smCard') || o.querySelector('.smCard') || o;
     var first = card.querySelector('label, input'); if(first) card.insertBefore(b, first.closest('div') && first.closest('div') !== card ? first.closest('div') : first); else card.appendChild(b);
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(btn, 50); }); else setTimeout(btn, 50);
+  setTimeout(wait, 5000); setInterval(wait, 15000);
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') wait(); });
+  window.smShopWait = wait;
 })();
 </script>
 <script type="text/fm-boot">
