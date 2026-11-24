@@ -10533,8 +10533,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
-const APP_BUILD_VERSION = 'SM2411TU313'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🛟 دکان کی بحالی: فون میں پچھلی بحالی کا نمبر / کوڈ رہ گیا ہو اور رجسٹریشن صفحہ آئے تب بھی دکان پورے ریکارڈ کے ساتھ واپس آتی ہے';
+const APP_BUILD_VERSION = 'SM2411TU314'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🎁 مفت ٹرائل اب دکان کے موبائل نمبر پر یاد — نیا براؤزر / APK یا ڈیٹا صاف کر کے اسی نمبر پر دوبارہ 7 دن نہیں';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -59097,6 +59097,25 @@ window.openHelpDesk = openHelpDesk;
   }
   setTimeout(push, 15000); setInterval(push, 30 * 60000);
   window.smShopPtrPush = push;
+  /* 🎁 SM2411TU314 (مالک کا حکم — «اگر وہی موبائل ہے تو اس کا ٹرائل ختم کر دیں»): مفت ٹرائل اب دکان کے موبائل نمبر پر سرور میں یاد (/smrestore op trial)؛
+     نیا براؤزر / ویب ویو APK / ڈیٹا صاف کر کے اسی نمبر پر دوبارہ 7 دن نہیں — ٹرائل = اس نمبر کا پہلا آغاز + 7 دن؛ ہیلپ ڈیسک «⛔ ٹرائل ختم» (endAt) ہو تو فوراً ختم۔
+     صرف مالک کا فون اور صرف مفت ٹرائل پر (پیکج / ملازم کو کبھی نہیں چھیڑتا)؛ تاریخ صرف کم ہوتی ہے، کبھی بڑھتی نہیں */
+  async function trialSync(){
+    try{
+      var s = st(); if(!s.smRegistered || s.smJoinedAsStaff || !s.isOnFreeTrial || !navigator.onLine) return;
+      var m = String(s.businessPhone || '').replace(/\D/g, ''); if(!/^03\d{9}$/.test(m)) return;
+      var start = 0; try{ start = s.subscriptionActivatedOn ? new Date(s.subscriptionActivatedOn + 'T00:00:00').getTime() : 0; }catch(e){}
+      var r = await fetch(W + '/smrestore', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'trial', mob: m, start: start || 0 }) }); var j = await r.json();
+      if(!j || !j.ok || !(j.first > 1.7e12)) return;
+      var end = j.first + 7 * 864e5; if(j.endAt) end = Math.min(end, j.endAt - 864e5);
+      var ymd = _smYMD(new Date(end)), s2 = st(); if(!s2.isOnFreeTrial) return;
+      if(!s2.subscriptionExpiry || ymd < s2.subscriptionExpiry){
+        s2.subscriptionExpiry = ymd; s2.subscriptionActivatedOn = _smYMD(new Date(Math.min(j.first, end))); saveToStorage('settings', s2); try{ persistAllData(); }catch(e){}
+        if(ymd < _smYMD(new Date())){ try{ if(typeof setupLoginScreen === 'function') setupLoginScreen(); }catch(e){} }
+      }
+    }catch(e){}
+  }
+  setTimeout(trialSync, 20000); setInterval(trialSync, 3 * 3600e3); window.smTrialSync = trialSync;
   /* 🛟 SM2411TU308: نارنجی ڈبے میں «📱 اس فون کی پہچان: XXXX» (انتظار والی شناخت `smWaitIdV1` کے آخری 4 حروف) — ہیلپ ڈیسک کی فہرست میں یہی؛ گاہک صرف پڑھ کر بتائے۔
      🛟 SM2411TU306 (مالک کا حکم — «کوڈ لکھنے کی مجبوری نہیں، ہیلپ ڈیسک سے ہی دکان چالو»):
      خالی (غیر رجسٹر) فون رجسٹریشن صفحے پر خود سرور کو «میں انتظار میں ہوں» بتاتا ہے (/smrestore op wait: اس انسٹال کی پہچان + فون کی پہچان fp + ماڈل)؛
