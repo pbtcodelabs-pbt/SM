@@ -10545,8 +10545,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
 // 🆕 SM2511WE319: ہیلپ ڈیسک #403 — نئی رجسٹریشن کے فوراً بعد اور انٹرنیٹ لوٹتے ہی ٹرائل کا موبائل نمبر والا سرور چیک (پہلے 3 گھنٹے تک انتظار ہوتا تھا)
-const APP_BUILD_VERSION = 'SM2611TH323'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🧑‍💼 ملازم جوڑنا آسان: ملازم صرف نام + موبائل سے کوڈ بنائے، مالک کوڈ لکھے تو نام / موبائل خود، PIN خود بنے (بدل سکتے ہیں)، ملازم کا فون خود جڑے؛ ملازم کا تازہ PIN مالک کے صفحے پر ہر وقت؛ فون الگ کرنے پر PIN مانگا جاتا ہے؛ پیکج صرف نئے SM ID کارڈ سے';
+const APP_BUILD_VERSION = 'SM2611TH324'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '👆 فنگر پرنٹ سے داخلہ — مالک کے ساتھ اب ملازم بھی (اپنے فون کے ٹچ سے)؛ PIN ساتھ چلتا ہے؛ مینو «👆 فنگر پرنٹ لاگ اِن» سے آن / بند';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -59655,6 +59655,105 @@ function chEditAll(variantId, chalanNo){
     try{ if(typeof uAlert === 'function') uAlert('✅ محفوظ ہو گیا', `${nm} — چالان #${chalanNo}: آمد ${nq}${delta ? ' (' + (delta > 0 ? '+' : '') + delta + ')' : ''}، خرید ${rate}، قیمت فروخت ${isb}`, 'green'); }catch(e){}
   };
 }
+</script>
+<script type="text/fm-boot" id="smBio323">
+/* 👆 SM2611TH324 (مالک کا حکم): فنگر پرنٹ لاگ اِن ملازم کے لیے بھی (sm_bioStaff، اسی فون کا) — مالک والا fm_bioCred ویسا؛ پن سے اندر آنے پر ایک بار پوچھتا ہے
+   («ابھی نہیں» = 30 دن نہیں)؛ لاگ اِن پر نام کے ساتھ 👆، کھلتے ہی خود؛ مینو «👆 فنگر پرنٹ لاگ اِن» سے آن / بند (مالک اور ملازم)۔ PIN ہمیشہ ساتھ۔ (FM2611TH551 جیسا) */
+(function(){
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const ask = (o) => (typeof uDialog === 'function') ? uDialog(o) : Promise.resolve(confirm(String(o.message || '').replace(/<[^>]+>/g, '\n')));
+  const owner = () => { try{ return JSON.parse(localStorage.getItem('fm_phoneOwner') || 'null'); }catch(e){ return null; } };
+  // ================= 👆 ملازم کا فنگر پرنٹ لاگ اِن =================
+  const SK = 'sm_bioStaff';
+  const staffCred = () => { try{ const c = JSON.parse(localStorage.getItem(SK) || 'null'); return c && c.id ? c : null; }catch(e){ return null; } };
+  const staffUser = () => { const c = staffCred(); if(!c) return null; return (usersData || []).find(u => u.role === 'salesman' && u.is_active !== false && (String(u.user_id) === String(c.userId))) || null; };
+  async function enableStaffBio(u){
+    if(!(await isBioSupported())){ alert('❌ اس فون میں فنگر پرنٹ کی سہولت نہیں ملی — فون کی سیٹنگ میں فنگر پرنٹ / اسکرین لاک لگا ہو اور ایپ Chrome میں کھلی ہو۔'); return false; }
+    try{
+      const cred = await navigator.credentials.create({ publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)), rp: { name: 'سبزی منڈی' },
+        user: { id: new TextEncoder().encode('sm-staff-' + u.user_id), name: u.name, displayName: u.name },
+        pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+        authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
+        timeout: 60000, attestation: 'none' } });
+      if(!cred) throw new Error('no');
+      localStorage.setItem(SK, JSON.stringify({ id: _bioB64(cred.rawId), userId: u.user_id, name: u.name, at: Date.now() }));
+      alert('✅ فنگر پرنٹ لاگ اِن آن — اب لاگ اِن صفحے پر اپنے نام کے ساتھ 👆 دبا کر سیدھا اندر آئیں (ایپ کھلتے ہی خود بھی پوچھے گی)۔');
+      staffIcon(); return true;
+    }catch(e){ alert('❌ فنگر پرنٹ آن نہیں ہو سکا' + (e && e.name === 'NotAllowedError' ? ' (منسوخ یا وقت ختم)' : '') + '۔'); return false; }
+  }
+  let _sb = false;
+  window.smStaffBioLogin = async function(){
+    if(_sb) return; const c = staffCred(), u = staffUser();
+    if(!c || !u){ alert('فنگر پرنٹ لاگ اِن آن نہیں — PIN سے داخل ہوں۔'); return; }
+    _sb = true;
+    try{
+      const a = await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)), allowCredentials: [{ type: 'public-key', id: _bioUnB64(c.id) }], userVerification: 'required', timeout: 60000 } });
+      if(a){ window.__bioVerified = true; _sb = false; finishLogin(u, true); return; }
+    }catch(e){
+      if(!(e && e.name === 'NotAllowedError')){ try{ localStorage.removeItem(SK); }catch(x){} staffIcon(); alert('❌ اس فون میں فنگر پرنٹ کی چابی نہیں ملی — PIN سے داخل ہوں، پھر مینو سے «👆 فنگر پرنٹ لاگ اِن» دوبارہ آن کریں۔'); }
+    }
+    _sb = false;
+  };
+  function staffIcon(){
+    const pi = document.getElementById('employeePinInput'), row = pi && pi.closest('.loginRoleRow'), t = row && row.querySelector('.loginRoleTitle');
+    if(!t) return;
+    let ic = document.getElementById('smBioStaffIcon'); const u = staffUser();
+    if(!u){ if(ic) ic.style.display = 'none'; return; }
+    if(!ic){ t.style.display = 'flex'; t.style.alignItems = 'center'; t.style.justifyContent = 'space-between'; t.style.gap = '8px';
+      ic = document.createElement('span'); ic.id = 'smBioStaffIcon'; ic.title = 'فنگر پرنٹ سے لاگ اِن'; ic.textContent = '👆';
+      ic.style.cssText = 'font-size:22px;cursor:pointer;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))'; ic.onclick = () => smStaffBioLogin(); t.appendChild(ic); }
+    ic.style.display = 'inline-block';
+    const sel = document.getElementById('employeeLoginSelect');
+    if(sel && [...sel.options].some(op => String(op.value) === String(u.user_id)) && !sel.dataset.smBioSet){ sel.value = String(u.user_id); sel.dataset.smBioSet = '1'; }
+  }
+  setInterval(() => { try{ staffIcon(); }catch(e){} }, 1500);
+  let _autoTried = false;
+  setInterval(() => { try{
+    const ls = document.getElementById('loginScreen'); const vis = ls && getComputedStyle(ls).display !== 'none';
+    if(!vis){ _autoTried = false; return; }
+    if(_autoTried || !staffUser()) return;
+    try{ if(sessionStorage.getItem('smStaffBioAuto')) return; sessionStorage.setItem('smStaffBioAuto', '1'); }catch(e){}
+    const o = owner(); if(o && o.role === 'admin') return; // مالک کے فون پر اپنا والا خودکار
+    _autoTried = true; smStaffBioLogin();
+  }catch(e){} }, 1200);
+
+  // پن سے اندر آنے کے بعد ایک بار پوچھیں
+  const _fl = window.finishLogin;
+  if(typeof _fl === 'function') window.finishLogin = finishLogin = function(user){
+    const r = _fl.apply(this, arguments);
+    try{ if(r !== false && user && !window.__bioVerified) setTimeout(() => offer(user), 1800); }catch(e){}
+    return r;
+  };
+  async function offer(u){
+    if(!(await isBioSupported())) return;
+    const key = 'sm_bioAsk_' + u.user_id; let t = 0; try{ t = +localStorage.getItem(key) || 0; }catch(e){}
+    if(Date.now() - t < 30 * 864e5) return;
+    if(u.role === 'admin' && getBioCred()) return;
+    if(u.role === 'salesman'){ const c = staffCred(); if(c && String(c.userId) === String(u.user_id)) return; }
+    if(u.role !== 'admin' && u.role !== 'salesman') return;
+    try{ localStorage.setItem(key, String(Date.now())); }catch(e){}
+    const ok = await ask({ title: '👆 فنگر پرنٹ سے داخلہ', message: '«' + esc(u.name) + '» — اگلی بار PIN لکھے بغیر صرف <b>فون کے فنگر پرنٹ</b> سے ایپ میں داخل ہوں؟<br><small>PIN بھی ساتھ چلتا رہے گا</small>', okText: '👆 ہاں، آن کریں', cancelText: 'ابھی نہیں', tone: 'green' });
+    if(!ok) return;
+    if(u.role === 'admin') await enableBioLogin(); else await enableStaffBio(u);
+  }
+  // مینو: «👆 فنگر پرنٹ لاگ اِن» آن / بند (مالک اور ملازم دونوں)
+  window.smBioMenu = async function(){
+    try{ toggleSidebar(); }catch(e){}
+    const role = AppState.currentRole, u = (usersData || []).find(x => x.name === (AppState.currentUser || {}).name && x.role === role);
+    if(!u){ alert('دوبارہ لاگ اِن کریں'); return; }
+    const on = role === 'admin' ? !!getBioCred() : !!(staffCred() && String(staffCred().userId) === String(u.user_id));
+    if(on){ const ok = await ask({ title: '👆 فنگر پرنٹ لاگ اِن', message: 'اس فون پر فنگر پرنٹ لاگ اِن آن ہے۔ بند کریں؟ (PIN سے لاگ اِن چلتا رہے گا)', okText: 'بند کریں', cancelText: 'رہنے دیں', tone: 'amber' }); if(!ok) return;
+      try{ localStorage.removeItem(role === 'admin' ? 'fm_bioCred' : SK); }catch(e){} try{ renderBioSettingsCard(); }catch(e){} staffIcon(); alert('✅ بند ہو گیا'); return; }
+    if(role === 'admin') await enableBioLogin(); else if(role === 'salesman') await enableStaffBio(u);
+  };
+  setInterval(() => { try{
+    if(document.getElementById('smBioNav')) return;
+    const p = [...document.querySelectorAll('.navItem')].find(n => /openMyPinChangeModal/.test(n.getAttribute('onclick') || '')); if(!p) return;
+    const n = document.createElement('div'); n.className = 'navItem'; n.id = 'smBioNav'; n.setAttribute('data-screen', ''); n.setAttribute('onclick', 'smBioMenu()');
+    n.style.cssText = 'background:#065f46; color:#fff;'; n.textContent = '👆 فنگر پرنٹ لاگ اِن'; p.after(n);
+  }catch(e){} }, 2000);
+})();
 </script>
 <script>
 /* 🗄️ SM2810WE212: بڑی الماری کا ڈیٹا یادداشت میں آنے کے بعد ایپ کا کوڈ چلتا ہے (ترتیب وہی)؛ اگر صفحہ پہلے ہی پورا کھل چکا ہو تو
