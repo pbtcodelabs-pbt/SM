@@ -10545,8 +10545,8 @@ function getDeveloperContact(){
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
 // 🆕 SM2511WE319: ہیلپ ڈیسک #403 — نئی رجسٹریشن کے فوراً بعد اور انٹرنیٹ لوٹتے ہی ٹرائل کا موبائل نمبر والا سرور چیک (پہلے 3 گھنٹے تک انتظار ہوتا تھا)
-const APP_BUILD_VERSION = 'SM2511WE322'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '🔴 بل کے دو ڈبے درست: دائیں «کل تک ٹوٹل کم وصولی» (پرانا بقایا)، بائیں «آج کی کم وصولی» = کل کا تازہ مال − آج کی وصولی؛ دونوں کا جوڑ = ٹوٹل';
+const APP_BUILD_VERSION = 'SM2611TH323'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🧑‍💼 ملازم جوڑنا آسان: ملازم صرف نام + موبائل سے کوڈ بنائے، مالک کوڈ لکھے تو نام / موبائل خود، PIN خود بنے (بدل سکتے ہیں)، ملازم کا فون خود جڑے؛ ملازم کا تازہ PIN مالک کے صفحے پر ہر وقت؛ فون الگ کرنے پر PIN مانگا جاتا ہے؛ پیکج صرف نئے SM ID کارڈ سے';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -56930,6 +56930,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const st = AppState.settings;
     if(st.smJoinedAsStaff){ alert('یہ ملازم کا فون ہے — سبسکرپشن مالک اپنے فون سے لیتا ہے۔'); return; }
     if(!st.smRegistered || !st.businessPhone){ alert('پہلے دکان کا نام، مالک کا نام اور موبائل نمبر لکھیں۔'); return; }
+    // 📦 SM2611TH323 (مالک کا حکم — «پرانا NB / SB والا نظام ختم، کنفیوژن نہ ہو»): ہر «پیکج / تجدید» بٹن اب نیا SM ID پیکج کارڈ (منگوائیں → ہیلپ ڈیسک → خود چالو)
+    if(typeof window.smPlansOpen === 'function') return window.smPlansOpen();
     const kind = isRenew() ? 'SB' : 'NB';
     P = { kind, plan: (kind === 'SB' && PLANS.indexOf(smPlan()) >= 0) ? smPlan() : 'P1+1', m: 6, R: rates() };
     draw();
@@ -57092,26 +57094,22 @@ window.addEventListener('DOMContentLoaded', () => {
     if(p && p.code && Date.now() - p.at < 2 * 864e5) return jsWait(p);
     const html = head('🧑‍💼 دکان سے جڑیں', 'linear-gradient(135deg,#1d4ed8,#1e3a8a)')
       + '<div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">'
-      + '<div style="font-size:14px;color:#334155;line-height:1.9">اپنی تفصیل لکھیں — ایک چھوٹا کوڈ بنے گا جو آپ اپنے مالک کو بھیجیں گے۔</div>'
+      + '<div style="font-size:14px;color:#334155;line-height:1.9">صرف اپنا نام اور موبائل لکھیں — ایک چھوٹا کوڈ بنے گا، وہ اپنے مالک کو بتائیں۔ PIN مالک بنائے گا اور جڑتے ہی آپ کو یہاں نظر آ جائے گا۔</div>'
       + '<label style="font-weight:800">👤 آپ کا نام *</label><input id="smJsName" dir="rtl" style="padding:9px;border:2px solid #93c5fd;border-radius:10px;font-size:17px;' + K + '">'
       + '<label style="font-weight:800">📱 آپ کا موبائل نمبر *</label><input id="smJsMob" type="tel" inputmode="numeric" dir="ltr" placeholder="03XXXXXXXXX" maxlength="13" style="padding:9px;border:2px solid #93c5fd;border-radius:10px;font-size:18px;text-align:center;font-family:Arial">'
-      + '<label style="font-weight:800">🔑 اپنا PIN بنائیں (4 ہندسے) *</label><input id="smJsPin" type="tel" inputmode="numeric" dir="ltr" maxlength="6" placeholder="••••" style="padding:9px;border:2px solid #93c5fd;border-radius:10px;font-size:22px;text-align:center;font-family:Arial;letter-spacing:6px">'
-      + '<div style="font-size:12.5px;color:#64748b">یہی PIN لکھ کر آپ روز ایپ میں داخل ہوں گے — یاد رکھیں۔</div>'
       + '<button type="button" id="smJsGo" onclick="smJsMake()" style="' + btnS('#1d4ed8', '#fff') + 'font-size:19px">🔢 کوڈ بنائیں</button>'
       + '<button type="button" onclick="document.getElementById(\'smJsOv\').remove()" style="' + btnS('#e2e8f0', '#334155') + '">✖ بند کریں</button></div>';
     ov('smJsOv', html);
   };
   window.smJsMake = async function(){
-    const name = (document.getElementById('smJsName').value || '').trim(), mob = (document.getElementById('smJsMob').value || '').replace(/[^0-9]/g, ''), pin = (document.getElementById('smJsPin').value || '').replace(/\D/g, '');
+    const name = (document.getElementById('smJsName').value || '').trim(), mob = (document.getElementById('smJsMob').value || '').replace(/[^0-9]/g, '');
     if(name.length < 2){ alert('اپنا نام لکھیں'); return; }
     if(!/^03\d{9}$/.test(mob)){ alert('درست موبائل نمبر لکھیں (03XXXXXXXXX)'); return; }
-    if(pin.length < 4){ alert('کم از کم 4 ہندسوں کا PIN بنائیں'); return; }
-    if(/^(\d)\1+$/.test(pin) || pin === '1234'){ alert('یہ PIN بہت آسان ہے — کوئی اور PIN بنائیں'); return; }
     const b = document.getElementById('smJsGo'); b.disabled = true; b.textContent = '⏳ …';
-    let j = null; try{ j = await smc({ op: 'put', kind: 'JS', uid: tok(), data: { name, mobile: mob, pinH: await hashPin(pin) } }); }catch(e){}
+    let j = null; try{ j = await smc({ op: 'put', kind: 'JS', uid: tok(), data: { name, mobile: mob, dev: (function(){ try{ return uid(); }catch(e){ return ''; } })() } }); }catch(e){}
     if(!j || !j.ok){ b.disabled = false; b.textContent = '🔢 کوڈ بنائیں'; alert('⚠️ انٹرنیٹ چیک کریں اور دوبارہ کوشش کریں'); return; }
     const p = { code: j.code, name, mobile: mob, at: Date.now() };
-    try{ localStorage.setItem('smJsPend', JSON.stringify(p)); sessionStorage.setItem('smJoinPin', pin); localStorage.setItem('smJoinName', name); }catch(e){}
+    try{ localStorage.setItem('smJsPend', JSON.stringify(p)); localStorage.setItem('smJoinName', name); }catch(e){}
     jsWait(p);
   };
   function jsMsg(p){ return 'سبزی منڈی — دکان سے جڑنے کا کوڈ: JS-' + p.code + '\nنام: ' + p.name + '\nموبائل: ' + p.mobile + '\n👉 مالک: مینیو ← ملازمین ← «ملازم کا کوڈ» میں یہ 6 ہندسے لکھیں: ' + p.code; }
@@ -57143,7 +57141,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const r = JSON.parse(j.res);
         if(s){ s.style.background = '#dcfce7'; s.style.color = '#166534'; s.innerHTML = '✅ مالک نے منظور کر دیا — ' + esc(r.shop || '') + '<br>دکان سے جڑ رہا ہے…'; }
         try{ await smc({ op: 'set', code: p.code, st: 'joined', uid: tok() }); }catch(e){}
-        try{ localStorage.removeItem('smJsPend'); localStorage.setItem('smJoinUser', r.uname || p.name); }catch(e){}
+        try{ localStorage.removeItem('smJsPend'); localStorage.setItem('smJoinUser', r.uname || p.name); if(r.pin){ sessionStorage.setItem('smJoinPin', String(r.pin)); localStorage.setItem('smJoinPinNote', String(r.pin)); } }catch(e){}
+        if(s && r.pin) s.innerHTML += '<br>🔑 آپ کا PIN: <b dir="ltr" style="font-family:Arial;font-size:24px;letter-spacing:3px">' + esc(String(r.pin)) + '</b> — یاد رکھیں';
         _jsBusy = false;
         await smJoinAsStaff('موبائل: ' + r.m + '\nکوڈ: ' + r.c);
         return;
@@ -57174,6 +57173,7 @@ window.addEventListener('DOMContentLoaded', () => {
       sel.value = String(u.user_id); const pi = document.getElementById('employeePinInput'); if(pi) pi.value = pin;
       clearInterval(t); try{ sessionStorage.removeItem('smJoinPin'); localStorage.removeItem('smJoinUser'); }catch(e){}
       try{ await employeeLogin(); toast('✅ خوش آمدید ' + u.name + ' — آپ دکان سے جڑ گئے'); }catch(e){}
+      try{ const pn = localStorage.getItem('smJoinPinNote'); if(pn){ localStorage.removeItem('smJoinPinNote'); setTimeout(() => alert('✅ ' + u.name + ' — آپ دکان سے جڑ گئے\n\n🔑 آپ کا PIN: ' + pn + '\n\nیہی PIN لکھ کر روز ایپ کھولیں — یاد رکھیں۔\nبدلنا ہو تو مینو ← «🔑 میرا پن تبدیل کریں» (مالک کو نیا PIN خود نظر آ جائے گا)۔'), 1200); } }catch(e){}
     }, 1500);
   }
   window.addEventListener('load', () => setTimeout(autoLogin, 2500));
@@ -57197,7 +57197,24 @@ window.addEventListener('DOMContentLoaded', () => {
     b.style.display = 'block';
   }
   const _rul = window.renderUserList;
-  window.renderUserList = renderUserList = function(){ const r = _rul.apply(this, arguments); try{ ownerBox(); }catch(e){} return r; };
+  // 🔑 SM2611TH323 (مالک کا حکم): ملازم کا تازہ ترین PIN مالک کے «ملازمین» صفحے پر ہر وقت سامنے (ملازم خود بدلے تو بھی — کلاؤڈ سے)
+  function showPins(){
+    if(AppState.currentRole !== 'admin' || AppState.settings.smJoinedAsStaff) return;
+    (usersData || []).forEach(u => {
+      if(u.role === 'admin') return;
+      const el = document.getElementById('uc2Pw_' + u.user_id); if(!el) return;
+      el.innerHTML = u.pinPlain ? '<b dir="ltr" style="font-family:Arial,sans-serif;font-size:22px;letter-spacing:3px;color:#0f172a">' + esc(String(u.pinPlain)) + '</b> <small style="color:#64748b">— بدلنے کے لیے دبائیں</small>' : '•••• — تبدیل کرنے کے لیے دبائیں';
+    });
+  }
+  window.renderUserList = renderUserList = function(){ const r = _rul.apply(this, arguments); try{ ownerBox(); }catch(e){} try{ showPins(); }catch(e){} return r; };
+  let _pinSyncBusy = false;
+  setInterval(async () => { try{
+    const act = document.querySelector('.screen.active'), m = document.getElementById('newUserModal');
+    if(_pinSyncBusy || !(act && act.id === 'screen-users') || AppState.currentRole !== 'admin' || AppState.settings.smJoinedAsStaff || navigator.onLine === false || (m && m.classList.contains('show'))) return;
+    _pinSyncBusy = true; const before = JSON.stringify((usersData || []).map(u => [u.user_id, u.pinPlain]));
+    const ok = await fetchUsersFromCloud(true);
+    if(ok && JSON.stringify((usersData || []).map(u => [u.user_id, u.pinPlain])) !== before) renderUserList();
+  }catch(e){} _pinSyncBusy = false; }, 45000);
   let JSP = null;
   window.smJsOwnerGo = async function(){
     const code = (document.getElementById('smJsOwnerIn').value || '').replace(/\D/g, '').slice(-6);
@@ -57213,40 +57230,39 @@ window.addEventListener('DOMContentLoaded', () => {
       if(confirm('📦 ' + (lim === 0 || AppState.settings.isOnFreeTrial ? 'ملازم جوڑنے کے لیے پیکج 1+1 یا اس سے بڑا چاہیے۔' : 'آپ کے پیکج (' + pLabel(smPlan()) + ') میں ملازموں کی حد پوری ہو گئی۔') + '\n\nپیکج بڑھانے کی درخواست بھیجیں؟')) smPkgOpen(false);
       return;
     }
-    if(usersData.some(u => u.pin === d.pinH)){
-      try{ await smc({ op: 'set', code, st: 'no' }); }catch(e){}
-      alert('⚠️ ملازم کا PIN کسی اور کے PIN جیسا ہے — ملازم سے کہیں کہ نیا کوڈ (نئے PIN کے ساتھ) بنائے۔'); return;
-    }
+    // 🔑 SM2611TH323 (مالک کا حکم): PIN مالک کی طرف خود بنتا ہے (4 ہندسے، کسی اور جیسا نہیں) — مالک بدل بھی سکتا ہے
+    let autoPin = '';
+    for(let i = 0; i < 40 && !autoPin; i++){ const c = String(1000 + Math.floor(Math.random() * 9000)); if(/^(\d)\1+$/.test(c) || c === '1234') continue; const h = await hashPin(c); if(!usersData.some(u => u.pin === h)) autoPin = c; }
     JSP = { code, d };
     openNewUserModal();
     const set = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
     set('nuName', d.name); set('nuUsername', d.name); set('nuPhone', d.mobile); set('nuRole', 'salesman');
     try{ toggleNewUserScreensBox(); }catch(e){}
-    const pin = document.getElementById('nuPin'); if(pin){ pin.value = String(100000 + Math.floor(Math.random() * 899999)); pin.dataset.smHid = '1'; pin.style.display = 'none'; }
+    const pin = document.getElementById('nuPin'); if(pin){ pin.value = autoPin; pin.type = 'tel'; pin.setAttribute('inputmode', 'numeric'); pin.dataset.smHid = '1'; pin.style.fontFamily = 'Arial'; pin.style.fontSize = '22px'; pin.style.letterSpacing = '4px'; pin.style.textAlign = 'center'; }
     let note = document.getElementById('smJsNuNote');
     if(!note){ note = document.createElement('div'); note.id = 'smJsNuNote'; const nm = document.getElementById('nuName'); if(nm) nm.parentNode.insertBefore(note, nm); }
     note.style.cssText = 'background:#dbeafe;border-radius:10px;padding:6px 10px;margin-bottom:6px;font-weight:800;color:#1e3a8a;direction:rtl;' + K;
-    note.textContent = '🧑‍💼 کوڈ JS-' + code + ' سے — PIN ملازم نے خود بنایا ہے۔ صرف اسکرینوں پر ✓ لگا کر محفوظ کریں۔';
+    note.innerHTML = '🧑‍💼 کوڈ JS-' + code + ' سے — نام اور موبائل ملازم کے فون سے آ گئے' + (d.dev ? '<br><small>📱 فون کی پہچان: <span dir="ltr" style="font-family:Arial">' + esc(String(d.dev).slice(0, 14)) + '</span></small>' : '') + '<br>🔑 PIN خود بن گیا (چاہیں تو بدل دیں) — اسکرینوں پر ✓ لگا کر «محفوظ کریں»؛ ملازم کا فون خود جڑ جائے گا اور اسے یہی PIN نظر آئے گا۔';
   };
   const _snu = window.saveNewUser;
   window.saveNewUser = saveNewUser = async function(){
-    const cur = JSP; const tmp = cur ? (document.getElementById('nuPin') || {}).value : '';
+    const cur = JSP; const tmp = cur ? String((document.getElementById('nuPin') || {}).value || '').trim() : '';
     const before = usersData.length;
     await _snu.apply(this, arguments);
     if(!cur) return;
     const u = usersData.length > before ? usersData.find(x => x.pinPlain === tmp) : null;
     if(!u) return; // فارم میں کوئی کمی — مالک دوبارہ محفوظ کرے
-    JSP = null; u.pin = cur.d.pinH; u.pinPlain = ''; u.joinCode = cur.code;
+    JSP = null; u.joinCode = cur.code; u.joinDev = cur.d.dev || '';
     try{ saveToStorage('users', usersData); pushUsersToCloud(); }catch(e){}
     try{ renderUserList(); }catch(e){}
-    let j = null; try{ j = await smc({ op: 'set', code: cur.code, st: 'ok', res: { m: smShopMobile(), c: smShopCode(), plan: smPlan(), uname: u.username || u.name, shop: smBiz() } }); }catch(e){}
+    let j = null; try{ j = await smc({ op: 'set', code: cur.code, st: 'ok', res: { m: smShopMobile(), c: smShopCode(), plan: smPlan(), uname: u.username || u.name, shop: smBiz(), pin: u.pinPlain || '' } }); }catch(e){}
     if(j && j.ok){ toast('✅ ' + u.name + ' شامل — اب اس کا فون خود جڑ جائے گا'); ownerWatch(cur.code, u.name); const oi = document.getElementById('smJsOwnerIn'); if(oi) oi.value = ''; }
     else alert('⚠️ ملازم بن گیا مگر اس کے فون تک اطلاع نہیں گئی (انٹرنیٹ) — دوبارہ کوشش کے لیے وہی کوڈ پھر لکھیں۔');
   };
   const _cnu = window.closeNewUserModal;
   window.closeNewUserModal = closeNewUserModal = function(){
     const r = _cnu.apply(this, arguments);
-    const pin = document.getElementById('nuPin'); if(pin){ pin.style.display = ''; delete pin.dataset.smHid; }
+    const pin = document.getElementById('nuPin'); if(pin){ pin.style.display = ''; if(pin.dataset.smHid){ pin.type = 'password'; pin.style.fontFamily = pin.style.fontSize = pin.style.letterSpacing = pin.style.textAlign = ''; } delete pin.dataset.smHid; }
     const n = document.getElementById('smJsNuNote'); if(n) n.remove();
     const i = document.getElementById('smJsOwnerIn'); if(i && !JSP) i.value = '';
     return r;
@@ -57265,7 +57281,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const anchor = paste.parentNode; if(document.getElementById('smcDevBox')) return;
     const b = document.createElement('div'); b.id = 'smcDevBox'; b.setAttribute('dir', 'rtl');
     b.style.cssText = 'background:#ecfdf5;border:2px solid #16a34a;border-radius:12px;padding:8px;margin-bottom:8px;';
-    b.innerHTML = '<div style="font-weight:900;font-size:14px;color:#065f46;margin-bottom:5px">🔑 دکاندار کا کوڈ لکھیں (NB / SB)</div>'
+    b.innerHTML = '<div style="font-weight:900;font-size:14px;color:#065f46;margin-bottom:5px">🔑 پرانا کوڈ (NB / SB) — صرف پہلے سے آئی درخواستوں کے لیے؛ نئے پیکج ہیلپ ڈیسک «SM ID» سے</div>'
       + '<div style="display:flex;gap:6px"><input id="smcDevIn" type="tel" inputmode="numeric" dir="ltr" maxlength="9" placeholder="NB-______" style="flex:1;min-width:0;padding:7px;border:2px solid #16a34a;border-radius:8px;font-size:20px;text-align:center;font-family:Arial Black,Arial;letter-spacing:2px">'
       + '<button type="button" onclick="smcDevGo()" style="padding:6px 14px;border:none;border-radius:8px;background:#16a34a;color:#fff;font-weight:900;cursor:pointer">🔍 کھولیں</button></div>'
       + '<div id="smcDevCard"></div>'
@@ -57526,13 +57542,24 @@ window.addEventListener('DOMContentLoaded', () => {
     if(!st.smRegistered || (own && !isDevDevice())){ alert('یہ فون کسی دکان سے ملازم کے طور پر جڑا ہوا نہیں۔'); return; }
     const shop = st.businessName || 'دکان';
     const pend = Object.keys(st).filter(k => /PendingSync$/.test(k) && st[k]);
-    const ok1 = await uDialog({ title: '🚪 دکان سے الگ کریں', message: 'یہ فون «' + esc(shop) + '» سے الگ ہو جائے گا۔<br>• دکان کا اصل ریکارڈ کلاؤڈ میں محفوظ رہے گا (مالک کے پاس)<br>• اس فون سے اس دکان کی نقل ہٹ جائے گی<br>• پھر یہ فون نئی دکان یا دوسری دکان کے لیے خالی' + (pend.length ? '<br><br>⚠️ <b>اس فون کا کچھ کام ابھی کلاؤڈ پر نہیں گیا</b> — پہلے انٹرنیٹ چالو کر کے ایپ ایک دو منٹ کھلی رکھیں۔' : ''), okText: 'آگے', cancelText: '✖ نہیں', tone: 'red' });
+    const ok1 = await uDialog({ title: '🚪 دکان سے الگ کریں', message: 'یہ فون «' + esc(shop) + '» سے الگ ہو جائے گا۔<br>• <b>اس فون سے اس دکان کا سارا ڈیٹا صاف ہو جائے گا — آپ اس فون پر اس دکان کا کام نہیں کر سکیں گے</b><br>• دکان کا اصل ریکارڈ کلاؤڈ میں محفوظ رہے گا (مالک کے پاس)<br>• اس فون سے اس دکان کی نقل ہٹ جائے گی<br>• پھر یہ فون نئی دکان یا دوسری دکان کے لیے خالی' + (pend.length ? '<br><br>⚠️ <b>اس فون کا کچھ کام ابھی کلاؤڈ پر نہیں گیا</b> — پہلے انٹرنیٹ چالو کر کے ایپ ایک دو منٹ کھلی رکھیں۔' : ''), okText: 'آگے', cancelText: '✖ نہیں', tone: 'red' });
     if(!ok1) return;
     const ok2 = await uDialog({ title: '⚠️ پکا؟', message: '«' + esc(shop) + '» سے یہ فون الگ کرنا ہے؟', okText: '✅ ہاں، الگ کریں', cancelText: '✖ نہیں', tone: 'red' });
     if(!ok2) return;
-    // 🛡️ SM1611MO285: تیسری حفاظت — لفظ لکھ کر ہی (غلطی سے دو بار دبانے پر نہیں)
-    const w = prompt('آخری تصدیق: الگ کرنے کے لیے نیچے لفظ «الگ» لکھیں');
-    if(String(w || '').replace(/\s/g, '') !== 'الگ'){ alert('✖ الگ نہیں کیا — فون اسی دکان میں ہے۔'); return; }
+    // 🛡️ SM2611TH323 (مالک کا حکم): تیسری حفاظت — اسی فون (ملازم) کا PIN؛ PIN والا کوئی ملازم نہ ملے تو لفظ «الگ»
+    let myId = '', myNm = ''; try{ myId = localStorage.getItem('smMyStaffId') || ''; myNm = localStorage.getItem('smMyStaffName') || localStorage.getItem('smJoinUser') || ''; }catch(e){}
+    const cu = AppState.currentUser || {};
+    const me = (usersData || []).find(u => (myId && String(u.user_id) === myId) || (cu.user_id != null && String(u.user_id) === String(cu.user_id)) || (myNm && (u.name === myNm || u.username === myNm)));
+    const cand = me ? [me] : (usersData || []).filter(u => u.pin && u.role !== 'customer' && (own || u.role !== 'admin'));
+    if(cand.length){
+      const w = prompt('🔑 آخری تصدیق: ' + (me ? '«' + me.name + '» کا' : 'اس فون کا') + ' PIN لکھیں — PIN صحیح ہو گا تو ہی یہ فون دکان سے الگ ہو گا');
+      if(w == null){ alert('✖ الگ نہیں کیا — فون اسی دکان میں ہے۔'); return; }
+      const h = await hashPin(String(w).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).trim());
+      if(!cand.some(u => u.pin === h)){ alert('❌ PIN غلط ہے — فون الگ نہیں کیا گیا، اسی دکان میں ہے۔'); return; }
+    } else {
+      const w = prompt('آخری تصدیق: الگ کرنے کے لیے نیچے لفظ «الگ» لکھیں');
+      if(String(w || '').replace(/\s/g, '') !== 'الگ'){ alert('✖ الگ نہیں کیا — فون اسی دکان میں ہے۔'); return; }
+    }
     return smLeaveCore(st, own, shop, false);
   };
   async function smLeaveCore(st, own, shop, kicked){
