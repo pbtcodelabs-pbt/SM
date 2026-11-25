@@ -3,11 +3,9 @@
 # دستخط کی چابی صرف ریپو کے خفیہ خانے (SMWV_KEYSTORE / SMWV_PASS) میں — ریپو میں کبھی نہیں۔
 # نتیجہ: Release «sm-webview-apk» — ہمیشہ ایک ہی لنک سے تازہ APK
 name: build-webview-apk
+# 🟥 بند (مالک کا حکم، 25 نومبر 2026): اب APK صرف ایپ بلڈر (APP-BUILDER → SMWV) سے — چابی وہاں ایک بار پکی؛ یہ پرانا طریقہ (debug چابی) دوبارہ نہ چلائیں
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.wvapk/**', '.github/workflows/build-webview-apk.yml']
 permissions:
   contents: write
 concurrency:
