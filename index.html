@@ -10544,9 +10544,10 @@ function getDeveloperContact(){
 // 🆕 SM2710TU203: آرڈر کبھی خاموشی سے نہیں مٹے گا (صرف حذف شدہ یا 3 دن پرانا مکمل)؛ غائب آرڈر سیف الماری سے خود واپس؛ غائب ڈرافٹ پر 1 چیز والا نیا آرڈر نہیں
 // 🆕 SM2710TU204: ✏️ بنے ہوئے بل میں ترمیم (صرف ایڈمن): نئی چیز، تعداد/ریٹ/مزدوری، چیز ہٹانا — سٹاک، بقایا، کیش خود درست
 // 🆕 SM2810WE212: 🗄️ بڑی الماری — 20 ہزار حروف سے بڑا ڈیٹا localStorage کی بجائے IndexedDB میں (چھوٹے خانے میں صرف نشان)، ایپ کھلنے سے پہلے یادداشت میں؛ پرانا ڈیٹا خود منتقل
+// 🆕 SM2811SA327: ہیلپ ڈیسک #447 — منشی کا ڈالا مال بیچتے وقت ڈبل: کلاؤڈ لکھائی کا جواب گم ہونے پر بنیاد غلط رہتی تھی؛ اب ہر لکھائی کا شناختی نمبر (widLog) اور اگلی بار تصدیق
 // 🆕 SM2511WE319: ہیلپ ڈیسک #403 — نئی رجسٹریشن کے فوراً بعد اور انٹرنیٹ لوٹتے ہی ٹرائل کا موبائل نمبر والا سرور چیک (پہلے 3 گھنٹے تک انتظار ہوتا تھا)
-const APP_BUILD_VERSION = 'SM2611TH326'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
-const UPDATE_NOTE = '⏻ لاگ آؤٹ اب گول سرخ پاور بٹن سے — پہلے «Logout / Yes / Cancel» پوچھتا ہے (سب ایپس میں ایک جیسا)';
+const APP_BUILD_VERSION = 'SM2811SA327'; // 🔢 آخر میں #نمبر = اب تک کے کل ورژن (ہر نئے ورژن پر ایک بڑھے گا)
+const UPDATE_NOTE = '🐞 منشی کا نیا مال ایڈمن کو بھیجنے کے بعد بیچتے وقت ڈبل ہو جانے کا مسئلہ ٹھیک — لکھائی کا جواب گم ہو تو اب وہی مال دوبارہ نہیں جڑتا';
 
 // ---------- ⏱️ ہدایت (4 ستمبر): جب بھی نیا ورژن لوڈ ہو، اوپر چلنے والی مووِنگ پٹی (marquee) کے
 // اندر یہ بتانا ہے کہ تازہ ترین ورژن کتنے منٹ پہلے لوڈ ہوا — یہ نیچے والے "اپڈیٹ دستیاب ہے" ڈبے سے بالکل
@@ -44085,6 +44086,22 @@ function _reattachLocalImages(merged, local){
 }
 
 let _prodPushAgain = false; // 🐞 FM510MO317
+/* 🐞 SM2811SA327 (ہیلپ ڈیسک #447 «منشی کا مال ڈبل»): لکھائی کا جواب راستے میں گم ہو جائے (فون ایپ بدلے / نیٹ ٹوٹے) مگر
+   کلاؤڈ پر لکھائی ہو چکی ہو تو بنیاد (base) پرانی رہ جاتی تھی — اگلے ملاپ میں وہی نیا مال کلاؤڈ سے بھی اور اس فون سے بھی جڑ جاتا (ڈبل)۔
+   اب ہر لکھائی کا ایک شناختی نمبر (wid) کلاؤڈ کے widLog میں بھی جاتا ہے اور فون میں بھی یاد رہتا ہے؛ اگلی بار کلاؤڈ میں وہ نمبر ملے
+   تو بنیاد وہی بھیجی ہوئی فہرست بن جاتی ہے، ورنہ پرانی بنیاد ہی رہتی ہے */
+let _prodPW = null;
+function _pwLoad(){ if(_prodPW) return _prodPW; try{ _prodPW = loadFromStorage('productsPendingWrite', null); }catch(e){ _prodPW = null; } return _prodPW; }
+function _pwSave(pw){ _prodPW = pw; try{ saveToStorage('productsPendingWrite', pw); }catch(e){} }
+function _pwClear(){ _prodPW = null; try{ saveToStorage('productsPendingWrite', null); }catch(e){} }
+function _pwResolve(doc){
+  try{
+    const pw = _pwLoad(); if(!pw || !pw.wid) return;
+    let log = []; try{ log = JSON.parse(doc && doc.fields && doc.fields.widLog && doc.fields.widLog.stringValue || '[]') || []; }catch(e){}
+    if(log.indexOf(pw.wid) !== -1 && Array.isArray(pw.sent)){ _syncSetBase(pw.sent); console.warn('🐞 SM2811SA327: پچھلی لکھائی کلاؤڈ پر لگ چکی تھی — بنیاد درست کی'); }
+  }catch(e){}
+  _pwClear();
+}
 function pushProductsToCloud(){ return _sqRun('prod', 'prod:push', _pushProductsRaw); } // 🔒 SM0111SU226: ایک وقت میں ایک
 async function _pushProductsRaw(){
   saveProductsLight(); // آف لائن فال بیک ہمیشہ پہلے محفوظ کریں (تصویریں الگ IndexedDB میں)
@@ -44098,11 +44115,13 @@ async function _pushProductsRaw(){
     // ---------- 🔗 26 ستمبر: پہلے کلاؤڈ کی تازہ کاپی، پھر تین طرفہ ملاپ، پھر لکھائی — اور لکھائی صرف تب جب
     // اس دوران کسی اور فون نے نہ لکھا ہو (updateTime شرط)؛ لکھا ہو تو دوبارہ ملاپ کر کے کوشش (3 بار تک) ---------- -->
     for(let attempt = 0; attempt < 3 && !ok; attempt++){
-      let updateTime = null, remoteManualStr = null, remoteLocked = null;
+      let updateTime = null, remoteManualStr = null, remoteLocked = null, remoteWidLog = [];
       const peek = await authFirestoreFetch(`${PRODUCTS_DOC_PATH}?key=${FIREBASE_API_KEY}`, { cache: 'no-store' });
       if(peek && peek.ok){
         const pdoc = await peek.json();
         _dgMergeRemote('products', pdoc); // 🛡️ FM610TU320
+        _pwResolve(pdoc); // 🐞 SM2811SA327
+        try{ remoteWidLog = JSON.parse(pdoc.fields?.widLog?.stringValue || '[]') || []; }catch(e){ remoteWidLog = []; }
         updateTime = pdoc.updateTime || null;
         remoteManualStr = pdoc.fields?.manualOrder?.stringValue ?? null;
         remoteLocked = (typeof pdoc.fields?.serialLocked?.booleanValue === 'boolean') ? pdoc.fields.serialLocked.booleanValue : null;
@@ -44127,7 +44146,10 @@ async function _pushProductsRaw(){
       // 🐞 FM510MO317 (مالک: آلو/پیاز/پالک/دھنیا/ساگ میں 10-10 "بھوت" سٹاک): جو فہرست کلاؤڈ پر جا رہی ہے اس کی اسی لمحے کی
       // کاپی — لکھائی کے انتظار (نیٹ ورک) کے دوران بننے والا نیا بل اب "پہلے سے بھیجا ہوا" نہیں سمجھا جائے گا
       const sentProductsJson = JSON.stringify(productsData);
-      const res = await authFirestoreFetch(`${PRODUCTS_DOC_PATH}?key=${FIREBASE_API_KEY}${pre}`, {
+      const _wid = Date.now() + '-' + Math.random().toString(36).slice(2, 8); // 🐞 SM2811SA327
+      _pwSave({ wid: _wid, at: Date.now(), sent: stripImagesForSync(JSON.parse(sentProductsJson)) });
+      let res = null;
+      try{ res = await authFirestoreFetch(`${PRODUCTS_DOC_PATH}?key=${FIREBASE_API_KEY}${pre}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -44140,10 +44162,12 @@ async function _pushProductsRaw(){
             // اپنی پرانی (مقامی) ترتیب کبھی کلاؤڈ پر نہیں بھیجے گا، کلاؤڈ والی ہی جوں کی توں واپس لکھے گا
             manualOrder: { stringValue: (AppState.currentRole !== 'admin' && remoteManualStr !== null) ? remoteManualStr : JSON.stringify(manualOrderForCloud) },
             serialLocked: { booleanValue: (AppState.currentRole !== 'admin' && remoteLocked !== null) ? remoteLocked : !!PRODUCT_SERIAL_LOCKED },
-            delGuard: _dgField('products') // 🛡️ FM610TU320
+            delGuard: _dgField('products'), // 🛡️ FM610TU320
+            widLog: { stringValue: JSON.stringify(remoteWidLog.concat([_wid]).slice(-30)) } // 🐞 SM2811SA327
           }
         })
-      });
+      }); }catch(e){ throw e; } // 🐞 SM2811SA327: نیٹ ٹوٹے تو _pw باقی رہتا ہے (لکھائی لگی یا نہیں — اگلی بار کلاؤڈ دیکھ کر پتا چلے گا)
+      if(res && (res.ok || res.status === 400 || res.status === 409 || res.status === 412)) _pwClear(); // واضح جواب — لکھائی لگی یا صاف نہیں لگی
       ok = !!(res && res.ok);
       if(ok){
         // 🐞 FM510MO317: بنیاد = بالکل وہی جو کلاؤڈ پر لکھا گیا (پہلے یہ فون کی ابھی کی فہرست تھی — اگر بھیجنے کے دوران
@@ -44188,6 +44212,7 @@ async function _fetchProductsRaw(silent){
     // مشترکہ تازہ ترین حالت ہے)، اور جو آئٹم صرف مقامی طور پر موجود ہیں (ابھی کلاؤڈ پر نہیں گئے) وہ آخر میں
     // شامل کر دیے جاتے ہیں — کسی کا ڈیٹا یا سیریل نمبر گم نہیں ہوگا ---------- -->
     _dgMergeRemote('products', doc); // 🛡️ FM610TU320
+    _pwResolve(doc); // 🐞 SM2811SA327
     const mergedNow = _dgFilter('products', _reattachLocalImages(mergeProductsThreeWay(productsSyncBase, productsData, cloudProducts), productsData));
     const hadLocalChanges = !_syncEq(stripImagesForSync(mergedNow), stripImagesForSync(cloudProducts));
     productsData = mergedNow;
